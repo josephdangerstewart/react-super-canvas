@@ -11,6 +11,12 @@ export default class PainterAPI implements IPainterAPI {
 	private scale: number;
 	private context2d: CanvasRenderingContext2D;
 
+	constructor(context2d: CanvasRenderingContext2D, panOffset: Vector2D, scale: number) {
+		this.context2d = context2d;
+		this.panOffset = panOffset;
+		this.scale = scale;
+	}
+
 	/* INTERFACE METHODS */
 
 	setPan = (pan: Vector2D): void => {
