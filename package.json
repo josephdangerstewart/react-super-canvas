@@ -1,0 +1,52 @@
+{
+	"name": "react-super-canvas",
+	"version": "0.0.1",
+	"description": "An API for creating powerful canvas based editors",
+	"main": "index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"docz:dev": "docz dev",
+		"docz:build": "docz build",
+		"lint": "eslint . --ext .js,.jsx,.ts,.tsx"
+	},
+	"keywords": [
+		"canvas",
+		"react",
+		"painting",
+		"map",
+		"maker"
+	],
+	"author": "Joseph Stewart",
+	"license": "ISC",
+	"dependencies": {
+		"@babel/preset-env": "^7.6.3",
+		"@babel/preset-react": "^7.6.3",
+		"babel-loader": "^8.0.6",
+		"docz": "^2.0.0-rc.57",
+		"prop-types": "^15.7.2",
+		"prop-types-ts": "^0.6.2",
+		"react": "^16.10.2",
+		"react-dom": "^16.10.2"
+	},
+	"devDependencies": {
+		"@types/react": "^16.9.9",
+		"@types/react-dom": "^16.9.2",
+		"@typescript-eslint/eslint-plugin": "^2.4.0",
+		"@typescript-eslint/parser": "^2.4.0",
+		"eslint": "^6.5.1",
+		"eslint-config-airbnb": "^18.0.1",
+		"eslint-config-prettier": "^6.4.0",
+		"eslint-import-resolver-typescript": "^2.0.0",
+		"eslint-plugin-import": "^2.18.2",
+		"eslint-plugin-json": "^1.4.0",
+		"eslint-plugin-jsx-a11y": "^6.2.3",
+		"eslint-plugin-prettier": "^3.1.1",
+		"eslint-plugin-react": "^7.16.0",
+		"prettier": "^1.18.2",
+		"source-map-loader": "^0.2.4",
+		"sourcemap-codec": "^1.4.6",
+		"ts-loader": "^6.2.0",
+		"typescript": "^3.6.4",
+		"webpack": "^4.41.2"
+	}
+}
