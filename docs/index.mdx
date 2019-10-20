@@ -8,10 +8,38 @@ order: 1
 
 Welcome!
 
-React super canvas is an API for creating power, declarative, canvas based visual graphics editors. This is useful for creating diagrams editors, map makers, graph editors and so forth. This project was originally made to power the map making tool in my other project [Campaign Buddy](http://app.dndcampaignbuddy.com). I decided to open source this as I saw more potential than just creating dungeon maps.
+React super canvas is an API for creating power, declarative, canvas based visual graphics editors. This is useful for creating diagrams editors, map makers, graph editors and so forth. This project was originally made to power the map making tool in my other project [Campaign Buddy](http://app.dndcampaignbuddy.com). I decided to open source this as I saw more potential than just creating dungeon maps. This project uses [semantic versioning](https://semver.org/) to track versions.
 
 ## Project goals
 
 1. **Simplicity of implementation** - It should be easy to use right out of the box with little configuration. It should not be much more complicated than using a text input component.
 2. **Simplicity of use** - End users should be able to use the SuperCanvas to create graphical canvas based creations (maps, graphs, diagrams, etc) without needing to read any documentation. It *feel natural* to use.
 3. **Customizability** - Developers should be able to extend the editor to create a graphical canvas based editor that suits any need (map creation, photo editing, diagraming, etc).
+
+## Concepts
+
+The following important concepts will form the foundation of the SuperCanvas component and API.
+
+### SuperCanvas
+
+The SuperCanvas is the editing environment built on top of the HTML5 canvas. Essentially, it is a collection of [canvas items](#canvas-items) in a virtual space with tools to manipulate and add to that collection. The SuperCanvas handles all interactions with the virtual environment itself. This includes
+
+1. Panning
+2. Zooming
+3. Grid control
+	1. Whether a grid is enabled
+	2. The spacing of the grid
+	3. The style of grid lines
+4. UI controls
+	1. Brush selection/configuration
+	2. Save/exit buttons
+5. Hotkeys
+6. Selecting canvas items
+
+### Canvas Items
+
+Canvas items are the visual objects that are drawn on the [SuperCanvas](#supercanvas). The objects in the collection can be anything, simple geometric shapes, images, text, anything that can be displayed visually. They can be more abstract (e.g. a location pin) or more low level (i.e. a circle). They exist on the SuperCanvas in layers. Canvas items always exist on top of each other. By default they are sorted in the order that they are added to the canvas. If I draw a circle, a square, and a triangle, the circle will be at the bottom then the square and then the triangle. The SuperCanvas stores the instances of the canvas items that are in the editor, but each canvas item maintains it's own state internally. It also implements it's own methods for rendering based on it's editor state (selected or unselected) as well as other methods required for interacting with the item in the space.
+
+### Brushes
+
+Brushes are used to "paint" canvas items to the SuperCanvas. They can be configured through the SuperCanvas UI but define their own parameters and, like canvas items, maintain their own state. They also implement methods for rendering previews of the canvas item based on certain events.
