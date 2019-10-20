@@ -7,9 +7,9 @@ import fillDefaults from '../utility/fill-defaults';
 import { getCanvasRect, lineCollidesWithRect } from '../utility/shapes-util';
 
 export default class PainterAPI implements IPainterAPI {
-	panOffset: Vector2D;
-	scale: number;
-	context2d: CanvasRenderingContext2D;
+	private panOffset: Vector2D;
+	private scale: number;
+	private context2d: CanvasRenderingContext2D;
 
 	/* INTERFACE METHODS */
 
