@@ -1,0 +1,20 @@
+---
+name: The Painter API
+menu: 3. The API
+route: /painterapi
+---
+
+# The Painter API
+
+The painter api is an API for virtually rendering things absolutely to the HTML5 canvas element
+
+## Methods
+
+1. `setPan(pan: Vector2D) => void` - Sets the pan (used by [SuperCanvasApi](/supercanvasapi))
+2. `setScale(scale: number) => void` - Sets the scale (used by [SuperCanvasApi](/supercanvasapi))
+3. `setContext2D(context: CanvasRenderingContext2D) => void` - Sets the canvas render (used by [SuperCanvasApi](/supercanvasapi))
+4. `clearCanvas(canvasSize: Vector2D) => void` - Clears all drawn elements on the canvas (used by [SuperCanvasApi](/supercanvasapi))
+5. `drawLine(line: Line) => void` - Draws a line in the virtual canvas space
+6. `drawImage(topLeftCorner: Vector2D, imageUrl: string) => void` - Draws an image in the virtual canvas space
+7. `drawRect(rect: Rectangle) => void` - Draws a rectangle in the virtual canvas space
+8. `drawCircle(circle: Circle) => void` - Draws a circle in the virtual space

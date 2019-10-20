@@ -1,5 +1,5 @@
 import SuperCanvas from './components/SuperCanvas';
 
-export {
+export default {
 	SuperCanvas,
 };

@@ -23,5 +23,7 @@ module.exports = {
 		'react/jsx-indent': [2, 'tab'],
 		'react/jsx-indent-props': [2, 'tab'],
 		'@typescript-eslint/no-unused-vars': 'error',
+		'@typescript-eslint/interface-name-prefix': 'off',
+		'max-len': 'off',
 	},
 };
