@@ -17,7 +17,7 @@ export default interface IPainterAPI {
 	/**
 	 * @description Clears all drawn elements on the canvas (used by [SuperCanvasApi](/supercanvasapi))
 	 */
-	clearCanvas: (canvasSize: Vector2D) => void;
+	clearCanvas: () => void;
 
 	/**
 	 * @description Sets the canvas render (used by [SuperCanvasApi](/supercanvasapi))

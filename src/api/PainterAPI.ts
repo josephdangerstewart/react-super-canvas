@@ -27,8 +27,8 @@ export default class PainterAPI implements IPainterAPI {
 		this.scale = scale;
 	};
 
-	clearCanvas = (canvasSize: Vector2D): void => {
-		this.context2d.clearRect(0, 0, canvasSize.x, canvasSize.y);
+	clearCanvas = (): void => {
+		this.context2d.clearRect(0, 0, this.context2d.canvas.width, this.context2d.canvas.height);
 	};
 
 	setContext2D = (context: CanvasRenderingContext2D): void => {
