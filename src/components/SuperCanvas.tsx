@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import ISuperCanvasManager from '../types/ISuperCanvasManager';
 import SuperCanvasManager from '../api/SuperCanvasManager';
+import DefaultBackgroundElement from '../api/background-elements/DefaultBackgroundElement';
 
 export interface SuperCanvasProps {
 	/**
@@ -9,8 +10,8 @@ export interface SuperCanvasProps {
 	height: number;
 }
 
-// eslint-disable-next-line
 let superCanvasManager: ISuperCanvasManager;
+const background = new DefaultBackgroundElement();
 
 export default ({ height }: SuperCanvasProps): React.ReactNode => {
 	const canvasRef = useRef(null);
@@ -19,6 +20,7 @@ export default ({ height }: SuperCanvasProps): React.ReactNode => {
 		if (canvasRef.current && !superCanvasManager) {
 			superCanvasManager = new SuperCanvasManager();
 			superCanvasManager.init(canvasRef.current);
+			superCanvasManager.setActiveBackgroundElement(background);
 		}
 	}, []);
 
