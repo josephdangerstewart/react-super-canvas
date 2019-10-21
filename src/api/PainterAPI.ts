@@ -2,13 +2,14 @@ import IPainterAPI from '../types/IPainterAPI';
 import Vector2D from '../types/utility/Vector2D';
 import Line, { LineDefaults } from '../types/shapes/Line';
 import Rectangle, { RectangleDefaults } from '../types/shapes/Rectangle';
-import Circle from '../types/shapes/Circle';
+import Circle, { CircleDefaults } from '../types/shapes/Circle';
 import fillDefaults from '../utility/fill-defaults';
 import {
 	getCanvasRect,
 	lineCollidesWithRect,
 	vector,
 	rectCollidesWithRect,
+	circleCollidesWithRect,
 } from '../utility/shapes-util';
 
 export default class PainterAPI implements IPainterAPI {
@@ -97,8 +98,27 @@ export default class PainterAPI implements IPainterAPI {
 		}
 	};
 
-	drawCircle = (circle: Circle): void => {
-		console.log(circle);
+	drawCircle = (circleParam: Circle): void => {
+		const circle = fillDefaults(circleParam, CircleDefaults);
+
+		const { x, y } = this.toAbsolutePoint(circle.center);
+		const { radius } = circle;
+		const canvasRect = getCanvasRect(this.context2d);
+
+		if (circleCollidesWithRect(circle, canvasRect)) {
+			this.context2d.beginPath();
+			this.context2d.arc(x, y, radius * this.scale, 0, Math.PI * 2);
+
+			this.context2d.strokeStyle = circle.strokeColor;
+			this.context2d.lineWidth = circle.strokeWeight;
+
+			if (circle.fillColor) {
+				this.context2d.fillStyle = circle.fillColor;
+				this.context2d.fill();
+			}
+
+			this.context2d.stroke();
+		}
 	};
 
 	/* UTILITY METHODS */

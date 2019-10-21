@@ -1,7 +1,12 @@
 import Line from '../types/shapes/Line';
 import Rectangle from '../types/shapes/Rectangle';
 import Vector2D from '../types/utility/Vector2D';
+import Circle from '../types/shapes/Circle';
 
+/**
+ * @description Converts a rectangle to a series of points (topLeft, topRight, bottomLeft, bottomRight)
+ * @param rect The rectangle to convert
+ */
 export function rectToPoints(rect: Rectangle): Vector2D[] {
 	const { x, y } = rect.topLeftCorner;
 	const { width, height } = rect;
@@ -34,6 +39,21 @@ export function rectToPoints(rect: Rectangle): Vector2D[] {
 	];
 }
 
+/**
+ * @description Converts a line into an array of it's two points
+ * @param line
+ */
+export function lineToPoints(line: Line): Vector2D[] {
+	return [
+		line.point1,
+		line.point2,
+	];
+}
+
+/**
+ * @description Converts a rectangle to a series of lines (top, right, bottom, left)
+ * @param rect The rectangle to convert
+ */
 export function rectToLines(rect: Rectangle): Line[] {
 	const [ topLeft, topRight, bottomLeft, bottomRight ] = rectToPoints(rect);
 
@@ -45,6 +65,11 @@ export function rectToLines(rect: Rectangle): Line[] {
 	];
 }
 
+/**
+ * @description Returns true if there is an intersection between two lines
+ * @param line1 The first line
+ * @param line2 The second line
+ */
 export function lineCollidesWithLine(line1: Line, line2: Line): boolean {
 	const { x: x1, y: y1 } = line1.point1;
 	const { x: x2, y: y2 } = line1.point2;
@@ -57,6 +82,11 @@ export function lineCollidesWithLine(line1: Line, line2: Line): boolean {
 	return uA >= 0 && uA <= 1 && uB >= 0 && uB <= 1;
 }
 
+/**
+ * @description Returns true if a given point lies within a given rectangle
+ * @param point The point
+ * @param rect The rectangle
+ */
 export function pointInsideRect(point: Vector2D, rect: Rectangle): boolean {
 	const { x, y } = point;
 	const { x: topLeftX, y: topLeftY } = rect.topLeftCorner;
@@ -65,16 +95,30 @@ export function pointInsideRect(point: Vector2D, rect: Rectangle): boolean {
 	return x >= topLeftX && x <= topLeftX + width && y >= topLeftY && y <= topLeftY + height;
 }
 
+/**
+ * @description Returns true if a line intersects a rectangle or if the line is completely inside the rectangle
+ * @param line The line
+ * @param rect The rectangle
+ */
 export function lineCollidesWithRect(line: Line, rect: Rectangle): boolean {
 	return rectToLines(rect).some((rectLine) => lineCollidesWithLine(rectLine, line)) || (
 		pointInsideRect(line.point1, rect) && pointInsideRect(line.point2, rect)
 	);
 }
 
+/**
+ * @description Shorthand way to create Vector2D objects
+ * @param x
+ * @param y
+ */
 export function vector(x: number, y: number): Vector2D {
 	return { x, y };
 }
 
+/**
+ * @description Returns a rectangle representing the size of the given canvas element
+ * @param context2d
+ */
 export function getCanvasRect(context2d: CanvasRenderingContext2D): Rectangle {
 	return {
 		topLeftCorner: vector(0, 0),
@@ -83,6 +127,12 @@ export function getCanvasRect(context2d: CanvasRenderingContext2D): Rectangle {
 	};
 }
 
+/**
+ * @description Returns true if there is an intersection between two rectangles or if one of the rectangles
+ * is inside the other
+ * @param rect1 The first rectangle
+ * @param rect2 The second rectangle
+ */
 export function rectCollidesWithRect(rect1: Rectangle, rect2: Rectangle): boolean {
 	const linesRect1 = rectToLines(rect1);
 	const linesRect2 = rectToLines(rect2);
@@ -95,4 +145,55 @@ export function rectCollidesWithRect(rect1: Rectangle, rect2: Rectangle): boolea
 	const rect2InsideRect1 = pointsRect2.every((point) => pointInsideRect(point, rect1));
 
 	return hasIntersections || rect1InsideRect2 || rect2InsideRect1;
+}
+
+/**
+ * @description Returns true if a point is inside a circle
+ * @param point
+ * @param circle
+ */
+export function pointInsideCircle(point: Vector2D, circle: Circle): boolean {
+	const { x: x1, y: y1 } = point;
+	const { x: x2, y: y2 } = circle.center;
+	const { radius: r } = circle;
+
+	const d = (x1 - x2) ** 2 + (y1 - y2) ** 2;
+	return d ** 2 <= r ** 2;
+}
+
+/**
+ * @description Returns true if a lines intersects a circle or if the line is completely inside the circle
+ * @param circle
+ * @param line
+ */
+export function circleCollidesWithLine(circle: Circle, line: Line): boolean {
+	if (lineToPoints(line).some((point) => pointInsideCircle(point, circle))) {
+		return true;
+	}
+
+	const { x: x1, y: y1 } = line.point1;
+	const { x: x2, y: y2 } = line.point2;
+	const { radius: r } = circle;
+
+	const dx = x2 - x1;
+	const dy = y2 - y1;
+	const dr = Math.sqrt(dx ** 2 + dy ** 2);
+	const D = x1 * y2 - x2 * y1;
+
+	return ((r ** 2) * (dr ** 2) - (D ** 2)) >= 0;
+}
+
+/**
+ * @description Returns true if a circle intersects a rectangle or if one is completely inside the other
+ * @param circle
+ * @param rect
+ */
+export function circleCollidesWithRect(circle: Circle, rect: Rectangle): boolean {
+	const circleInsideRectangle = pointInsideRect(circle.center, rect);
+
+	if (circleInsideRectangle) {
+		return true;
+	}
+
+	return rectToLines(rect).some((line) => circleCollidesWithLine(circle, line)) || rectToPoints(rect).every((point) => pointInsideCircle(point, circle));
 }
