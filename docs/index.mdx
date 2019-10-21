@@ -22,14 +22,10 @@ The following important concepts will form the foundation of the SuperCanvas com
 
 ### SuperCanvas
 
-The SuperCanvas is the editing environment built on top of the HTML5 canvas. Essentially, it is a collection of [canvas items](#canvas-items) in a virtual space with tools to manipulate and add to that collection. The SuperCanvas handles all interactions with the virtual environment itself. This includes
+The SuperCanvas is the editing environment built on top of the HTML5 canvas. Essentially, it is a collection of [canvas items](#canvas-items) in a virtual space with tools to manipulate and add to that collection. The SuperCanvas handles all interactions with the virtual environment itself except for snap control (which is delegated to the [canvas background element](#canvas-background-element)). This includes
 
 1. Panning
 2. Zooming
-3. Grid control
-	1. Whether a grid is enabled
-	2. The spacing of the grid
-	3. The style of grid lines
 4. UI controls
 	1. Brush selection/configuration
 	2. Save/exit buttons
@@ -43,3 +39,7 @@ Canvas items are the visual objects that are drawn on the [SuperCanvas](#superca
 ### Brushes
 
 Brushes are used to "paint" canvas items to the SuperCanvas. They can be configured through the SuperCanvas UI but define their own parameters and, like canvas items, maintain their own state. They also implement methods for rendering previews of the canvas item based on certain events.
+
+### Canvas Background Element
+
+The canvas background element is a special kind of element that enforces snap rules and renders background content (e.g. grid lines). In concept, it is similar to a [canvas item](#canvas-items) in that it has a position on the canvas (usually 0,0) and manages what it renders. The canvas background element is different in that it is responsible for enforcing cursor snapping. This means that the canvas will use the current background element to map the virtual position of the cursor (i.e. transformed to account for panning and zooming) to it's snapped position. This mapped cursor position is then passed to the active brush as the users mouse position. This logic is abstracted to it's own component (and not managed by the SuperCanvas) for customizability. If a user wanted to create a timeline for example, where the cursor position is snapped across a horizontal line then they could without worrying about the implementation of the super canvas.
