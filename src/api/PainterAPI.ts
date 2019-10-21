@@ -11,12 +11,13 @@ import {
 	rectCollidesWithRect,
 	circleCollidesWithRect,
 } from '../utility/shapes-util';
+import CachedImage from '../types/utility/CachedImage';
 
 export default class PainterAPI implements IPainterAPI {
 	private panOffset: Vector2D;
 	private scale: number;
 	private context2d: CanvasRenderingContext2D;
-	private imageCache: Record<string, HTMLImageElement>;
+	private imageCache: Record<string, CachedImage>;
 
 	constructor(context2d: CanvasRenderingContext2D, panOffset: Vector2D, scale: number) {
 		this.context2d = context2d;
@@ -61,7 +62,8 @@ export default class PainterAPI implements IPainterAPI {
 	};
 
 	drawImage = (topLeftCorner: Vector2D, imageUrl: string): void => {
-		const image = this.imageCache[imageUrl] || new Image();
+		const cachedImage = this.imageCache[imageUrl];
+		const image = cachedImage ? cachedImage.image : new Image();
 
 		if (!image.complete) {
 			image.onload = (): void => {
@@ -71,10 +73,24 @@ export default class PainterAPI implements IPainterAPI {
 			this.doDrawImage(topLeftCorner, image);
 		}
 
-		if (!this.imageCache[imageUrl]) {
+		if (!cachedImage) {
 			image.src = imageUrl;
-			this.imageCache[imageUrl] = image;
+			this.imageCache[imageUrl] = {
+				image,
+				lastAccessed: new Date(),
+			};
+		} else {
+			this.imageCache[imageUrl].lastAccessed = new Date();
 		}
+	};
+
+	cleanImageCache = (timeout: number): void => {
+		const now = new Date();
+		Object.keys(this.imageCache).forEach((key) => {
+			if (+now - +this.imageCache[key].lastAccessed > timeout) {
+				this.imageCache[key] = null;
+			}
+		});
 	};
 
 	drawRect = (rectParam: Rectangle): void => {

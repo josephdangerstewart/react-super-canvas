@@ -25,6 +25,11 @@ export default interface IPainterAPI {
 	setContext2D: (context: CanvasRenderingContext2D) => void;
 
 	/**
+	 * @description Removes any image in the cache that haven't been used in *timeout* milliseconds
+	 */
+	cleanImageCache: (timeout: number) => void;
+
+	/**
 	 * @description Draws a line in the virtual space
 	 */
 	drawLine: (line: Line) => void;
