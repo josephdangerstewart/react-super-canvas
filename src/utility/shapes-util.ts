@@ -2,7 +2,7 @@ import Line from '../types/shapes/Line';
 import Rectangle from '../types/shapes/Rectangle';
 import Vector2D from '../types/utility/Vector2D';
 
-export function rectToLines(rect: Rectangle): Line[] {
+export function rectToPoints(rect: Rectangle): Vector2D[] {
 	const { x, y } = rect.topLeftCorner;
 	const { width, height } = rect;
 
@@ -25,6 +25,17 @@ export function rectToLines(rect: Rectangle): Line[] {
 		x: x + width,
 		y: y + height,
 	};
+
+	return [
+		topLeft,
+		topRight,
+		bottomLeft,
+		bottomRight,
+	];
+}
+
+export function rectToLines(rect: Rectangle): Line[] {
+	const [ topLeft, topRight, bottomLeft, bottomRight ] = rectToPoints(rect);
 
 	return [
 		{ point1: topLeft, point2: topRight },
@@ -70,4 +81,18 @@ export function getCanvasRect(context2d: CanvasRenderingContext2D): Rectangle {
 		width: context2d.canvas.width,
 		height: context2d.canvas.height,
 	};
+}
+
+export function rectCollidesWithRect(rect1: Rectangle, rect2: Rectangle): boolean {
+	const linesRect1 = rectToLines(rect1);
+	const linesRect2 = rectToLines(rect2);
+
+	const pointsRect1 = rectToPoints(rect1);
+	const pointsRect2 = rectToPoints(rect2);
+
+	const hasIntersections = linesRect1.some((line1) => linesRect2.some((line2) => lineCollidesWithLine(line1, line2)));
+	const rect1InsideRect2 = pointsRect1.every((point) => pointInsideRect(point, rect2));
+	const rect2InsideRect1 = pointsRect2.every((point) => pointInsideRect(point, rect1));
+
+	return hasIntersections || rect1InsideRect2 || rect2InsideRect1;
 }
