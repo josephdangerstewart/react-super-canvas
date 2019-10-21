@@ -78,7 +78,23 @@ export default class PainterAPI implements IPainterAPI {
 
 	drawRect = (rectParam: Rectangle): void => {
 		const rect = fillDefaults(rectParam, RectangleDefaults);
-		console.log(rect);
+
+		const { x, y } = this.toAbsolutePoint(rect.topLeftCorner);
+		const { width, height } = rect;
+		const canvasRect = getCanvasRect(this.context2d);
+
+		if (rectCollidesWithRect(rect, canvasRect)) {
+			this.context2d.rect(x, y, width * this.scale, height * this.scale);
+			this.context2d.strokeStyle = rect.strokeColor;
+			this.context2d.lineWidth = rect.strokeWeight;
+
+			if (rect.fillColor) {
+				this.context2d.fillStyle = rect.fillColor;
+				this.context2d.fill();
+			}
+
+			this.context2d.stroke();
+		}
 	};
 
 	drawCircle = (circle: Circle): void => {

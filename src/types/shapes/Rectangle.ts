@@ -26,7 +26,7 @@ export default interface Rectangle {
 	 * @description The thickness of the stroke
 	 * @default 1.0
 	 */
-	strokeWidth?: number;
+	strokeWeight?: number;
 
 	/**
 	 * @description The color of the fill (unfilled if null)
@@ -37,6 +37,6 @@ export default interface Rectangle {
 
 export const RectangleDefaults: object = {
 	strokeColor: 'black',
-	strokeWidth: 1.0,
+	strokeWeight: 1.0,
 	fillColor: null,
 };
