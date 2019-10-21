@@ -6,5 +6,6 @@
         "target": "es6",
 		"jsx": "react",
 		"rootDir": ".",
+		"esModuleInterop": true,
     }
 }
