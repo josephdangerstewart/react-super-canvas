@@ -1,5 +1,5 @@
 import IPainterAPI from './IPainterAPI';
-import CanvasItemMetadata from './utility/CanvasItemMetadata';
+import CanvasItemContext from './utility/CanvasItemContext';
 
 export default interface ICanvasItem {
 	/**
@@ -8,5 +8,5 @@ export default interface ICanvasItem {
 	 * @param painter The painter api used for drawing in the virtual space
 	 * @param metadata Useful context about the instance being rendered (e.g. whether or not it is selected)
 	 */
-	render: (painter: IPainterAPI, metadata: CanvasItemMetadata) => void;
+	render: (painter: IPainterAPI, metadata: CanvasItemContext) => void;
 }

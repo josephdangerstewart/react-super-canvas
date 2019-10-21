@@ -4,9 +4,14 @@ import IBrush from './IBrush';
 
 export default interface ISuperCanvasManager {
 	/**
-	 * @description Initializes the super canvas manager with the canvas element
+	 * @description Initializes the super canvas manager with the canvas element and begins the update loop
 	 */
 	init: (canvas: HTMLCanvasElement) => void;
+
+	/**
+	 * @description Stops the update loop and cleans up the canvas
+	 */
+	destroy: () => void;
 
 	/**
 	 * @description Sets the active canvas items (useful for a controlled version of the editor)

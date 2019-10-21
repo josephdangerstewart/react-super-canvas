@@ -6,6 +6,7 @@ import { vector } from '../utility/shapes-util';
 import ICanvasItem from '../types/ICanvasItem';
 import IBrush from '../types/IBrush';
 import IBackgroundElement from '../types/IBackgroundElement';
+import CanvasItemContext from '../types/utility/CanvasItemContext';
 
 export default class SuperCanvasManager implements ISuperCanvasManager {
 	/* PRIVATE MEMBERS */
@@ -31,6 +32,9 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 	// The active background element
 	private activeBackgroundElement: IBackgroundElement;
 
+	// Used for determining whether to keep updating (preventing memory leaks)
+	private isActive: boolean;
+
 	/* PUBLIC METHODS */
 
 	init = (canvas: HTMLCanvasElement): void => {
@@ -40,6 +44,12 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 
 		this.canvasItems = [];
 		this.availableBrushes = [];
+
+		this.isActive = true;
+	};
+
+	destroy = (): void => {
+		this.isActive = false;
 	};
 
 	setCanvasItems = (items: ICanvasItem[]): void => {
@@ -55,4 +65,28 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 	setAvailableBrushes = (brushes: IBrush[]): void => {
 		this.availableBrushes = brushes;
 	};
+
+	/* PRIVATE METHODS */
+
+	update = (): void => {
+		this.painter.clearCanvas();
+
+		this.painter.setPan(this.panOffset);
+		this.painter.setScale(this.scale);
+
+		this.canvasItems.forEach((item) => {
+			const context = this.generateCanvasContextForItem();
+			item.render(this.painter, context);
+		});
+
+		if (this.isActive) {
+			requestAnimationFrame(this.update);
+		}
+	};
+
+	generateCanvasContextForItem = (): CanvasItemContext => ({
+		isSelected: false,
+		mousePosition: vector(0, 0),
+		absoluteMousePosition: vector(0, 0),
+	});
 }
