@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import ISuperCanvasManager from '../types/ISuperCanvasManager';
+import SuperCanvasManager from '../api/SuperCanvasManager';
 
 export interface SuperCanvasProps {
 	/**
@@ -15,9 +16,9 @@ export default ({ height }: SuperCanvasProps): React.ReactNode => {
 	const canvasRef = useRef(null);
 
 	useEffect(() => {
-		if (canvasRef.current) {
-			console.log(canvasRef.current, 'from mounted!');
-			// superCanvasManager.init(canvasRef.current as HTMLCanvasElement);
+		if (canvasRef.current && !superCanvasManager) {
+			superCanvasManager = new SuperCanvasManager();
+			superCanvasManager.init(canvasRef.current);
 		}
 	}, []);
 
