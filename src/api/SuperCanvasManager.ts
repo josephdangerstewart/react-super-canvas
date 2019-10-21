@@ -8,6 +8,8 @@ import IBrush from '../types/IBrush';
 import IBackgroundElement from '../types/IBackgroundElement';
 
 export default class SuperCanvasManager implements ISuperCanvasManager {
+	/* PRIVATE MEMBERS */
+
 	// The painter object used for drawing with virtual coordinates
 	private painter: IPainterAPI;
 
@@ -29,9 +31,28 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 	// The active background element
 	private activeBackgroundElement: IBackgroundElement;
 
+	/* PUBLIC METHODS */
+
 	init = (canvas: HTMLCanvasElement): void => {
 		this.panOffset = vector(0, 0);
 		this.scale = 1.0;
 		this.painter = new PainterAPI(canvas.getContext('2d'), this.panOffset, this.scale);
+
+		this.canvasItems = [];
+		this.availableBrushes = [];
+	};
+
+	setCanvasItems = (items: ICanvasItem[]): void => {
+		this.canvasItems = items;
+	};
+
+	getCanvasItems = (): ICanvasItem[] => this.canvasItems;
+
+	setActiveBackgroundElement = (element: IBackgroundElement): void => {
+		this.activeBackgroundElement = element;
+	};
+
+	setAvailableBrushes = (brushes: IBrush[]): void => {
+		this.availableBrushes = brushes;
 	};
 }
