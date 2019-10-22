@@ -29,6 +29,7 @@ module.exports = {
 		'@typescript-eslint/no-unused-vars': 'error',
 		'@typescript-eslint/interface-name-prefix': 'off',
 		'max-len': 'off',
-		'lines-between-class-members': 'off'
+		'lines-between-class-members': 'off',
+		'no-underscore-dangle': 'off',
 	},
 };

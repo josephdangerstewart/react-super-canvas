@@ -1,12 +1,11 @@
 import ISuperCanvasManager from '../types/ISuperCanvasManager';
 import IPainterAPI from '../types/IPainterAPI';
 import PainterAPI from './PainterAPI';
-import Vector2D from '../types/utility/Vector2D';
-import { vector } from '../utility/shapes-util';
 import ICanvasItem from '../types/ICanvasItem';
 import IBrush from '../types/IBrush';
 import IBackgroundElement from '../types/IBackgroundElement';
 import CanvasItemContext from '../types/utility/CanvasItemContext';
+import CanvasInteractionManager from './helpers/CanvasInteractionManager';
 
 export default class SuperCanvasManager implements ISuperCanvasManager {
 	/* PRIVATE MEMBERS */
@@ -14,11 +13,8 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 	// The painter object used for drawing with virtual coordinates
 	private painter: IPainterAPI;
 
-	// The offset of the panning. (10, 10) would put the origin at (-10, -10)
-	private panOffset: Vector2D;
-
-	// The zoom factor
-	private scale: number;
+	// The object that manages the canvas interactions such as panning and zoom
+	private interactionManager: CanvasInteractionManager;
 
 	// The active canvas items on the canvas
 	private canvasItems: ICanvasItem[];
@@ -38,14 +34,16 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 	/* PUBLIC METHODS */
 
 	init = (canvas: HTMLCanvasElement): void => {
-		this.panOffset = vector(0, 0);
-		this.scale = 1.0;
-		this.painter = new PainterAPI(canvas.getContext('2d'), this.panOffset, this.scale);
+		// This must be the first thing called
+		this.interactionManager = new CanvasInteractionManager(canvas);
+		this.painter = new PainterAPI(canvas.getContext('2d'), this.interactionManager.panOffset, this.interactionManager.scale);
 
 		this.canvasItems = [];
 		this.availableBrushes = [];
 
 		this.isActive = true;
+
+		this.update();
 	};
 
 	destroy = (): void => {
@@ -69,10 +67,12 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 	/* PRIVATE METHODS */
 
 	update = (): void => {
+		// This must be the first thing called
+		this.interactionManager.update();
 		this.painter.clearCanvas();
 
-		this.painter.setPan(this.panOffset);
-		this.painter.setScale(this.scale);
+		this.painter.setPan(this.interactionManager.panOffset);
+		this.painter.setScale(this.interactionManager.scale);
 
 		this.canvasItems.forEach((item) => {
 			const context = this.generateCanvasContextForItem();
@@ -86,7 +86,7 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 
 	generateCanvasContextForItem = (): CanvasItemContext => ({
 		isSelected: false,
-		mousePosition: vector(0, 0),
-		absoluteMousePosition: vector(0, 0),
+		mousePosition: this.interactionManager.mousePosition,
+		absoluteMousePosition: this.interactionManager.absoluteMousePosition,
 	});
 }
