@@ -43,3 +43,10 @@ Brushes are used to "paint" canvas items to the SuperCanvas. They can be configu
 ### Canvas Background Element
 
 The canvas background element is a special kind of element that enforces snap rules and renders background content (e.g. grid lines). In concept, it is similar to a [canvas item](#canvas-items) in that it has a position on the canvas (usually 0,0) and manages what it renders. The canvas background element is different in that it is responsible for enforcing cursor snapping. This means that the canvas will use the current background element to map the virtual position of the cursor (i.e. transformed to account for panning and zooming) to it's snapped position. This mapped cursor position is then passed to the active brush as the users mouse position. This logic is abstracted to it's own component (and not managed by the SuperCanvas) for customizability. If a user wanted to create a timeline for example, where the cursor position is snapped across a horizontal line then they could without worrying about the implementation of the super canvas.
+
+## Todo
+
+1. [ ] Render background element
+2. [ ] Add grid background element
+3. [ ] Flesh out brush API
+4. [ ] Add UI controls for brush selection
