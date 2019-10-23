@@ -97,6 +97,13 @@ export default class CanvasInteractionManager {
 	}
 
 	/**
+	 * @description The virtual position of the top left corner of the canvas
+	 */
+	get virtualTopLeftCorner(): Vector2D {
+		return this.absolutePosToVirtualPos(vector(0, 0));
+	}
+
+	/**
 	 * @description Removes the dom events
 	 */
 	destroy = (): void => {
@@ -119,13 +126,6 @@ export default class CanvasInteractionManager {
 			y: rect.top,
 		};
 	};
-
-	/**
-	 * @description The virtual position of the top left corner of the canvas
-	 */
-	get virtualTopLeftCorner(): Vector2D {
-		return this.absolutePosToVirtualPos(vector(0, 0));
-	}
 
 	/* PRIVATE METHODS */
 
