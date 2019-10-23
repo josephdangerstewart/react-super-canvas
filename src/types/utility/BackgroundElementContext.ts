@@ -1,11 +1,6 @@
 import Vector2D from './Vector2D';
 
-export default interface CanvasItemContext {
-	/**
-	 * @description Whether or not the current item is selected
-	 */
-	isSelected: boolean;
-
+export default interface BackgroundElementContext {
 	/**
 	 * @description The current virtual mouse position of the user
 	 */
@@ -20,4 +15,9 @@ export default interface CanvasItemContext {
 	 * @description Whether or not the canvas is being panned
 	 */
 	isPanning: boolean;
+
+	/**
+	 * @description The virtual position of the top left corner of the canvas
+	 */
+	virtualTopLeftCorner: Vector2D;
 }

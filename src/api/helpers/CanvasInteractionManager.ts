@@ -86,7 +86,7 @@ export default class CanvasInteractionManager {
 	 * @description The user mouse position in the virtual space
 	 */
 	get mousePosition(): Vector2D {
-		return this.absoluteMousePosToVirtualMousePos(this._userMousePosition);
+		return this.absolutePosToVirtualPos(this._userMousePosition);
 	}
 
 	/**
@@ -125,16 +125,23 @@ export default class CanvasInteractionManager {
 		this.canvasPos = pos;
 	};
 
+	/**
+	 * @description The virtual position of the top left corner of the canvas
+	 */
+	get virtualTopLeftCorner(): Vector2D {
+		return this.absolutePosToVirtualPos(vector(0, 0));
+	}
+
 	/* PRIVATE METHODS */
 
-	private screenMousePosToAbsoluteMousePos = (screenPos: Vector2D): Vector2D => ({
-		x: screenPos.x - this.canvasPos.x,
-		y: screenPos.y - this.canvasPos.y,
-	});
-
-	private absoluteMousePosToVirtualMousePos = (virtualMousePos: Vector2D): Vector2D => ({
+	private absolutePosToVirtualPos = (virtualMousePos: Vector2D): Vector2D => ({
 		x: virtualMousePos.x + this.totalPanOffset.x + this.panDiff.x,
 		y: virtualMousePos.y + this.totalPanOffset.y + this.panDiff.y,
+	});
+
+	private screenPosToAbsolutePos = (screenPos: Vector2D): Vector2D => ({
+		x: screenPos.x - this.canvasPos.x,
+		y: screenPos.y - this.canvasPos.y,
 	});
 
 	private onKeyDown = (event: KeyboardEvent): void => {
@@ -147,7 +154,7 @@ export default class CanvasInteractionManager {
 
 	private onMouseDown = (event: MouseEvent): void => {
 		this._isMouseDown = true;
-		this.mouseDownAt = this.screenMousePosToAbsoluteMousePos(vector(event.clientX, event.clientY));
+		this.mouseDownAt = this.screenPosToAbsolutePos(vector(event.clientX, event.clientY));
 		this.panDiff = vector(0, 0);
 
 		if (this._keysDown.Shift) {
@@ -175,7 +182,7 @@ export default class CanvasInteractionManager {
 	};
 
 	private onMouseMove = (event: MouseEvent): void => {
-		this._userMousePosition = this.screenMousePosToAbsoluteMousePos(vector(event.clientX, event.clientY));
+		this._userMousePosition = this.screenPosToAbsolutePos(vector(event.clientX, event.clientY));
 		const { x: curX, y: curY } = this._userMousePosition;
 
 		if (this._isPanning) {

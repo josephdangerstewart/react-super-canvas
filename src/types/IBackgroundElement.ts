@@ -1,5 +1,6 @@
 import Vector2D from './utility/Vector2D';
 import IPainterAPI from './IPainterAPI';
+import BackgroundElementContext from './utility/BackgroundElementContext';
 
 export default interface IBackgroundElement {
 	/**
@@ -18,5 +19,5 @@ export default interface IBackgroundElement {
 	 * @param context2d OPTIONAL - The context for the HTML canvas useful for drawing without respect
 	 * to virtual spacing
 	 */
-	renderBackground: (painter: IPainterAPI, context2d?: CanvasRenderingContext2D) => void;
+	renderBackground: (painter: IPainterAPI, context2d: CanvasRenderingContext2D, context: BackgroundElementContext) => void;
 }
