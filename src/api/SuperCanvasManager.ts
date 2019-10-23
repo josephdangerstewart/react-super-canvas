@@ -4,9 +4,9 @@ import PainterAPI from './PainterAPI';
 import ICanvasItem from '../types/ICanvasItem';
 import IBrush from '../types/IBrush';
 import IBackgroundElement from '../types/IBackgroundElement';
-import CanvasItemContext from '../types/utility/CanvasItemContext';
+import CanvasItemContext from '../types/context/CanvasItemContext';
 import CanvasInteractionManager from './helpers/CanvasInteractionManager';
-import BackgroundElementContext from '../types/utility/BackgroundElementContext';
+import BackgroundElementContext from '../types/context/BackgroundElementContext';
 
 export default class SuperCanvasManager implements ISuperCanvasManager {
 	/* PRIVATE MEMBERS */

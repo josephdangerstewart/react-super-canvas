@@ -1,6 +1,6 @@
 import Vector2D from './utility/Vector2D';
 import IPainterAPI from './IPainterAPI';
-import BackgroundElementContext from './utility/BackgroundElementContext';
+import BackgroundElementContext from './context/BackgroundElementContext';
 
 export default interface IBackgroundElement {
 	/**

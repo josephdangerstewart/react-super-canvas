@@ -1,5 +1,8 @@
-import ICanvasItem from './ICanvasItem';
+import IPainterAPI from './IPainterAPI';
 
 export default interface IBrush {
-	renderedCanvasItemType: ICanvasItem;
+	/**
+	 * @description Renders a preview of the element being drawn to the screen
+	 */
+	renderPreview: (painter: IPainterAPI, canvasContext: CanvasRenderingContext2D) => void;
 }

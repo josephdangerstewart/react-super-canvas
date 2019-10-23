@@ -1,7 +1,7 @@
 import IBackgroundElement from '../../types/IBackgroundElement';
 import Vector2D from '../../types/utility/Vector2D';
 import IPainterAPI from '../../types/IPainterAPI';
-import BackgroundElementContext from '../../types/utility/BackgroundElementContext';
+import BackgroundElementContext from '../../types/context/BackgroundElementContext';
 import Circle from '../../types/shapes/Circle';
 
 /**

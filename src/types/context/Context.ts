@@ -1,11 +1,9 @@
-import Vector2D from './Vector2D';
+import Vector2D from '../utility/Vector2D';
 
-export default interface CanvasItemContext {
-	/**
-	 * @description Whether or not the current item is selected
-	 */
-	isSelected: boolean;
-
+/**
+ * @description Shared data between all of the context interfaces
+ */
+export default interface Context {
 	/**
 	 * @description The current virtual mouse position of the user
 	 */

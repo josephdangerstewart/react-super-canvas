@@ -1,5 +1,5 @@
 import IPainterAPI from './IPainterAPI';
-import CanvasItemContext from './utility/CanvasItemContext';
+import CanvasItemContext from './context/CanvasItemContext';
 
 export default interface ICanvasItem {
 	/**
