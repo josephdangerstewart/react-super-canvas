@@ -71,7 +71,6 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 		this.availableBrushes = brushes;
 
 		if (this.availableBrushes && this.availableBrushes.length > 0) {
-			console.log('setting active brush');
 			[ this.activeBrush ] = this.availableBrushes;
 		}
 	};
