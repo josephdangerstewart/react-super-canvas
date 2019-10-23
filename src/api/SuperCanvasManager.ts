@@ -7,6 +7,8 @@ import IBackgroundElement from '../types/IBackgroundElement';
 import CanvasItemContext from '../types/context/CanvasItemContext';
 import CanvasInteractionManager from './helpers/CanvasInteractionManager';
 import BackgroundElementContext from '../types/context/BackgroundElementContext';
+import Context from '../types/context/Context';
+import { BrushContext } from '../types/context/BrushContext';
 
 export default class SuperCanvasManager implements ISuperCanvasManager {
 	/* PRIVATE MEMBERS */
@@ -71,7 +73,7 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 
 	/* PRIVATE METHODS */
 
-	update = (): void => {
+	private update = (): void => {
 		// This must be the first thing called
 		this.interactionManager.update();
 		this.painter.clearCanvas();
@@ -88,22 +90,35 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 			item.render(this.painter, context);
 		});
 
+		if (this.activeBrush) {
+			this.activeBrush.renderPreview(this.painter, this.context2d, this.generateBrushContext());
+		}
+
 		if (this.isActive) {
 			requestAnimationFrame(this.update);
 		}
 	};
 
-	generateCanvasContextForItem = (): CanvasItemContext => ({
-		isSelected: false,
+	private generateContext = (): Context => ({
 		mousePosition: this.interactionManager.mousePosition,
 		absoluteMousePosition: this.interactionManager.absoluteMousePosition,
 		isPanning: this.interactionManager.isPanning,
 	});
 
-	generateBackgroundElementContext = (): BackgroundElementContext => ({
-		mousePosition: this.interactionManager.mousePosition,
-		absoluteMousePosition: this.interactionManager.absoluteMousePosition,
-		isPanning: this.interactionManager.isPanning,
+	private generateCanvasContextForItem = (): CanvasItemContext => ({
+		...this.generateContext(),
+		isSelected: false,
+	});
+
+	private generateBackgroundElementContext = (): BackgroundElementContext => ({
+		...this.generateContext(),
 		virtualTopLeftCorner: this.interactionManager.virtualTopLeftCorner,
+	});
+
+	private generateBrushContext = (): BrushContext => ({
+		...this.generateContext(),
+		snappedMousePosition: this.activeBackgroundElement
+			? this.activeBackgroundElement.mapMouseCoordinates(this.interactionManager.mousePosition)
+			: this.interactionManager.mousePosition,
 	});
 }

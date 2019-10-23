@@ -4,6 +4,7 @@ menu: 2. Components
 ---
 
 import SuperCanvas from '../../src/components/SuperCanvas';
+import DefaultBackground from '../../src/api/background-elements/DefaultBackgroundElement';
 import { Playground, Props } from 'docz';
 
 # The Super Canvas
@@ -18,6 +19,7 @@ The super canvas is super easy to use! Use it just like this:
 	<SuperCanvas
 		height={300}
 		width={300}
+		activeBackgroundElement={new DefaultBackground()}
 	/>
 </Playground>
 
