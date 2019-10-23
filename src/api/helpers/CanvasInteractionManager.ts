@@ -163,9 +163,7 @@ export default class CanvasInteractionManager {
 		}
 	};
 
-	private onMouseUp = (event: MouseEvent): void => {
-		console.log(`mouse up at (${event.clientX}, ${event.clientY})`);
-
+	private onMouseUp = (): void => {
 		if (this._isPanning) {
 			this.totalPanOffset.x += this.panDiff.x;
 			this.totalPanOffset.y += this.panDiff.y;
@@ -177,8 +175,8 @@ export default class CanvasInteractionManager {
 		this.panDiff = vector(0, 0);
 	};
 
-	private onMouseOut = (event: MouseEvent): void => {
-		this.onMouseUp(event);
+	private onMouseOut = (): void => {
+		this.onMouseUp();
 	};
 
 	private onMouseMove = (event: MouseEvent): void => {
