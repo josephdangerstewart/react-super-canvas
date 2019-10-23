@@ -17,6 +17,7 @@ export default class GridBackground implements IBackgroundElement {
 	});
 
 	renderBackground = (painter: IPainterAPI, canvasContext: CanvasRenderingContext2D, context: BackgroundElementContext): void => {
+		const { scale } = context;
 		const snappedTopLeftCorner = this.mapMouseCoordinates(context.virtualTopLeftCorner);
 
 		const circle: Circle = {
@@ -24,8 +25,8 @@ export default class GridBackground implements IBackgroundElement {
 			radius: 1,
 		};
 
-		for (let { x } = snappedTopLeftCorner; x < canvasContext.canvas.width + snappedTopLeftCorner.x; x += this.pixelsPerUnit) {
-			for (let { y } = snappedTopLeftCorner; y < canvasContext.canvas.height + snappedTopLeftCorner.y; y += this.pixelsPerUnit) {
+		for (let { x } = snappedTopLeftCorner; x < canvasContext.canvas.width / scale + snappedTopLeftCorner.x; x += this.pixelsPerUnit) {
+			for (let { y } = snappedTopLeftCorner; y < canvasContext.canvas.height / scale + snappedTopLeftCorner.y; y += this.pixelsPerUnit) {
 				circle.center = { x, y };
 
 				if (x === 0 || y === 0) {

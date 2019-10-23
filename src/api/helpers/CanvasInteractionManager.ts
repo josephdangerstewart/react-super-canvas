@@ -4,6 +4,9 @@ import { MouseEventKind, KeyboardEventKind } from '../../types/callbacks/DomEven
 import { MouseEventCallback } from '../../types/callbacks/MouseEventCallback';
 import { KeyboardEventCallback } from '../../types/callbacks/KeyboardEventCallback';
 
+const SCALE_MIN = 0.2;
+const SCALE_MAX = 5;
+
 /**
  * @description This class registers all dom events that perform data calculations needed
  * by the super canvas. It exists to abstract out some of the pan/zoom/coordinate geometry
@@ -22,6 +25,7 @@ export default class CanvasInteractionManager {
 	private canvasPos: Vector2D;
 	private mouseEvents: Record<MouseEventKind, MouseEventCallback[]>;
 	private keyboardEvents: Record<KeyboardEventKind, KeyboardEventCallback[]>;
+	private isMouseIn: boolean;
 
 	private _scale: number;
 	private _keysDown: Record<string, boolean>;
@@ -37,14 +41,26 @@ export default class CanvasInteractionManager {
 		this.canvasPos = vector(0, 0);
 		this._scale = 1.0;
 		this._keysDown = {};
+		this.keyboardEvents = {
+			keydown: [],
+			keyup: [],
+		};
+		this.mouseEvents = {
+			mousedown: [],
+			mousemove: [],
+			mouseup: [],
+		};
+		this.isMouseIn = false;
 
 		// Attach the events
 		document.addEventListener('keydown', this.onKeyDown);
 		document.addEventListener('keyup', this.onKeyUp);
+		document.addEventListener('wheel', this.onScroll);
 		this.canvas.addEventListener('mousedown', this.onMouseDown);
 		this.canvas.addEventListener('mouseup', this.onMouseUp);
 		this.canvas.addEventListener('mouseout', this.onMouseOut);
 		this.canvas.addEventListener('mousemove', this.onMouseMove);
+		this.canvas.addEventListener('mouseenter', this.onMouseIn);
 
 		this.update();
 	}
@@ -114,10 +130,12 @@ export default class CanvasInteractionManager {
 	destroy = (): void => {
 		document.removeEventListener('keydown', this.onKeyDown);
 		document.removeEventListener('keyup', this.onKeyUp);
+		document.removeEventListener('wheel', this.onScroll);
 		this.canvas.removeEventListener('mousedown', this.onMouseDown);
 		this.canvas.removeEventListener('mouseup', this.onMouseUp);
 		this.canvas.removeEventListener('mouseout', this.onMouseOut);
 		this.canvas.removeEventListener('mousemove', this.onMouseMove);
+		this.canvas.removeEventListener('mouseenter', this.onMouseIn);
 	};
 
 	/**
@@ -125,10 +143,6 @@ export default class CanvasInteractionManager {
 	 * that no system events (zooming, panning, etc) are taking place
 	 */
 	registerMouseEvent = (eventType: MouseEventKind, callback: MouseEventCallback): void => {
-		if (!this.mouseEvents[eventType]) {
-			this.mouseEvents[eventType] = [];
-		}
-
 		this.mouseEvents[eventType].push(callback);
 	};
 
@@ -137,10 +151,6 @@ export default class CanvasInteractionManager {
 	 * providing that no system events are taking place
 	 */
 	registerKeyboardEvent = (eventType: KeyboardEventKind, callback: KeyboardEventCallback): void => {
-		if (!this.keyboardEvents[eventType]) {
-			this.keyboardEvents[eventType] = [];
-		}
-
 		this.keyboardEvents[eventType].push(callback);
 	};
 
@@ -158,9 +168,9 @@ export default class CanvasInteractionManager {
 
 	/* PRIVATE METHODS */
 
-	private absolutePosToVirtualPos = (virtualMousePos: Vector2D): Vector2D => ({
-		x: virtualMousePos.x + this.totalPanOffset.x + this.panDiff.x,
-		y: virtualMousePos.y + this.totalPanOffset.y + this.panDiff.y,
+	private absolutePosToVirtualPos = (absolute: Vector2D): Vector2D => ({
+		x: absolute.x / this._scale + this.totalPanOffset.x + this.panDiff.x,
+		y: absolute.y / this._scale + this.totalPanOffset.y + this.panDiff.y,
 	});
 
 	private screenPosToAbsolutePos = (screenPos: Vector2D): Vector2D => ({
@@ -170,18 +180,12 @@ export default class CanvasInteractionManager {
 
 	private onKeyDown = (event: KeyboardEvent): void => {
 		this._keysDown[event.key] = true;
-
-		if (this.keyboardEvents[KeyboardEventKind.KeyDown]) {
-			this.keyboardEvents[KeyboardEventKind.KeyDown].forEach((callback) => callback(event));
-		}
+		this.keyboardEvents[KeyboardEventKind.KeyDown].forEach((callback) => callback(event));
 	};
 
 	private onKeyUp = (event: KeyboardEvent): void => {
 		this._keysDown[event.key] = false;
-
-		if (this.keyboardEvents[KeyboardEventKind.KeyUp]) {
-			this.keyboardEvents[KeyboardEventKind.KeyUp].forEach((callback) => callback(event));
-		}
+		this.keyboardEvents[KeyboardEventKind.KeyUp].forEach((callback) => callback(event));
 	};
 
 	private onMouseDown = (event: MouseEvent): void => {
@@ -192,7 +196,7 @@ export default class CanvasInteractionManager {
 		if (this._keysDown.Shift) {
 			this._isPanning = true;
 			this.panDiff = vector(0, 0);
-		} else if (this.mouseEvents[MouseEventKind.MouseDown]) {
+		} else if (event.button === 0) {
 			this.mouseEvents[MouseEventKind.MouseDown].forEach((callback) => callback(event));
 		}
 	};
@@ -201,7 +205,7 @@ export default class CanvasInteractionManager {
 		if (this._isPanning) {
 			this.totalPanOffset.x += this.panDiff.x;
 			this.totalPanOffset.y += this.panDiff.y;
-		} else if (this.mouseEvents[MouseEventKind.MouseUp]) {
+		} else {
 			this.mouseEvents[MouseEventKind.MouseUp].forEach((callback) => callback(event));
 		}
 
@@ -211,7 +215,12 @@ export default class CanvasInteractionManager {
 		this.panDiff = vector(0, 0);
 	};
 
+	private onMouseIn = (): void => {
+		this.isMouseIn = true;
+	};
+
 	private onMouseOut = (event: MouseEvent): void => {
+		this.isMouseIn = false;
 		this.onMouseUp(event);
 	};
 
@@ -222,8 +231,19 @@ export default class CanvasInteractionManager {
 		if (this._isPanning) {
 			this.panDiff.x = this.mouseDownAt.x - curX;
 			this.panDiff.y = this.mouseDownAt.y - curY;
-		} else if (this.mouseEvents[MouseEventKind.MouseMove]) {
+		} else {
 			this.mouseEvents[MouseEventKind.MouseMove].forEach((callback) => callback(event));
+		}
+	};
+
+	private onScroll = (event: WheelEvent): void => {
+		if (this._keysDown.Shift && this.isMouseIn) {
+			this._scale += event.deltaY / 50;
+			if (this._scale > SCALE_MAX) {
+				this._scale = SCALE_MAX;
+			} else if (this._scale < SCALE_MIN) {
+				this._scale = SCALE_MIN;
+			}
 		}
 	};
 }

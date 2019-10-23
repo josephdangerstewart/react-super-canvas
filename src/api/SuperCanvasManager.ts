@@ -9,6 +9,7 @@ import CanvasInteractionManager from './helpers/CanvasInteractionManager';
 import BackgroundElementContext from '../types/context/BackgroundElementContext';
 import Context from '../types/context/Context';
 import { BrushContext } from '../types/context/BrushContext';
+import { MouseEventKind } from '../types/callbacks/DomEventKinds';
 
 export default class SuperCanvasManager implements ISuperCanvasManager {
 	/* PRIVATE MEMBERS */
@@ -49,6 +50,8 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 		this.availableBrushes = [];
 
 		this.isActive = true;
+
+		this.interactionManager.registerMouseEvent(MouseEventKind.MouseDown, this.onMouseDown);
 
 		this.update();
 	};
@@ -117,6 +120,7 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 	private generateBackgroundElementContext = (): BackgroundElementContext => ({
 		...this.generateContext(),
 		virtualTopLeftCorner: this.interactionManager.virtualTopLeftCorner,
+		scale: this.interactionManager.scale,
 	});
 
 	private generateBrushContext = (): BrushContext => ({
@@ -125,4 +129,14 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 			? this.activeBackgroundElement.mapMouseCoordinates(this.interactionManager.mousePosition)
 			: this.interactionManager.mousePosition,
 	});
+
+	private onMouseDown = (): void => {
+		if (this.activeBrush) {
+			this.activeBrush.mouseDown(this.addCanvasItem, this.generateBrushContext());
+		}
+	};
+
+	private addCanvasItem = (canvasItem: ICanvasItem): void => {
+		this.canvasItems.push(canvasItem);
+	};
 }

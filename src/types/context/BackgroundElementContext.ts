@@ -6,4 +6,9 @@ export default interface BackgroundElementContext extends Context {
 	 * @description The virtual position of the top left corner of the canvas
 	 */
 	virtualTopLeftCorner: Vector2D;
+
+	/**
+	 * @description The zoom of the super canvas
+	 */
+	scale: number;
 }
