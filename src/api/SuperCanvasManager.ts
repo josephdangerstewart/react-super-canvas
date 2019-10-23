@@ -69,6 +69,11 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 
 	setAvailableBrushes = (brushes: IBrush[]): void => {
 		this.availableBrushes = brushes;
+
+		if (this.availableBrushes && this.availableBrushes.length > 0) {
+			console.log('setting active brush');
+			[ this.activeBrush ] = this.availableBrushes;
+		}
 	};
 
 	/* PRIVATE METHODS */

@@ -113,16 +113,11 @@ export default class CanvasInteractionManager {
 	 * of the canvas update loop
 	 */
 	update = (): void => {
-		const pos = vector(0, 0);
-
-		let el = this.canvas as HTMLElement;
-		while (el) {
-			pos.x += (el.offsetLeft - el.scrollLeft + el.clientLeft);
-			pos.y += (el.offsetTop - el.scrollTop + el.clientTop);
-			el = el.offsetParent as HTMLElement;
-		}
-
-		this.canvasPos = pos;
+		const rect = this.canvas.getBoundingClientRect();
+		this.canvasPos = {
+			x: rect.left,
+			y: rect.top,
+		};
 	};
 
 	/**

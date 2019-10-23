@@ -5,6 +5,7 @@ menu: 2. Components
 
 import SuperCanvas from '../../src/components/SuperCanvas';
 import DefaultBackground from '../../src/api/background-elements/DefaultBackgroundElement';
+import CircleBrush from '../../src/api/brushes/CircleBrush';
 import { Playground, Props } from 'docz';
 
 # The Super Canvas
@@ -20,6 +21,9 @@ The super canvas is super easy to use! Use it just like this:
 		height={300}
 		width={300}
 		activeBackgroundElement={new DefaultBackground()}
+		availableBrushes={[
+			new CircleBrush(),
+		]}
 	/>
 </Playground>
 
