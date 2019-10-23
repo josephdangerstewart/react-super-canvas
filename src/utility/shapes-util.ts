@@ -197,3 +197,7 @@ export function circleCollidesWithRect(circle: Circle, rect: Rectangle): boolean
 
 	return rectToLines(rect).some((line) => circleCollidesWithLine(circle, line)) || rectToPoints(rect).every((point) => pointInsideCircle(point, circle));
 }
+
+export function distanceBetweenTwoPoints(point1: Vector2D, point2: Vector2D): number {
+	return Math.sqrt((point1.x - point2.x) ** 2 + (point1.y - point2.y) ** 2);
+}
