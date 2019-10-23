@@ -33,10 +33,18 @@ export default interface Rectangle {
 	 * @default null
 	 */
 	fillColor?: string;
+
+	/**
+	 * @description The background image of the rectangle (wont have a background image if undefined, is overridden
+	 * by `fillColor`)
+	 * @default null
+	 */
+	fillImageUrl?: string;
 }
 
 export const RectangleDefaults: object = {
 	strokeColor: 'black',
 	strokeWeight: 1.0,
 	fillColor: null,
+	fillImageUrl: null,
 };

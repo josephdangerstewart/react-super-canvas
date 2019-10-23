@@ -33,10 +33,18 @@ export default interface Circle {
 	 * @default 1.0
 	 */
 	strokeWeight?: number;
+
+	/**
+	 * @description The background image of the circle (will have no background image if undefined and is
+	 * overridden by fillColor)
+	 * @default null
+	 */
+	fillImageUrl?: string;
 }
 
 export const CircleDefaults: object = {
 	strokeColor: 'black',
 	fillColor: null,
 	strokeWeight: 1.0,
+	fillImageUrl: null,
 };
