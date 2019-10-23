@@ -42,6 +42,7 @@ export default class PainterAPI implements IPainterAPI {
 
 	setContext2D = (context: CanvasRenderingContext2D): void => {
 		this.context2d = context;
+		context.translate(0.5, 0.5);
 	};
 
 	drawLine = (arg: Line): void => {

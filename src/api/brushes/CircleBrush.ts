@@ -4,10 +4,10 @@ import { BrushContext } from '../../types/context/BrushContext';
 import Circle from '../../types/shapes/Circle';
 
 export default class CircleBrush implements IBrush {
-	private radius: number;
+	private cursorRadius: number;
 
-	constructor(radius: number) {
-		this.radius = radius || 10;
+	constructor(cursorRadius: number) {
+		this.cursorRadius = cursorRadius || 2;
 	}
 
 	renderPreview = (painter: IPainterAPI, canvasContext: CanvasRenderingContext2D, context: BrushContext): void => {
@@ -15,8 +15,8 @@ export default class CircleBrush implements IBrush {
 
 		const circlePreview: Circle = {
 			center: cursor,
-			radius: this.radius,
-			fillColor: 'black',
+			radius: this.cursorRadius,
+			fillColor: 'rgba(0, 0, 0, 0.58)',
 			strokeColor: 'black',
 		};
 
