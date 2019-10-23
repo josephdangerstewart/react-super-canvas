@@ -1,6 +1,6 @@
 import IPainterAPI from './IPainterAPI';
 import { BrushContext } from './context/BrushContext';
-import { AddCanvasItemCallback } from './utility/AddCanvasItemCallback';
+import { AddCanvasItemCallback } from './callbacks/AddCanvasItemCallback';
 
 export default interface IBrush {
 	/**

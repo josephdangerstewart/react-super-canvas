@@ -2,7 +2,7 @@ import IBrush from '../../types/IBrush';
 import IPainterAPI from '../../types/IPainterAPI';
 import { BrushContext } from '../../types/context/BrushContext';
 import Circle from '../../types/shapes/Circle';
-import { AddCanvasItemCallback } from '../../types/utility/AddCanvasItemCallback';
+import { AddCanvasItemCallback } from '../../types/callbacks/AddCanvasItemCallback';
 import Vector2D from '../../types/utility/Vector2D';
 import { distanceBetweenTwoPoints } from '../../utility/shapes-util';
 import CircleCanvasItem from '../canvas-items/CircleCanvasItem';

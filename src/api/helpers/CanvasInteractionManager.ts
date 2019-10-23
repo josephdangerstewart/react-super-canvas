@@ -1,5 +1,8 @@
 import Vector2D from '../../types/utility/Vector2D';
 import { vector } from '../../utility/shapes-util';
+import { MouseEventKind, KeyboardEventKind } from '../../types/callbacks/DomEventKinds';
+import { MouseEventCallback } from '../../types/callbacks/MouseEventCallback';
+import { KeyboardEventCallback } from '../../types/callbacks/KeyboardEventCallback';
 
 /**
  * @description This class registers all dom events that perform data calculations needed
@@ -17,6 +20,8 @@ export default class CanvasInteractionManager {
 	private mouseDownAt: Vector2D;
 	private canvas: HTMLCanvasElement;
 	private canvasPos: Vector2D;
+	private mouseEvents: Record<MouseEventKind, MouseEventCallback[]>;
+	private keyboardEvents: Record<KeyboardEventKind, KeyboardEventCallback[]>;
 
 	private _scale: number;
 	private _keysDown: Record<string, boolean>;
@@ -116,6 +121,30 @@ export default class CanvasInteractionManager {
 	};
 
 	/**
+	 * @description Attaches a mouse event that is called when the corresponding event type happens providing
+	 * that no system events (zooming, panning, etc) are taking place
+	 */
+	registerMouseEvent = (eventType: MouseEventKind, callback: MouseEventCallback): void => {
+		if (!this.mouseEvents[eventType]) {
+			this.mouseEvents[eventType] = [];
+		}
+
+		this.mouseEvents[eventType].push(callback);
+	};
+
+	/**
+	 * @description Attaches a keyboard event that is called when the corresponding event type happens
+	 * providing that no system events are taking place
+	 */
+	registerKeyboardEvent = (eventType: KeyboardEventKind, callback: KeyboardEventCallback): void => {
+		if (!this.keyboardEvents[eventType]) {
+			this.keyboardEvents[eventType] = [];
+		}
+
+		this.keyboardEvents[eventType].push(callback);
+	};
+
+	/**
 	 * @description Does important calculations to maintain the interaction state. MUST be called at the beginning
 	 * of the canvas update loop
 	 */
@@ -141,10 +170,18 @@ export default class CanvasInteractionManager {
 
 	private onKeyDown = (event: KeyboardEvent): void => {
 		this._keysDown[event.key] = true;
+
+		if (this.keyboardEvents[KeyboardEventKind.KeyDown]) {
+			this.keyboardEvents[KeyboardEventKind.KeyDown].forEach((callback) => callback(event));
+		}
 	};
 
 	private onKeyUp = (event: KeyboardEvent): void => {
 		this._keysDown[event.key] = false;
+
+		if (this.keyboardEvents[KeyboardEventKind.KeyUp]) {
+			this.keyboardEvents[KeyboardEventKind.KeyUp].forEach((callback) => callback(event));
+		}
 	};
 
 	private onMouseDown = (event: MouseEvent): void => {
@@ -155,13 +192,17 @@ export default class CanvasInteractionManager {
 		if (this._keysDown.Shift) {
 			this._isPanning = true;
 			this.panDiff = vector(0, 0);
+		} else if (this.mouseEvents[MouseEventKind.MouseDown]) {
+			this.mouseEvents[MouseEventKind.MouseDown].forEach((callback) => callback(event));
 		}
 	};
 
-	private onMouseUp = (): void => {
+	private onMouseUp = (event: MouseEvent): void => {
 		if (this._isPanning) {
 			this.totalPanOffset.x += this.panDiff.x;
 			this.totalPanOffset.y += this.panDiff.y;
+		} else if (this.mouseEvents[MouseEventKind.MouseUp]) {
+			this.mouseEvents[MouseEventKind.MouseUp].forEach((callback) => callback(event));
 		}
 
 		this._isMouseDown = false;
@@ -170,8 +211,8 @@ export default class CanvasInteractionManager {
 		this.panDiff = vector(0, 0);
 	};
 
-	private onMouseOut = (): void => {
-		this.onMouseUp();
+	private onMouseOut = (event: MouseEvent): void => {
+		this.onMouseUp(event);
 	};
 
 	private onMouseMove = (event: MouseEvent): void => {
@@ -181,6 +222,8 @@ export default class CanvasInteractionManager {
 		if (this._isPanning) {
 			this.panDiff.x = this.mouseDownAt.x - curX;
 			this.panDiff.y = this.mouseDownAt.y - curY;
+		} else if (this.mouseEvents[MouseEventKind.MouseMove]) {
+			this.mouseEvents[MouseEventKind.MouseMove].forEach((callback) => callback(event));
 		}
 	};
 }
