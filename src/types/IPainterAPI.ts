@@ -2,6 +2,7 @@ import Vector2D from './utility/Vector2D';
 import Line from './shapes/Line';
 import Rectangle from './shapes/Rectangle';
 import Circle from './shapes/Circle';
+import Polygon from './shapes/Polygon';
 
 export default interface IPainterAPI {
 	/**
@@ -49,4 +50,9 @@ export default interface IPainterAPI {
 	 * @description Draws a circle in the virtual space
 	 */
 	drawCircle: (circle: Circle) => void;
+
+	/**
+	 * @description Draws a polygon in the virtual space
+	 */
+	drawPolygon: (polygon: Polygon) => void;
 }

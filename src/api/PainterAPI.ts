@@ -10,8 +10,12 @@ import {
 	vector,
 	rectCollidesWithRect,
 	circleCollidesWithRect,
+	polygonCollidesWithRect,
 } from '../utility/shapes-util';
 import CachedImage from '../types/utility/CachedImage';
+import Polygon, { PolygonDefaults } from '../types/shapes/Polygon';
+import StyledShape from '../types/shapes/StyledShape';
+import { WithCachedImageCallback, OnImageUnprocessedCallback } from '../types/callbacks/WithCachedImageCallback';
 
 export default class PainterAPI implements IPainterAPI {
 	private panOffset: Vector2D;
@@ -63,26 +67,9 @@ export default class PainterAPI implements IPainterAPI {
 	};
 
 	drawImage = (topLeftCorner: Vector2D, imageUrl: string): void => {
-		const cachedImage = this.imageCache[imageUrl];
-		const image = cachedImage ? cachedImage.image : new Image();
-
-		if (!image.complete) {
-			image.onload = (): void => {
-				this.doDrawImage(topLeftCorner, image);
-			};
-		} else {
+		this.withCachedImage(imageUrl, (image) => {
 			this.doDrawImage(topLeftCorner, image);
-		}
-
-		if (!cachedImage) {
-			image.src = imageUrl;
-			this.imageCache[imageUrl] = {
-				image,
-				lastAccessed: new Date(),
-			};
-		} else {
-			this.imageCache[imageUrl].lastAccessed = new Date();
-		}
+		});
 	};
 
 	cleanImageCache = (timeout: number): void => {
@@ -94,6 +81,29 @@ export default class PainterAPI implements IPainterAPI {
 		});
 	};
 
+	drawPolygon = (polygonParam: Polygon): void => {
+		const polygon = fillDefaults(polygonParam, PolygonDefaults);
+
+		if (polygon.points.length < 2) {
+			return;
+		}
+
+		const canvasRect = getCanvasRect(this.context2d);
+		if (polygonCollidesWithRect(polygon, canvasRect)) {
+			const [ firstPoint, ...restOfPoints ] = polygon.points.map(this.toAbsolutePoint);
+			const { x: firstX, y: firstY } = firstPoint;
+
+			this.context2d.moveTo(firstX, firstY);
+
+			restOfPoints.forEach((point) => {
+				const { x, y } = point;
+				this.context2d.lineTo(x, y);
+			});
+
+			this.drawWithStyles(polygon);
+		}
+	};
+
 	drawRect = (rectParam: Rectangle): void => {
 		const rect = fillDefaults(rectParam, RectangleDefaults);
 
@@ -103,15 +113,7 @@ export default class PainterAPI implements IPainterAPI {
 
 		if (rectCollidesWithRect(rect, canvasRect)) {
 			this.context2d.rect(x, y, width * this.scale, height * this.scale);
-			this.context2d.strokeStyle = rect.strokeColor;
-			this.context2d.lineWidth = rect.strokeWeight;
-
-			if (rect.fillColor) {
-				this.context2d.fillStyle = rect.fillColor;
-				this.context2d.fill();
-			}
-
-			this.context2d.stroke();
+			this.drawWithStyles(rect);
 		}
 	};
 
@@ -125,20 +127,33 @@ export default class PainterAPI implements IPainterAPI {
 		if (circleCollidesWithRect(circle, canvasRect)) {
 			this.context2d.beginPath();
 			this.context2d.arc(x, y, radius * this.scale, 0, Math.PI * 2);
-
-			this.context2d.strokeStyle = circle.strokeColor;
-			this.context2d.lineWidth = circle.strokeWeight;
-
-			if (circle.fillColor) {
-				this.context2d.fillStyle = circle.fillColor;
-				this.context2d.fill();
-			}
-
-			this.context2d.stroke();
+			this.drawWithStyles(circle);
 		}
 	};
 
 	/* UTILITY METHODS */
+
+	private drawWithStyles = (styles: StyledShape): void => {
+		this.context2d.strokeStyle = styles.strokeColor;
+		this.context2d.lineWidth = styles.strokeWeight;
+
+		if (styles.fillColor) {
+			this.context2d.fillStyle = styles.fillColor;
+			this.context2d.fill();
+		} else if (styles.fillImageUrl) {
+			this.withCachedImage(styles.fillImageUrl, (image, repeating) => {
+				this.context2d.fillStyle = repeating;
+				this.context2d.fill();
+				this.context2d.stroke();
+			}, () => {
+				this.context2d.fill();
+			});
+
+			return;
+		}
+
+		this.context2d.stroke();
+	};
 
 	private toAbsolutePoint = (point: Vector2D): Vector2D => {
 		const absolutePoint: Vector2D = {
@@ -179,5 +194,39 @@ export default class PainterAPI implements IPainterAPI {
 		if (rectCollidesWithRect(imageRect, canvasRect)) {
 			this.context2d.drawImage(image, x, y, absWidth, absHeight);
 		}
+	};
+
+	private withCachedImage = (imageUrl: string, callback: WithCachedImageCallback, onImageUnprocessed?: OnImageUnprocessedCallback): boolean => {
+		const cachedImage = this.imageCache[imageUrl];
+		const image = cachedImage ? cachedImage.image : new Image();
+
+		if (!image.complete) {
+			// Do not handle context sensitive code asynchronously
+			// we don't want consumers drawing the canvas whenever their image happens to load
+			// So don't call the callback in onload
+			image.onload = (): void => {
+				cachedImage.repeating = this.context2d.createPattern(image, 'repeating');
+			};
+
+			if (onImageUnprocessed) {
+				onImageUnprocessed();
+			}
+		} else {
+			callback(image, cachedImage && cachedImage.repeating);
+		}
+
+		// Still cache the image though no matter what
+		if (!cachedImage) {
+			image.src = imageUrl;
+			this.imageCache[imageUrl] = {
+				image,
+				lastAccessed: new Date(),
+				repeating: null,
+			};
+		} else {
+			this.imageCache[imageUrl].lastAccessed = new Date();
+		}
+
+		return image.complete;
 	};
 }

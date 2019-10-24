@@ -2,6 +2,33 @@ import Line from '../types/shapes/Line';
 import Rectangle from '../types/shapes/Rectangle';
 import Vector2D from '../types/utility/Vector2D';
 import Circle from '../types/shapes/Circle';
+import Polygon from '../types/shapes/Polygon';
+
+/**
+ * @description Converts a polygon into a series of lines
+ * @param polygon
+ */
+export function polygonToLines(polygon: Polygon): Line[] {
+	if (polygon.points.length < 2) {
+		return [];
+	}
+
+	let point1: Vector2D;
+	let point2: Vector2D;
+	const lines: Line[] = [];
+
+	for (let i = 0; i < polygon.points.length; i++) {
+		point1 = polygon.points[i];
+		if (i === polygon.points.length - 1) {
+			[ point2 ] = polygon.points;
+		} else {
+			point2 = polygon.points[i + 1];
+		}
+		lines.push({ point1, point2 });
+	}
+
+	return lines;
+}
 
 /**
  * @description Converts a rectangle to a series of points (topLeft, topRight, bottomLeft, bottomRight)
@@ -116,6 +143,29 @@ export function vector(x: number, y: number): Vector2D {
 }
 
 /**
+ * @description Tests whether a point is inside of a polygon
+ * @param point
+ * @param polygon
+ */
+export function pointInsidePolygon(point: Vector2D, polygon: Polygon): boolean {
+	const ray: Line = {
+		point1: vector(-Infinity, point.y),
+		point2: point,
+	};
+
+	const polyLines = polygonToLines(polygon);
+	let intersections = 0;
+
+	for (let i = 0; i < polyLines.length; i++) {
+		if (lineCollidesWithLine(polyLines[i], ray)) {
+			intersections++;
+		}
+	}
+
+	return intersections % 2 === 1;
+}
+
+/**
  * @description Returns a rectangle representing the size of the given canvas element
  * @param context2d
  */
@@ -141,8 +191,8 @@ export function rectCollidesWithRect(rect1: Rectangle, rect2: Rectangle): boolea
 	const pointsRect2 = rectToPoints(rect2);
 
 	const hasIntersections = linesRect1.some((line1) => linesRect2.some((line2) => lineCollidesWithLine(line1, line2)));
-	const rect1InsideRect2 = pointsRect1.every((point) => pointInsideRect(point, rect2));
-	const rect2InsideRect1 = pointsRect2.every((point) => pointInsideRect(point, rect1));
+	const rect1InsideRect2 = pointsRect1.some((point) => pointInsideRect(point, rect2));
+	const rect2InsideRect1 = pointsRect2.some((point) => pointInsideRect(point, rect1));
 
 	return hasIntersections || rect1InsideRect2 || rect2InsideRect1;
 }
@@ -198,6 +248,35 @@ export function circleCollidesWithRect(circle: Circle, rect: Rectangle): boolean
 	return rectToLines(rect).some((line) => circleCollidesWithLine(circle, line)) || rectToPoints(rect).every((point) => pointInsideCircle(point, circle));
 }
 
+/**
+ * @description Returns the distance between two points in a cartesean plane
+ * @param point1
+ * @param point2
+ */
 export function distanceBetweenTwoPoints(point1: Vector2D, point2: Vector2D): number {
 	return Math.sqrt((point1.x - point2.x) ** 2 + (point1.y - point2.y) ** 2);
+}
+
+/**
+ * @description Returns true if a polygon intersects a rectangle or if one is inside the other
+ * @param polygon
+ * @param rect
+ */
+export function polygonCollidesWithRect(polygon: Polygon, rect: Rectangle): boolean {
+	// Polygon is inside rectangle
+	if (polygon.points.some((point) => pointInsideRect(point, rect))) {
+		return true;
+	}
+
+	// Rectangle inside polygon
+	if (rectToPoints(rect).some((point) => pointInsidePolygon(point, polygon))) {
+		return true;
+	}
+
+	// Polygon intersects with rectangle
+	if (polygonToLines(polygon).some((line) => lineCollidesWithRect(line, rect))) {
+		return true;
+	}
+
+	return false;
 }

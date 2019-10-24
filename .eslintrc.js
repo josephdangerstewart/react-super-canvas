@@ -31,5 +31,6 @@ module.exports = {
 		'max-len': 'off',
 		'lines-between-class-members': 'off',
 		'no-underscore-dangle': 'off',
+		'no-plusplus': 'off',
 	},
 };

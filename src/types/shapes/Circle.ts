@@ -4,8 +4,9 @@
  */
 
 import Vector2D from '../utility/Vector2D';
+import StyledShape, { StyledShapeDefaults } from './StyledShape';
 
-export default interface Circle {
+export default interface Circle extends StyledShape {
 	/**
 	 * @description The center of the circle in the virtual canvas space
 	 */
@@ -15,36 +16,6 @@ export default interface Circle {
 	 * @description The radius of the circle
 	 */
 	radius: number;
-
-	/**
-	 * @description The stroke of the color
-	 * @default "black"
-	 */
-	strokeColor?: string;
-
-	/**
-	 * @description The color of the fill (will have no fill if undefined)
-	 * @default null
-	 */
-	fillColor?: string;
-
-	/**
-	 * @description The background image of the circle (will have no background image if undefined and is
-	 * overridden by fillColor)
-	 * @default null
-	 */
-	fillImageUrl?: string;
-
-	/**
-	 * @description The thickness of the stroke
-	 * @default 1.0
-	 */
-	strokeWeight?: number;
 }
 
-export const CircleDefaults: object = {
-	strokeColor: 'black',
-	fillColor: null,
-	fillImageUrl: null,
-	strokeWeight: 1.0,
-};
+export const CircleDefaults: object = StyledShapeDefaults;
