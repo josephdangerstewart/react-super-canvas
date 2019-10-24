@@ -1,20 +1,10 @@
-/**
- * @author Joseph Stewart
- * @version 1.0.0
- */
-
 import Vector2D from '../utility/Vector2D';
 
-export default interface Circle {
+export default interface Polygon {
 	/**
-	 * @description The center of the circle in the virtual canvas space
+	 * @description The points that make up the polygon
 	 */
-	center: Vector2D;
-
-	/**
-	 * @description The radius of the circle
-	 */
-	radius: number;
+	points: Vector2D[];
 
 	/**
 	 * @description The stroke of the color
@@ -42,9 +32,9 @@ export default interface Circle {
 	strokeWeight?: number;
 }
 
-export const CircleDefaults: object = {
+export const PolygonDefaults: object = {
 	strokeColor: 'black',
 	fillColor: null,
 	fillImageUrl: null,
-	strokeWeight: 1.0,
+	strokeWeight: 1,
 };
