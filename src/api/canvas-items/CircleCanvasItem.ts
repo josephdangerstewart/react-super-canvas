@@ -13,7 +13,7 @@ export default class CircleCanvasItem implements ICanvasItem {
 		this.circle = {
 			center,
 			radius,
-			fillColor: 'green',
+			fillImageUrl: 'https://www.researchgate.net/profile/Junyu_Dong/publication/220930608/figure/fig2/AS:341588443189250@1458452439365/D-texture-synthesis-results-The-small-image-is-the-input-sample-while-the-larger-one-is.png',
 			strokeColor: 'black',
 		};
 

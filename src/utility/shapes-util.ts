@@ -280,3 +280,66 @@ export function polygonCollidesWithRect(polygon: Polygon, rect: Rectangle): bool
 
 	return false;
 }
+
+/**
+ * @description Returns the bounding rectangle of a circle
+ * @param circle
+ */
+export function boundingRectOfCircle(circle: Circle): Rectangle {
+	const { center: { x, y }, radius } = circle;
+	return {
+		topLeftCorner: vector(x - radius, y + radius),
+		width: radius * 2,
+		height: radius * 2,
+	};
+}
+
+/**
+ * @description Returns the bounding rectangle of a line
+ */
+export function boundingRectOfLine(line: Line): Rectangle {
+	const { point1, point2 } = line;
+	const topLeftX = Math.min(point1.x, point2.x);
+	const topLeftY = Math.max(point1.y, point2.y);
+	const bottomRightX = Math.max(point1.x, point2.x);
+	const bottomRightY = Math.min(point1.y, point2.y);
+	return {
+		topLeftCorner: vector(topLeftX, topLeftY),
+		height: topLeftY - bottomRightY,
+		width: bottomRightX - topLeftX,
+	};
+}
+
+/**
+ * @description Returns the bounding rectangle of a polygon
+ */
+export function boundingRectOfPolygon(polygon: Polygon): Rectangle {
+	const { points } = polygon;
+
+	let maxX = -Infinity;
+	let maxY = -Infinity;
+	let minX = Infinity;
+	let minY = Infinity;
+
+	points.forEach((point) => {
+		const { x, y } = point;
+		if (x > maxX) {
+			maxX = x;
+		}
+		if (x < minX) {
+			minX = x;
+		}
+		if (y > maxY) {
+			maxY = y;
+		}
+		if (y < minY) {
+			minY = y;
+		}
+	});
+
+	return {
+		topLeftCorner: vector(minX, maxY),
+		height: maxY - minY,
+		width: maxX - minX,
+	};
+}

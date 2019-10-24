@@ -57,18 +57,22 @@ export default class PainterAPI implements IPainterAPI {
 
 		// Only draw if it is visible
 		if (this.lineIntersectsCanvas({ point1, point2 })) {
+			this.context2d.save();
 			this.context2d.beginPath();
 			this.context2d.moveTo(point1.x, point1.y);
 			this.context2d.lineTo(point2.x, point2.y);
 			this.context2d.strokeStyle = line.strokeColor;
 			this.context2d.lineWidth = line.strokeWeight;
 			this.context2d.stroke();
+			this.context2d.restore();
 		}
 	};
 
 	drawImage = (topLeftCorner: Vector2D, imageUrl: string): void => {
 		this.withCachedImage(imageUrl, (image) => {
+			this.context2d.save();
 			this.doDrawImage(topLeftCorner, image);
+			this.context2d.restore();
 		});
 	};
 
@@ -82,6 +86,7 @@ export default class PainterAPI implements IPainterAPI {
 	};
 
 	drawPolygon = (polygonParam: Polygon): void => {
+		this.context2d.save();
 		const polygon = fillDefaults(polygonParam, PolygonDefaults);
 
 		if (polygon.points.length < 2) {
@@ -102,9 +107,11 @@ export default class PainterAPI implements IPainterAPI {
 
 			this.drawWithStyles(polygon);
 		}
+		this.context2d.restore();
 	};
 
 	drawRect = (rectParam: Rectangle): void => {
+		this.context2d.save();
 		const rect = fillDefaults(rectParam, RectangleDefaults);
 
 		const { x, y } = this.toAbsolutePoint(rect.topLeftCorner);
@@ -115,6 +122,7 @@ export default class PainterAPI implements IPainterAPI {
 			this.context2d.rect(x, y, width * this.scale, height * this.scale);
 			this.drawWithStyles(rect);
 		}
+		this.context2d.restore();
 	};
 
 	drawCircle = (circleParam: Circle): void => {
@@ -125,9 +133,11 @@ export default class PainterAPI implements IPainterAPI {
 		const canvasRect = getCanvasRect(this.context2d);
 
 		if (circleCollidesWithRect(circle, canvasRect)) {
+			this.context2d.save();
 			this.context2d.beginPath();
 			this.context2d.arc(x, y, radius * this.scale, 0, Math.PI * 2);
 			this.drawWithStyles(circle);
+			this.context2d.restore();
 		}
 	};
 
@@ -143,6 +153,7 @@ export default class PainterAPI implements IPainterAPI {
 		} else if (styles.fillImageUrl) {
 			this.withCachedImage(styles.fillImageUrl, (image, repeating) => {
 				this.context2d.fillStyle = repeating;
+
 				this.context2d.fill();
 				this.context2d.stroke();
 			}, () => {
@@ -205,7 +216,7 @@ export default class PainterAPI implements IPainterAPI {
 			// we don't want consumers drawing the canvas whenever their image happens to load
 			// So don't call the callback in onload
 			image.onload = (): void => {
-				cachedImage.repeating = this.context2d.createPattern(image, 'repeating');
+				cachedImage.repeating = this.context2d.createPattern(image, 'repeat');
 			};
 
 			if (onImageUnprocessed) {
