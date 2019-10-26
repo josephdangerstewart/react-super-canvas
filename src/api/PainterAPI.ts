@@ -11,6 +11,8 @@ import {
 	rectCollidesWithRect,
 	circleCollidesWithRect,
 	polygonCollidesWithRect,
+	boundingRectOfCircle,
+	boundingRectOfPolygon,
 } from '../utility/shapes-util';
 import CachedImage from '../types/utility/CachedImage';
 import Polygon, { PolygonDefaults } from '../types/shapes/Polygon';
@@ -105,7 +107,7 @@ export default class PainterAPI implements IPainterAPI {
 				this.context2d.lineTo(x, y);
 			});
 
-			this.drawWithStyles(polygon);
+			this.drawWithStyles(polygon, boundingRectOfPolygon(polygon));
 		}
 		this.context2d.restore();
 	};
@@ -120,7 +122,7 @@ export default class PainterAPI implements IPainterAPI {
 
 		if (rectCollidesWithRect(rect, canvasRect)) {
 			this.context2d.rect(x, y, width * this.scale, height * this.scale);
-			this.drawWithStyles(rect);
+			this.drawWithStyles(rect, rect);
 		}
 		this.context2d.restore();
 	};
@@ -136,14 +138,14 @@ export default class PainterAPI implements IPainterAPI {
 			this.context2d.save();
 			this.context2d.beginPath();
 			this.context2d.arc(x, y, radius * this.scale, 0, Math.PI * 2);
-			this.drawWithStyles(circle);
+			this.drawWithStyles(circle, boundingRectOfCircle(circle));
 			this.context2d.restore();
 		}
 	};
 
 	/* UTILITY METHODS */
 
-	private drawWithStyles = (styles: StyledShape): void => {
+	private drawWithStyles = (styles: StyledShape, boundingRect: Rectangle): void => {
 		this.context2d.strokeStyle = styles.strokeColor;
 		this.context2d.lineWidth = styles.strokeWeight;
 
@@ -152,8 +154,13 @@ export default class PainterAPI implements IPainterAPI {
 			this.context2d.fill();
 		} else if (styles.fillImageUrl) {
 			this.withCachedImage(styles.fillImageUrl, (image, repeating) => {
-				this.context2d.fillStyle = repeating;
+				if (!repeating) {
+					return;
+				}
 
+				const { x, y } = this.toAbsolutePoint(boundingRect.topLeftCorner);
+				repeating.setTransform(new DOMMatrix().translate(x, y).scale(this.scale, this.scale));
+				this.context2d.fillStyle = repeating;
 				this.context2d.fill();
 				this.context2d.stroke();
 			}, () => {
