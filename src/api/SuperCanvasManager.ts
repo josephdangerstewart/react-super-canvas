@@ -98,7 +98,7 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 		});
 
 		if (this.activeBrush) {
-			this.activeBrush.renderPreview(this.painter, this.context2d, this.generateBrushContext());
+			this.activeBrush.renderPreview(this.painter, this.generateBrushContext());
 		}
 
 		if (this.isActive) {

@@ -18,7 +18,7 @@ export default class CircleBrush implements IBrush {
 		this.previewRadius = cursorRadius;
 	}
 
-	renderPreview = (painter: IPainterAPI, canvasContext: CanvasRenderingContext2D, context: BrushContext): void => {
+	renderPreview = (painter: IPainterAPI, context: BrushContext): void => {
 		const cursor = context.snappedMousePosition;
 		let circlePreview: Circle;
 

@@ -343,3 +343,13 @@ export function boundingRectOfPolygon(polygon: Polygon): Rectangle {
 		width: maxX - minX,
 	};
 }
+
+/**
+ * @description A convinience method to get the shape for the mouse cursor
+ * @param pos The position of the cursor
+ */
+export const cursorPreview = (pos: Vector2D): Circle => ({
+	center: pos,
+	radius: 2,
+	fillColor: 'rgba(0, 0, 0, 0.75)',
+});
