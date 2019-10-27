@@ -106,6 +106,7 @@ export default class PainterAPI implements IPainterAPI {
 				const { x, y } = point;
 				this.context2d.lineTo(x, y);
 			});
+			this.context2d.lineTo(firstX, firstY);
 
 			this.drawWithStyles(polygon, boundingRectOfPolygon(polygon));
 		}

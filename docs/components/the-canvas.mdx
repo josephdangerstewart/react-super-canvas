@@ -6,6 +6,7 @@ menu: 2. Components
 import SuperCanvas from '../../src/components/SuperCanvas';
 import GridBackground from '../../src/api/background-elements/GridBackground';
 import CircleBrush from '../../src/api/brushes/CircleBrush';
+import PolygonBrush from '../../src/api/brushes/PolygonBrush';
 import { Playground, Props } from 'docz';
 
 # The Super Canvas
@@ -22,7 +23,7 @@ The super canvas is super easy to use! Use it just like this:
 		width={300}
 		activeBackgroundElement={new GridBackground(20)}
 		availableBrushes={[
-			new CircleBrush(),
+			new PolygonBrush(),
 		]}
 	/>
 </Playground>

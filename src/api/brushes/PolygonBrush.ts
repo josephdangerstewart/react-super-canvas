@@ -9,6 +9,10 @@ import PolygonCanvasItem from '../canvas-items/PolygonCanvasItem';
 export default class PolygonBrush implements IBrush {
 	private points: Vector2D[];
 
+	constructor() {
+		this.points = [];
+	}
+
 	renderPreview = (painter: IPainterAPI, context: BrushContext): void => {
 		const cursor = context.snappedMousePosition;
 		const cursorShape = cursorPreview(cursor);
@@ -17,7 +21,7 @@ export default class PolygonBrush implements IBrush {
 		if (this.points.length === 0) {
 			painter.drawCircle(cursorShape);
 		} else {
-			const lines = polygonToLines({ points: this.points });
+			const lines = polygonToLines({ points: [ ...this.points, cursor ] }, false);
 			lines.forEach((line) => painter.drawLine(line));
 			painter.drawCircle(cursorShape);
 		}
@@ -42,6 +46,7 @@ export default class PolygonBrush implements IBrush {
 			}
 
 			addCanvasItem(new PolygonCanvasItem(this.points));
+			this.points = [];
 			return;
 		}
 

@@ -8,7 +8,7 @@ import Polygon from '../types/shapes/Polygon';
  * @description Converts a polygon into a series of lines
  * @param polygon
  */
-export function polygonToLines(polygon: Polygon): Line[] {
+export function polygonToLines(polygon: Polygon, enforceCompleteness = true): Line[] {
 	if (polygon.points.length < 2) {
 		return [];
 	}
@@ -24,7 +24,10 @@ export function polygonToLines(polygon: Polygon): Line[] {
 		} else {
 			point2 = polygon.points[i + 1];
 		}
-		lines.push({ point1, point2 });
+
+		if (i < polygon.points.length - 1 || enforceCompleteness) {
+			lines.push({ point1, point2 });
+		}
 	}
 
 	return lines;
