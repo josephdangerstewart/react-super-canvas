@@ -5,7 +5,7 @@ import { MouseEventCallback } from '../../types/callbacks/MouseEventCallback';
 import { KeyboardEventCallback } from '../../types/callbacks/KeyboardEventCallback';
 
 const SCALE_MIN = 0.2;
-const SCALE_MAX = 5;
+const SCALE_MAX = 3;
 
 /**
  * @description This class registers all dom events that perform data calculations needed
