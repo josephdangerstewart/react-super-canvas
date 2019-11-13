@@ -1,8 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react';
-import ISuperCanvasManager from '../types/ISuperCanvasManager';
-import SuperCanvasManager from '../api/SuperCanvasManager';
+import React from 'react';
 import IBrush from '../types/IBrush';
 import IBackgroundElement from '../types/IBackgroundElement';
+import { RenderToolbarCallback } from '../types/callbacks/RenderToolbarCallback';
+import { useSuperCanvasManager } from '../hooks/use-super-canvas-manager';
+import { renderDefaultToolbar } from './DefautltToolbar';
 
 export interface SuperCanvasProps {
 	/**
@@ -24,6 +25,11 @@ export interface SuperCanvasProps {
 	 * The active background element
 	 */
 	activeBackgroundElement: IBackgroundElement;
+
+	/**
+	 * The render function for rendering a custom toolbar
+	 */
+	renderToolbar?: RenderToolbarCallback;
 }
 
 export default ({
@@ -31,32 +37,20 @@ export default ({
 	width,
 	availableBrushes,
 	activeBackgroundElement,
+	renderToolbar: customRenderToolbar,
 }: SuperCanvasProps): React.ReactNode => {
-	const canvasRef = useRef(null);
-	const [ superCanvasManager, setSuperCanvasManager ] = useState<ISuperCanvasManager>(null);
+	const { canvasRef, superCanvasManager } = useSuperCanvasManager(activeBackgroundElement, availableBrushes);
 
-	useEffect(() => {
-		if (canvasRef.current && !superCanvasManager) {
-			const manager = new SuperCanvasManager();
-			manager.init(canvasRef.current);
-			manager.setActiveBackgroundElement(activeBackgroundElement);
-			manager.setAvailableBrushes(availableBrushes);
-
-			setSuperCanvasManager(manager);
-
-			return (): void => {
-				manager.destroy();
-			};
-		}
-
-		return null;
-	}, []);
+	const renderToolbar = customRenderToolbar || renderDefaultToolbar;
 
 	return (
-		<canvas
-			height={height}
-			width={width}
-			ref={canvasRef}
-		/>
+		<div>
+			<canvas
+				height={height}
+				width={width}
+				ref={canvasRef}
+			/>
+			{superCanvasManager && renderToolbar(superCanvasManager.setActiveBrush, availableBrushes)}
+		</div>
 	);
 };

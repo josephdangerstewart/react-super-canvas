@@ -78,6 +78,10 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 		}
 	};
 
+	setActiveBrush = (brush: IBrush): void => {
+		this.activeBrush = brush;
+	};
+
 	/* PRIVATE METHODS */
 
 	private update = (): void => {

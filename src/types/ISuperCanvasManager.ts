@@ -34,4 +34,9 @@ export default interface ISuperCanvasManager {
 	 * it cannot be mutated internally
 	 */
 	setAvailableBrushes: (brushes: IBrush[]) => void;
+
+	/**
+	 * @description Sets the brush that the user is currently using
+	 */
+	setActiveBrush: (brush: IBrush) => void;
 }

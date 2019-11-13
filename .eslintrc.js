@@ -34,5 +34,6 @@ module.exports = {
 		'no-plusplus': 'off',
 		'import/prefer-default-export': 'off',
 		'no-confusing-arrow': 'off',
+		'react/button-has-type': 'off',
 	},
 };
