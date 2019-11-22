@@ -1,4 +1,4 @@
-import IBrush from '../../types/IBrush';
+import IBrush, { DefaultBrushKind } from '../../types/IBrush';
 import Vector2D from '../../types/utility/Vector2D';
 import IPainterAPI from '../../types/IPainterAPI';
 import { BrushContext } from '../../types/context/BrushContext';
@@ -7,6 +7,7 @@ import { AddCanvasItemCallback } from '../../types/callbacks/AddCanvasItemCallba
 import PolygonCanvasItem from '../canvas-items/PolygonCanvasItem';
 
 export default class PolygonBrush implements IBrush {
+	public brushName = DefaultBrushKind.PolygonBrush;
 	private points: Vector2D[];
 
 	constructor() {

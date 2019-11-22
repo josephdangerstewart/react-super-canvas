@@ -1,4 +1,4 @@
-import IBrush from '../../types/IBrush';
+import IBrush, { DefaultBrushKind } from '../../types/IBrush';
 import IPainterAPI from '../../types/IPainterAPI';
 import { BrushContext } from '../../types/context/BrushContext';
 import Circle from '../../types/shapes/Circle';
@@ -8,6 +8,8 @@ import { distanceBetweenTwoPoints } from '../../utility/shapes-util';
 import CircleCanvasItem from '../canvas-items/CircleCanvasItem';
 
 export default class CircleBrush implements IBrush {
+	public brushName = DefaultBrushKind.CircleBrush;
+
 	private cursorRadius: number;
 	private centerAt: Vector2D;
 	private previewRadius: number;

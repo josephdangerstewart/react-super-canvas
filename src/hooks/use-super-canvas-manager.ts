@@ -9,6 +9,9 @@ export interface UseSuperCanvasManagerHook {
 	superCanvasManager: ISuperCanvasManager;
 }
 
+/**
+ * @description Initializes the super canvas manager
+ */
 export const useSuperCanvasManager = (activeBackgroundElement: IBackgroundElement, availableBrushes: IBrush[]): UseSuperCanvasManagerHook => {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const [ superCanvasManager, setSuperCanvasManager ] = useState<ISuperCanvasManager>(null);
