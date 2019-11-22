@@ -35,5 +35,6 @@ module.exports = {
 		'import/prefer-default-export': 'off',
 		'no-confusing-arrow': 'off',
 		'react/button-has-type': 'off',
+		'react/prop-types': 'off',
 	},
 };

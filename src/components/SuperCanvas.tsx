@@ -1,9 +1,14 @@
 import React from 'react';
 import IBrush from '../types/IBrush';
 import IBackgroundElement from '../types/IBackgroundElement';
-import { RenderToolbarCallback } from '../types/callbacks/RenderToolbarCallback';
 import { useSuperCanvasManager } from '../hooks/use-super-canvas-manager';
-import { renderDefaultToolbar } from './DefautltToolbar';
+import DefaultToolbar, { ToolbarProps } from './toolbar/DefaultToolbar';
+import DefaultBrushControls, { BrushControlsProps } from './toolbar/DefaultBrushControls';
+
+export interface ToolbarComponents {
+	Toolbar?: React.ComponentType<ToolbarProps>;
+	BrushControls?: React.ComponentType<BrushControlsProps>;
+}
 
 export interface SuperCanvasProps {
 	/**
@@ -27,21 +32,26 @@ export interface SuperCanvasProps {
 	activeBackgroundElement: IBackgroundElement;
 
 	/**
-	 * The render function for rendering a custom toolbar
+	 * Optional replaceable components for the toolbar
 	 */
-	renderToolbar?: RenderToolbarCallback;
+	toolbarComponents?: ToolbarComponents;
 }
 
-export default ({
+const SuperCanvas: React.FunctionComponent<SuperCanvasProps> = ({
 	height,
 	width,
 	availableBrushes,
 	activeBackgroundElement,
-	renderToolbar: customRenderToolbar,
-}: SuperCanvasProps): React.ReactNode => {
+	toolbarComponents,
+}) => {
 	const { canvasRef, superCanvasManager } = useSuperCanvasManager(activeBackgroundElement, availableBrushes);
+	const {
+		Toolbar: CustomToolbar,
+		BrushControls: CustomBrushControls,
+	} = (toolbarComponents || {}) as ToolbarComponents;
 
-	const renderToolbar = customRenderToolbar || renderDefaultToolbar;
+	const Toolbar = CustomToolbar || DefaultToolbar as React.ComponentType<ToolbarProps>;
+	const BrushControls = CustomBrushControls || DefaultBrushControls as React.ComponentType<BrushControlsProps>;
 
 	return (
 		<div>
@@ -50,7 +60,18 @@ export default ({
 				width={width}
 				ref={canvasRef}
 			/>
-			{superCanvasManager && renderToolbar(superCanvasManager.setActiveBrush, availableBrushes)}
+			{superCanvasManager && (
+				<Toolbar
+					brushControls={(
+						<BrushControls
+							setActiveBrush={superCanvasManager.setActiveBrush}
+							brushes={availableBrushes}
+						/>
+					)}
+				/>
+			)}
 		</div>
 	);
 };
+
+export default SuperCanvas;
