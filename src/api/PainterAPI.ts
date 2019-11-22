@@ -59,22 +59,19 @@ export default class PainterAPI implements IPainterAPI {
 
 		// Only draw if it is visible
 		if (this.lineIntersectsCanvas({ point1, point2 })) {
-			this.context2d.save();
 			this.context2d.beginPath();
 			this.context2d.moveTo(point1.x, point1.y);
 			this.context2d.lineTo(point2.x, point2.y);
 			this.context2d.strokeStyle = line.strokeColor;
 			this.context2d.lineWidth = line.strokeWeight;
+			this.context2d.closePath();
 			this.context2d.stroke();
-			this.context2d.restore();
 		}
 	};
 
 	drawImage = (topLeftCorner: Vector2D, imageUrl: string): void => {
 		this.withCachedImage(imageUrl, (image) => {
-			this.context2d.save();
 			this.doDrawImage(topLeftCorner, image);
-			this.context2d.restore();
 		});
 	};
 
@@ -88,7 +85,6 @@ export default class PainterAPI implements IPainterAPI {
 	};
 
 	drawPolygon = (polygonParam: Polygon): void => {
-		this.context2d.save();
 		const polygon = fillDefaults(polygonParam, PolygonDefaults);
 
 		if (polygon.points.length < 2) {
@@ -100,6 +96,7 @@ export default class PainterAPI implements IPainterAPI {
 			const [ firstPoint, ...restOfPoints ] = polygon.points.map(this.toAbsolutePoint);
 			const { x: firstX, y: firstY } = firstPoint;
 
+			this.context2d.beginPath();
 			this.context2d.moveTo(firstX, firstY);
 
 			restOfPoints.forEach((point) => {
@@ -108,9 +105,9 @@ export default class PainterAPI implements IPainterAPI {
 			});
 			this.context2d.lineTo(firstX, firstY);
 
+			this.context2d.closePath();
 			this.drawWithStyles(polygon, boundingRectOfPolygon(polygon));
 		}
-		this.context2d.restore();
 	};
 
 	drawRect = (rectParam: Rectangle): void => {
@@ -136,11 +133,10 @@ export default class PainterAPI implements IPainterAPI {
 		const canvasRect = getCanvasRect(this.context2d);
 
 		if (circleCollidesWithRect(circle, canvasRect)) {
-			this.context2d.save();
 			this.context2d.beginPath();
 			this.context2d.arc(x, y, radius * this.scale, 0, Math.PI * 2);
+			this.context2d.closePath();
 			this.drawWithStyles(circle, boundingRectOfCircle(circle));
-			this.context2d.restore();
 		}
 	};
 
