@@ -54,7 +54,7 @@ export default class CircleBrush implements IBrush {
 		if (!this.centerAt) {
 			this.centerAt = context.snappedMousePosition;
 		} else {
-			addCanvasItem(new CircleCanvasItem(this.centerAt, this.previewRadius));
+			addCanvasItem(new CircleCanvasItem(this.centerAt, this.previewRadius, context.styleContext.fillColor));
 			this.centerAt = null;
 			this.previewRadius = this.cursorRadius;
 		}

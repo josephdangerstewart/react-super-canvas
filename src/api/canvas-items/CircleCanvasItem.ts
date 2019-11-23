@@ -9,11 +9,11 @@ export default class CircleCanvasItem implements ICanvasItem {
 	private circle: Circle;
 	private line: Line;
 
-	constructor(center: Vector2D, radius: number) {
+	constructor(center: Vector2D, radius: number, fillColor = 'green') {
 		this.circle = {
 			center,
 			radius,
-			fillColor: 'green',
+			fillColor,
 			strokeColor: 'black',
 		};
 

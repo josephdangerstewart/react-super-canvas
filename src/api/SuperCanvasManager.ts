@@ -10,6 +10,7 @@ import BackgroundElementContext from '../types/context/BackgroundElementContext'
 import Context from '../types/context/Context';
 import { BrushContext } from '../types/context/BrushContext';
 import { MouseEventKind } from '../types/callbacks/DomEventKinds';
+import StyleContext, { defaultStyleContext } from '../types/context/StyleContext';
 
 export default class SuperCanvasManager implements ISuperCanvasManager {
 	/* PRIVATE MEMBERS */
@@ -38,6 +39,9 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 	// Used for determining whether to keep updating (preventing memory leaks)
 	private isActive: boolean;
 
+	// Allows users to set color/stroke settings
+	private styleContext: StyleContext;
+
 	/* PUBLIC METHODS */
 
 	init = (canvas: HTMLCanvasElement): void => {
@@ -48,6 +52,7 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 
 		this.canvasItems = [];
 		this.availableBrushes = [];
+		this.styleContext = defaultStyleContext;
 
 		this.isActive = true;
 
@@ -82,6 +87,19 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 		this.activeBrush = brush;
 	};
 
+	setStyleContext = (styleContext: StyleContext): void => {
+		const copy = { ...styleContext };
+		if (styleContext.fillImageUrl && styleContext.fillColor) {
+			console.warn('Both fillImageUrl and fillColor were provided: fillImageUrl will be overridden');
+			copy.fillImageUrl = null;
+		}
+
+		this.styleContext = {
+			...this.styleContext,
+			...copy,
+		};
+	};
+
 	/* PRIVATE METHODS */
 
 	private update = (): void => {
@@ -114,6 +132,7 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 		mousePosition: this.interactionManager.mousePosition,
 		absoluteMousePosition: this.interactionManager.absoluteMousePosition,
 		isPanning: this.interactionManager.isPanning,
+		styleContext: this.styleContext,
 	});
 
 	private generateCanvasContextForItem = (): CanvasItemContext => ({

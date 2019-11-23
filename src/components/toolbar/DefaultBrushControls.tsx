@@ -18,14 +18,17 @@ export interface BrushControlsProps {
 const DefaultBrushControls: React.FunctionComponent<BrushControlsProps> = ({
 	setActiveBrush,
 	brushes,
-}) => (
-	<>
-		{brushes.map((brush) => ICONS[brush.brushName] && (
-			<button onClick={(): void => setActiveBrush(brush)} key={`brush-${brush.brushName}`}>
-				<FontAwesomeIcon icon={ICONS[brush.brushName]} />
-			</button>
-		))}
-	</>
-);
+}) => {
+	let count = 1;
+	return (
+		<>
+			{brushes.map((brush) => (
+				<button onClick={(): void => setActiveBrush(brush)} key={`brush-${brush.brushName}`}>
+					{ICONS[brush.brushName] ? <FontAwesomeIcon icon={ICONS[brush.brushName]} /> : count++ }
+				</button>
+			))}
+		</>
+	);
+};
 
 export default DefaultBrushControls;

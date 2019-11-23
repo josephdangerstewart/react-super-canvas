@@ -1,6 +1,7 @@
 import ICanvasItem from './ICanvasItem';
 import IBackgroundElement from './IBackgroundElement';
 import IBrush from './IBrush';
+import StyleContext from './context/StyleContext';
 
 export default interface ISuperCanvasManager {
 	/**
@@ -39,4 +40,9 @@ export default interface ISuperCanvasManager {
 	 * @description Sets the brush that the user is currently using
 	 */
 	setActiveBrush: (brush: IBrush) => void;
+
+	/**
+	 * @description Sets the style context for the active brush
+	 */
+	setStyleContext: (styleContext: StyleContext) => void;
 }

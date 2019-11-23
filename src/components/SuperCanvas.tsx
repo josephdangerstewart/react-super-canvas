@@ -4,10 +4,12 @@ import IBackgroundElement from '../types/IBackgroundElement';
 import { useSuperCanvasManager } from '../hooks/use-super-canvas-manager';
 import DefaultToolbar, { ToolbarProps } from './toolbar/DefaultToolbar';
 import DefaultBrushControls, { BrushControlsProps } from './toolbar/DefaultBrushControls';
+import DefaultStyleControls, { StyleControlsProps } from './toolbar/DefaultStyleControls';
 
 export interface ToolbarComponents {
 	Toolbar?: React.ComponentType<ToolbarProps>;
 	BrushControls?: React.ComponentType<BrushControlsProps>;
+	StyleControls?: React.ComponentType<StyleControlsProps>;
 }
 
 export interface SuperCanvasProps {
@@ -48,10 +50,12 @@ const SuperCanvas: React.FunctionComponent<SuperCanvasProps> = ({
 	const {
 		Toolbar: CustomToolbar,
 		BrushControls: CustomBrushControls,
+		StyleControls: CustomStyleControls,
 	} = (toolbarComponents || {}) as ToolbarComponents;
 
 	const Toolbar = CustomToolbar || DefaultToolbar as React.ComponentType<ToolbarProps>;
 	const BrushControls = CustomBrushControls || DefaultBrushControls as React.ComponentType<BrushControlsProps>;
+	const StyleControls = CustomStyleControls || DefaultStyleControls as React.ComponentType<StyleControlsProps>;
 
 	return (
 		<div>
@@ -66,6 +70,11 @@ const SuperCanvas: React.FunctionComponent<SuperCanvasProps> = ({
 						<BrushControls
 							setActiveBrush={superCanvasManager.setActiveBrush}
 							brushes={availableBrushes}
+						/>
+					)}
+					styleControls={(
+						<StyleControls
+							setStyleContext={superCanvasManager.setStyleContext}
 						/>
 					)}
 				/>
