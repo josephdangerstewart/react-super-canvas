@@ -11,6 +11,7 @@ import Context from '../types/context/Context';
 import { BrushContext } from '../types/context/BrushContext';
 import { MouseEventKind } from '../types/callbacks/DomEventKinds';
 import StyleContext, { defaultStyleContext } from '../types/context/StyleContext';
+import { ActiveBrushChangeCallback } from '../types/callbacks/ActiveBrushChangeCallback';
 
 export default class SuperCanvasManager implements ISuperCanvasManager {
 	/* PRIVATE MEMBERS */
@@ -41,6 +42,8 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 
 	// Allows users to set color/stroke settings
 	private styleContext: StyleContext;
+
+	private _onActiveBrushChange: ActiveBrushChangeCallback;
 
 	/* PUBLIC METHODS */
 
@@ -85,6 +88,9 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 
 	setActiveBrush = (brush: IBrush): void => {
 		this.activeBrush = brush;
+		if (this.onActiveBrushChange) {
+			this._onActiveBrushChange(this.activeBrush);
+		}
 	};
 
 	setStyleContext = (styleContext: StyleContext): void => {
@@ -98,6 +104,11 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 			...this.styleContext,
 			...copy,
 		};
+	};
+
+	onActiveBrushChange = (onChange: ActiveBrushChangeCallback): void => {
+		onChange(this.activeBrush);
+		this._onActiveBrushChange = onChange;
 	};
 
 	/* PRIVATE METHODS */

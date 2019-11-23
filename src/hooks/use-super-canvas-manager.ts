@@ -7,6 +7,7 @@ import IBrush from '../types/IBrush';
 export interface UseSuperCanvasManagerHook {
 	canvasRef: React.MutableRefObject<HTMLCanvasElement>;
 	superCanvasManager: ISuperCanvasManager;
+	activeBrushName: string;
 }
 
 /**
@@ -14,6 +15,7 @@ export interface UseSuperCanvasManagerHook {
  */
 export const useSuperCanvasManager = (activeBackgroundElement: IBackgroundElement, availableBrushes: IBrush[]): UseSuperCanvasManagerHook => {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
+	const [ activeBrushName, setActiveBrushName ] = useState('');
 	const [ superCanvasManager, setSuperCanvasManager ] = useState<ISuperCanvasManager>(null);
 
 	useEffect(() => {
@@ -22,6 +24,9 @@ export const useSuperCanvasManager = (activeBackgroundElement: IBackgroundElemen
 			manager.init(canvasRef.current);
 			manager.setActiveBackgroundElement(activeBackgroundElement);
 			manager.setAvailableBrushes(availableBrushes);
+			manager.onActiveBrushChange((brush): void => {
+				setActiveBrushName(brush.brushName);
+			});
 
 			setSuperCanvasManager(manager);
 
@@ -36,5 +41,6 @@ export const useSuperCanvasManager = (activeBackgroundElement: IBackgroundElemen
 	return {
 		canvasRef,
 		superCanvasManager,
+		activeBrushName,
 	};
 };

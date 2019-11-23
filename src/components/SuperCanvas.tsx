@@ -46,7 +46,7 @@ const SuperCanvas: React.FunctionComponent<SuperCanvasProps> = ({
 	activeBackgroundElement,
 	toolbarComponents,
 }) => {
-	const { canvasRef, superCanvasManager } = useSuperCanvasManager(activeBackgroundElement, availableBrushes);
+	const { canvasRef, superCanvasManager, activeBrushName } = useSuperCanvasManager(activeBackgroundElement, availableBrushes);
 	const {
 		Toolbar: CustomToolbar,
 		BrushControls: CustomBrushControls,
@@ -58,7 +58,7 @@ const SuperCanvas: React.FunctionComponent<SuperCanvasProps> = ({
 	const StyleControls = CustomStyleControls || DefaultStyleControls as React.ComponentType<StyleControlsProps>;
 
 	return (
-		<div>
+		<div style={{ position: 'relative' }}>
 			<canvas
 				height={height}
 				width={width}
@@ -70,6 +70,7 @@ const SuperCanvas: React.FunctionComponent<SuperCanvasProps> = ({
 						<BrushControls
 							setActiveBrush={superCanvasManager.setActiveBrush}
 							brushes={availableBrushes}
+							activeBrushName={activeBrushName}
 						/>
 					)}
 					styleControls={(

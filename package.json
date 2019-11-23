@@ -24,12 +24,15 @@
 		"@fortawesome/fontawesome-svg-core": "^1.2.25",
 		"@fortawesome/free-solid-svg-icons": "^5.11.2",
 		"@fortawesome/react-fontawesome": "^0.1.7",
+		"@types/styled-components": "^4.4.0",
 		"babel-loader": "^8.0.6",
 		"docz": "^2.0.0-rc.57",
 		"prop-types": "^15.7.2",
 		"prop-types-ts": "^0.6.2",
 		"react": "^16.10.2",
-		"react-dom": "^16.10.2"
+		"react-dom": "^16.10.2",
+		"react-tiny-popover": "^3.4.5",
+		"styled-components": "^4.4.1"
 	},
 	"devDependencies": {
 		"@types/react": "^16.9.9",
