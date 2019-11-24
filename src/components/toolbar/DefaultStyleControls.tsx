@@ -2,6 +2,7 @@ import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSlidersH } from '@fortawesome/free-solid-svg-icons';
 import { SetStyleContextCallback } from '../../types/callbacks/SetStyleContextCallback';
+import { Button } from './StyledButton';
 
 export interface StyleControlsProps {
 	setStyleContext: SetStyleContextCallback;
@@ -10,9 +11,9 @@ export interface StyleControlsProps {
 const DefaultStyleControls: React.FunctionComponent<StyleControlsProps> = ({
 	setStyleContext,
 }) => (
-	<button onClick={(): void => setStyleContext({ fillColor: 'orange' })}>
+	<Button onClick={(): void => setStyleContext({ fillColor: 'orange' })}>
 		<FontAwesomeIcon icon={faSlidersH} />
-	</button>
+	</Button>
 );
 
 export default DefaultStyleControls;

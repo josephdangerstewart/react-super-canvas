@@ -19,3 +19,22 @@ export const ToggleButton = styled.button<ToggleButtonProps>`
 		outline: none;
 	}
 `;
+
+export const Button = styled.button`
+	background: none;
+	border: 0;
+	cursor: pointer;
+	color: black;
+
+	&:hover {
+		color: #8C8C8C;
+	}
+
+	&:focus {
+		outline: none;
+	}
+
+	&:active {
+		color: #BBBBBB;
+	}
+`;
