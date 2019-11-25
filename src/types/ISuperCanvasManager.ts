@@ -3,6 +3,7 @@ import IBackgroundElement from './IBackgroundElement';
 import IBrush from './IBrush';
 import StyleContext from './context/StyleContext';
 import { ActiveBrushChangeCallback } from './callbacks/ActiveBrushChangeCallback';
+import { StyleContextChangeCallback } from './callbacks/StyleContextChangeCallback';
 
 export default interface ISuperCanvasManager {
 	/**
@@ -51,4 +52,9 @@ export default interface ISuperCanvasManager {
 	 * @description Calls the callback when the brush is changed
 	 */
 	onActiveBrushChange: (onChange: ActiveBrushChangeCallback) => void;
+
+	/**
+	 * @description Calls the callback when the style context is changed
+	 */
+	onStyleContextChange: (onChange: StyleContextChangeCallback) => void;
 }

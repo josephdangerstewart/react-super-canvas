@@ -46,7 +46,12 @@ const SuperCanvas: React.FunctionComponent<SuperCanvasProps> = ({
 	activeBackgroundElement,
 	toolbarComponents,
 }) => {
-	const { canvasRef, superCanvasManager, activeBrushName } = useSuperCanvasManager(activeBackgroundElement, availableBrushes);
+	const {
+		canvasRef,
+		superCanvasManager,
+		activeBrushName,
+		styleContext,
+	} = useSuperCanvasManager(activeBackgroundElement, availableBrushes);
 	const {
 		Toolbar: CustomToolbar,
 		BrushControls: CustomBrushControls,
@@ -76,6 +81,7 @@ const SuperCanvas: React.FunctionComponent<SuperCanvasProps> = ({
 					styleControls={(
 						<StyleControls
 							setStyleContext={superCanvasManager.setStyleContext}
+							styleContext={styleContext}
 						/>
 					)}
 				/>

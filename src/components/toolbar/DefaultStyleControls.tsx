@@ -4,14 +4,17 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSlidersH } from '@fortawesome/free-solid-svg-icons';
 import { SetStyleContextCallback } from '../../types/callbacks/SetStyleContextCallback';
 import { Button } from './StyledButton';
-import { StyleControls } from './StyleControls';
+import { StyleControlPopover } from './StyleControlPopover';
+import StyleContext from '../../types/context/StyleContext';
 
 export interface StyleControlsProps {
 	setStyleContext: SetStyleContextCallback;
+	styleContext: StyleContext;
 }
 
 const DefaultStyleControls: React.FunctionComponent<StyleControlsProps> = ({
 	setStyleContext,
+	styleContext,
 }) => {
 	const [ isOpen, setIsOpen ] = useState(false);
 
@@ -19,8 +22,9 @@ const DefaultStyleControls: React.FunctionComponent<StyleControlsProps> = ({
 		<Popover
 			isOpen={isOpen}
 			content={(
-				<StyleControls
+				<StyleControlPopover
 					setStyleContext={setStyleContext}
+					styleContext={styleContext}
 				/>
 			)}
 			onClickOutside={(): void => setIsOpen(false)}
