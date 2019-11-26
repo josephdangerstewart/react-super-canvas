@@ -1,13 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFillDrip } from '@fortawesome/free-solid-svg-icons';
 import { SetStyleContextCallback } from '../../types/callbacks/SetStyleContextCallback';
 import StyleContext from '../../types/context/StyleContext';
+import ColorInput from '../color-input/ColorInput';
 
 export const PopoverContentWrapper = styled.div`
 	background-color: #F8F8F8;
-	padding: 8px;
 	border-radius: 4px;
 	z-index: 10px;
 `;
@@ -17,20 +15,25 @@ export interface StyleControlsProps {
 	styleContext: StyleContext;
 }
 
-export const StyleControlPopover: React.FunctionComponent<StyleControlsProps> = ({
-	setStyleContext,
-	styleContext,
-}) => (
-	<PopoverContentWrapper>
-		<div>
-			<FontAwesomeIcon icon={faFillDrip} />
-			<input
-				type="color"
-				onChange={(event): void => {
-					setStyleContext({ fillColor: event.target.value, fillImageUrl: '' });
-				}}
-				value={styleContext.fillColor}
+export const StyleControlPopover: React.FunctionComponent<StyleControlsProps> = () => {
+	const [ selectedColor, setSelectedColor ] = useState('#697689');
+
+	return (
+		<PopoverContentWrapper>
+			<ColorInput
+				presetColors={[
+					'#F47373',
+					'#697689',
+					'#37D67A',
+					'#2CCCE4',
+					'#555555',
+					'#DCE775',
+					'#FF8A65',
+					'#BA68C8',
+				]}
+				value={selectedColor}
+				onChange={(value): void => setSelectedColor(value)}
 			/>
-		</div>
-	</PopoverContentWrapper>
-);
+		</PopoverContentWrapper>
+	);
+};
