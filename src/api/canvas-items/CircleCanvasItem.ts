@@ -27,6 +27,5 @@ export default class CircleCanvasItem implements ICanvasItem {
 
 	render = (painter: IPainterAPI): void => {
 		painter.drawCircle(this.circle);
-		painter.drawLine(this.line);
 	};
 }
