@@ -9,6 +9,8 @@ export const ToggleButton = styled.button<ToggleButtonProps>`
 	background: none;
 	border: 0;
 	cursor: pointer;
+	padding: 0;
+	margin: 1px 6px;
 	color: ${(props): string => props.toggled ? 'black' : '#BBBBBB'};
 
 	&:hover {
@@ -28,6 +30,8 @@ export const Button = styled.button<ButtonProps>`
 	background: none;
 	border: 0;
 	cursor: pointer;
+	padding: 0;
+	margin: 1px 6px;
 	color: black;
 	${(props): string => props.backgroundColor ? `background-color: ${props.backgroundColor}` : ''}
 
