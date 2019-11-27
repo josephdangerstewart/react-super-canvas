@@ -4,17 +4,18 @@ import IPainterAPI from '../../types/IPainterAPI';
 import Vector2D from '../../types/utility/Vector2D';
 import Line from '../../types/shapes/Line';
 import { vector } from '../../utility/shapes-util';
+import StyleContext from '../../types/context/StyleContext';
 
 export default class CircleCanvasItem implements ICanvasItem {
 	private circle: Circle;
 	private line: Line;
 
-	constructor(center: Vector2D, radius: number, fillColor = 'green') {
+	constructor(center: Vector2D, radius: number, styleContext: StyleContext) {
 		this.circle = {
 			center,
 			radius,
-			fillColor,
-			strokeColor: 'black',
+			fillColor: styleContext.fillColor,
+			strokeColor: styleContext.strokeColor,
 		};
 
 		this.line = {

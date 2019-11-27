@@ -14,6 +14,10 @@ export interface RGBA extends RGB {
 }
 
 export function hexToRgb(hex: string): RGB {
+	if (!hex) {
+		return null;
+	}
+
 	const normalizedHex = hex.replace(
 		/^#([a-f\d])([a-f\d])([a-f\d])/ig,
 		(m, r, g, b) => (r + r + g + g + b + b),
@@ -28,6 +32,10 @@ export function hexToRgb(hex: string): RGB {
 }
 
 export function hexaToRgba(hex: string): RGBA {
+	if (!hex) {
+		return null;
+	}
+
 	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
 	return result && {
 		r: parseInt(result[1], 16),
@@ -38,14 +46,26 @@ export function hexaToRgba(hex: string): RGBA {
 }
 
 export function isValidHex(color: string): boolean {
+	if (!color) {
+		return false;
+	}
+
 	return /^(#[A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9]|#[A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9])$/.test(color);
 }
 
 export function isValidHexa(color: string): boolean {
+	if (!color) {
+		return false;
+	}
+
 	return /^#[A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9]$/.test(color);
 }
 
 export function stringToRgb(color: string): RGB {
+	if (!color) {
+		return null;
+	}
+
 	const normalizedColor = color.replace(/\s/g, '');
 
 	if (isValidHex(color)) {
@@ -70,6 +90,10 @@ export function stringToRgb(color: string): RGB {
 }
 
 export function stringToRgba(color: string): RGBA {
+	if (!color) {
+		return null;
+	}
+
 	const normalizedColor = color.replace(/\s/g, '');
 
 	if (isValidHexa(normalizedColor)) {
@@ -148,5 +172,9 @@ export function getContrast(color: string): ColorContrast {
 }
 
 export function withOpacity(color: string, alpha: number): string {
+	if (!color) {
+		return null;
+	}
+
 	return rgbaToString({ ...stringToRgb(color), a: alpha });
 }

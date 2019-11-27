@@ -6,6 +6,7 @@ import { AddCanvasItemCallback } from '../../types/callbacks/AddCanvasItemCallba
 import Vector2D from '../../types/utility/Vector2D';
 import { distanceBetweenTwoPoints } from '../../utility/shapes-util';
 import CircleCanvasItem from '../canvas-items/CircleCanvasItem';
+import { withOpacity } from '../../utility/color-utility';
 
 export default class CircleBrush implements IBrush {
 	public brushName = DefaultBrushKind.CircleBrush;
@@ -22,6 +23,7 @@ export default class CircleBrush implements IBrush {
 
 	renderPreview = (painter: IPainterAPI, context: BrushContext): void => {
 		const cursor = context.snappedMousePosition;
+		const { styleContext } = context;
 		let circlePreview: Circle;
 
 		if (!this.centerAt) {
@@ -42,8 +44,8 @@ export default class CircleBrush implements IBrush {
 			circlePreview = {
 				center: this.centerAt,
 				radius: this.previewRadius,
-				fillColor: 'black',
-				strokeColor: 'black',
+				fillColor: withOpacity(styleContext.fillColor, 0.5),
+				strokeColor: withOpacity(styleContext.strokeColor, 0.5),
 			};
 		}
 
@@ -54,7 +56,7 @@ export default class CircleBrush implements IBrush {
 		if (!this.centerAt) {
 			this.centerAt = context.snappedMousePosition;
 		} else {
-			addCanvasItem(new CircleCanvasItem(this.centerAt, this.previewRadius, context.styleContext.fillColor));
+			addCanvasItem(new CircleCanvasItem(this.centerAt, this.previewRadius, context.styleContext));
 			this.centerAt = null;
 			this.previewRadius = this.cursorRadius;
 		}
