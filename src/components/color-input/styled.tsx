@@ -16,6 +16,7 @@ export const ColorValueDisplay = styled.div<ColorValueDisplayProps>`
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	font-family: sans-serif;
 	background-color: ${(props): string => props.color};
 	color: ${(props): string => props.color && getContrast(props.color) === ColorContrast.Dark ? 'white' : 'black'};
 	width: 100%;
@@ -59,4 +60,9 @@ export const Input = styled.input`
 	border: 0px;
 	box-shadow: rgb(221, 221, 221) 0px 0px 0px 1px inset;
 	padding: 2px 4px;
+	font-family: sans-serif;
+
+	&:focus {
+		outline: none;
+	}
 `;

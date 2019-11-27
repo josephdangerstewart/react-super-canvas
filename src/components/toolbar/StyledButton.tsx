@@ -20,11 +20,16 @@ export const ToggleButton = styled.button<ToggleButtonProps>`
 	}
 `;
 
-export const Button = styled.button`
+export interface ButtonProps {
+	backgroundColor?: string;
+}
+
+export const Button = styled.button<ButtonProps>`
 	background: none;
 	border: 0;
 	cursor: pointer;
 	color: black;
+	${(props): string => props.backgroundColor ? `background-color: ${props.backgroundColor}` : ''}
 
 	&:hover {
 		color: #8C8C8C;

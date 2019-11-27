@@ -22,7 +22,8 @@ const ColorInput: React.FunctionComponent<ColorInputProps> = ({
 	presetColors,
 	onChange,
 }) => {
-	const [ stateValue, setStateValue ] = useState(defaultValue || '');
+	const [ stateValue, setStateValue ] = useState(controlledValue || defaultValue || '');
+	const [ inputValue, setInputValue ] = useState(controlledValue || defaultValue || '');
 
 	const value = controlledValue || stateValue;
 
@@ -37,6 +38,7 @@ const ColorInput: React.FunctionComponent<ColorInputProps> = ({
 						color={color}
 						isSelected={color === value}
 						onClick={() => {
+							setInputValue(color);
 							setStateValue(color);
 							onChange(color);
 						}}
@@ -48,12 +50,18 @@ const ColorInput: React.FunctionComponent<ColorInputProps> = ({
 					onChange={(event): void => {
 						const newValue = event.target.value;
 
+						setInputValue(newValue);
 						if (isValidHex(newValue)) {
 							setStateValue(newValue);
 							onChange(newValue);
 						}
 					}}
-					value={value}
+					value={inputValue}
+					onBlur={() => {
+						if (!isValidHex(inputValue)) {
+							setInputValue(stateValue);
+						}
+					}}
 				/>
 			</InputContainer>
 		</ColorInputRoot>
