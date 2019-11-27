@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 import styles from '../global-styles';
 import { getContrast, ColorContrast } from '../../utility/color-utility';
+import { Button } from '../toolbar/StyledButton';
 
 export const ColorInputRoot = styled.div`
 	background-color: ${styles.background.white};
@@ -15,6 +16,7 @@ export interface ColorValueDisplayProps {
 
 export const ColorValueDisplay = styled.div<ColorValueDisplayProps>`
 	display: flex;
+	position: relative;
 	align-items: center;
 	justify-content: center;
 	font-family: sans-serif;
@@ -22,6 +24,12 @@ export const ColorValueDisplay = styled.div<ColorValueDisplayProps>`
 	color: ${(props): string => props.color && getContrast(props.color) === ColorContrast.Dark ? 'white' : 'black'};
 	width: 100%;
 	height: 110px;
+`;
+
+export const ClearButton = styled(Button)`
+	position: absolute;
+	right: 5px;
+	top: 5px;
 `;
 
 export const ColorButtonContainer = styled.div`

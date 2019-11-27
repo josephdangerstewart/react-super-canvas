@@ -26,7 +26,7 @@ export default interface StyleContext {
 }
 
 export const defaultStyleContext: StyleContext = {
-	strokeColor: 'black',
+	strokeColor: '#000000',
 	strokeWeight: 1.0,
 	fillColor: null,
 	fillImageUrl: null,

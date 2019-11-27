@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTimesCircle } from '@fortawesome/free-solid-svg-icons';
+import styled from 'styled-components';
 import {
 	ColorInputRoot,
 	ColorValueDisplay,
@@ -6,14 +9,20 @@ import {
 	ColorButton,
 	InputContainer,
 	Input,
+	ClearButton,
 } from './styled';
 import { isValidHex } from '../../utility/color-utility';
+
+const Italics = styled.span`
+	font-style: italic;
+`;
 
 export interface ColorInputProps {
 	onChange: (value: string) => void;
 	presetColors: string[];
 	value?: string;
 	defaultValue?: string;
+	canClear?: boolean;
 }
 
 const ColorInput: React.FunctionComponent<ColorInputProps> = ({
@@ -21,6 +30,7 @@ const ColorInput: React.FunctionComponent<ColorInputProps> = ({
 	defaultValue,
 	presetColors,
 	onChange,
+	canClear,
 }) => {
 	const [ stateValue, setStateValue ] = useState(controlledValue || defaultValue || '');
 	const [ inputValue, setInputValue ] = useState(controlledValue || defaultValue || '');
@@ -30,14 +40,25 @@ const ColorInput: React.FunctionComponent<ColorInputProps> = ({
 	return (
 		<ColorInputRoot>
 			<ColorValueDisplay color={value}>
-				<p>{value}</p>
+				<p>{value || <Italics>NA</Italics>}</p>
+				{value && canClear && (
+					<ClearButton
+						onClick={(): void => {
+							setInputValue('');
+							setStateValue(null);
+							onChange(null);
+						}}
+					>
+						<FontAwesomeIcon icon={faTimesCircle} />
+					</ClearButton>
+				)}
 			</ColorValueDisplay>
 			<ColorButtonContainer>
 				{presetColors.map((color) => (
 					<ColorButton
 						color={color}
 						isSelected={color === value}
-						onClick={() => {
+						onClick={(): void => {
 							setInputValue(color);
 							setStateValue(color);
 							onChange(color);
@@ -57,7 +78,7 @@ const ColorInput: React.FunctionComponent<ColorInputProps> = ({
 						}
 					}}
 					value={inputValue}
-					onBlur={() => {
+					onBlur={(): void => {
 						if (!isValidHex(inputValue)) {
 							setInputValue(stateValue);
 						}

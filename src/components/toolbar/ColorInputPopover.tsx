@@ -19,6 +19,7 @@ export interface ColorInputPopoverProps {
 	styleContext: StyleContext;
 	icon: IconDefinition;
 	styleContextKey: keyof StyleContext;
+	canClear?: boolean;
 }
 
 const ColorInputPopover: React.FunctionComponent<ColorInputPopoverProps> = ({
@@ -26,6 +27,7 @@ const ColorInputPopover: React.FunctionComponent<ColorInputPopoverProps> = ({
 	styleContext,
 	styleContextKey,
 	setStyleContext,
+	canClear,
 }) => {
 	const [ isOpen, setIsOpen ] = useState(false);
 	const selectedColor = styleContext[styleContextKey] as string;
@@ -50,6 +52,7 @@ const ColorInputPopover: React.FunctionComponent<ColorInputPopoverProps> = ({
 						onChange={(value): void => {
 							setStyleContext({ [styleContextKey]: value });
 						}}
+						canClear={canClear}
 					/>
 				</PopoverContentWrapper>
 			)}
