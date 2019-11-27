@@ -56,8 +56,8 @@ const ColorInputPopover: React.FunctionComponent<ColorInputPopoverProps> = ({
 			onClickOutside={(): void => setIsOpen(false)}
 			position="bottom"
 		>
-			<Button onClick={(): void => setIsOpen(!isOpen)}>
-				<FontAwesomeIcon icon={icon} color={selectedColor} />
+			<Button onClick={(): void => setIsOpen(!isOpen)} highlightColor={selectedColor}>
+				<FontAwesomeIcon icon={icon} />
 			</Button>
 		</Popover>
 	);

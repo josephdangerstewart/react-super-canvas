@@ -23,7 +23,7 @@ export const ToggleButton = styled.button<ToggleButtonProps>`
 `;
 
 export interface ButtonProps {
-	backgroundColor?: string;
+	highlightColor?: string;
 }
 
 export const Button = styled.button<ButtonProps>`
@@ -33,7 +33,7 @@ export const Button = styled.button<ButtonProps>`
 	padding: 0;
 	margin: 1px 6px;
 	color: black;
-	${(props): string => props.backgroundColor ? `background-color: ${props.backgroundColor}` : ''}
+	position: relative;
 
 	&:hover {
 		color: #8C8C8C;
@@ -45,5 +45,16 @@ export const Button = styled.button<ButtonProps>`
 
 	&:active {
 		color: #BBBBBB;
+	}
+
+	&:after {
+		content: '';
+		position: absolute;
+		width: 100%;
+		height: 2px;
+		bottom: -2px;
+		left: 0;
+		${(props): string => !props.highlightColor ? 'display: none' : ''}
+		${(props): string => props.highlightColor ? `background-color: ${props.highlightColor}` : ''}
 	}
 `;

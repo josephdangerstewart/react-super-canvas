@@ -6,6 +6,7 @@ export const ColorInputRoot = styled.div`
 	background-color: ${styles.background.white};
 	border-radius: 10px;
 	width: 170px;
+	overflow: hidden;
 `;
 
 export interface ColorValueDisplayProps {
