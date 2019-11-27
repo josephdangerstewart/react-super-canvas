@@ -3,8 +3,107 @@ export enum ColorContrast {
 	Dark = 'dark',
 }
 
+export interface RGB {
+	r: number;
+	g: number;
+	b: number;
+}
+
+export interface RGBA extends RGB {
+	a: number;
+}
+
+export function hexToRgb(hex: string): RGB {
+	const normalizedHex = hex.replace(
+		/^#([a-f\d])([a-f\d])([a-f\d])/ig,
+		(m, r, g, b) => (r + r + g + g + b + b),
+	);
+
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(normalizedHex);
+	return result && {
+		r: parseInt(result[1], 16),
+		g: parseInt(result[2], 16),
+		b: parseInt(result[3], 16),
+	};
+}
+
+export function hexaToRgba(hex: string): RGBA {
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	return result && {
+		r: parseInt(result[1], 16),
+		g: parseInt(result[2], 16),
+		b: parseInt(result[3], 16),
+		a: parseInt(result[4], 16) / 255,
+	};
+}
+
 export function isValidHex(color: string): boolean {
 	return /^(#[A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9]|#[A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9])$/.test(color);
+}
+
+export function isValidHexa(color: string): boolean {
+	return /^#[A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9]$/.test(color);
+}
+
+export function stringToRgb(color: string): RGB {
+	const normalizedColor = color.replace(/\s/g, '');
+
+	if (isValidHex(color)) {
+		return hexToRgb(color);
+	}
+
+	if (isValidHexa(color)) {
+		const { r, g, b } = hexaToRgba(color);
+		return { r, g, b };
+	}
+
+	const pieces = normalizedColor.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+(?:\.\d+)?))?\)$/);
+
+	if (!pieces) {
+		return null;
+	}
+
+	pieces.shift();
+
+	const [ r, g, b ] = pieces.map((num): number => Number(num));
+	return { r, g, b };
+}
+
+export function stringToRgba(color: string): RGBA {
+	const normalizedColor = color.replace(/\s/g, '');
+
+	if (isValidHexa(normalizedColor)) {
+		return hexaToRgba(color);
+	}
+
+	const pieces = normalizedColor.match(/^rgba\((\d+),(\d+),(\d+),(\d+)\)$/);
+
+	if (!pieces) {
+		return null;
+	}
+
+	pieces.shift();
+
+	const [ r, g, b, a ] = pieces.map((num): number => Number(num));
+	return {
+		r,
+		g,
+		b,
+		a,
+	};
+}
+
+export function rgbToString({ r, g, b }: RGB): string {
+	return `rgb(${r},${g},${b})`;
+}
+
+export function rgbaToString({
+	r,
+	g,
+	b,
+	a,
+}: RGBA): string {
+	return `rgba(${r},${g},${b},${a})`;
 }
 
 // Copied from https://awik.io/determine-color-bright-dark-using-javascript/
@@ -16,6 +115,7 @@ export function getContrast(color: string): ColorContrast {
 	if (color.match(/^rgb/)) {
 		// If HEX --> store the red, green, blue values in separate variables
 		const colorPieces = color.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+(?:\.\d+)?))?\)$/);
+		colorPieces.shift();
 
 		[ r, g, b ] = colorPieces.map((val): number => Number(val));
 	} else {
@@ -45,4 +145,8 @@ export function getContrast(color: string): ColorContrast {
 	}
 
 	return ColorContrast.Dark;
+}
+
+export function withOpacity(color: string, alpha: number): string {
+	return rgbaToString({ ...stringToRgb(color), a: alpha });
 }
