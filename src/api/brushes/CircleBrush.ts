@@ -1,10 +1,9 @@
 import IBrush, { DefaultBrushKind } from '../../types/IBrush';
 import IPainterAPI from '../../types/IPainterAPI';
 import { BrushContext } from '../../types/context/BrushContext';
-import Circle from '../../types/shapes/Circle';
 import { AddCanvasItemCallback } from '../../types/callbacks/AddCanvasItemCallback';
 import Vector2D from '../../types/utility/Vector2D';
-import { distanceBetweenTwoPoints } from '../../utility/shapes-util';
+import { distanceBetweenTwoPoints, cursorPreview } from '../../utility/shapes-util';
 import CircleCanvasItem from '../canvas-items/CircleCanvasItem';
 import { withOpacity } from '../../utility/color-utility';
 
@@ -15,25 +14,19 @@ export default class CircleBrush implements IBrush {
 	private centerAt: Vector2D;
 	private previewRadius: number;
 
-	constructor(cursorRadius: number) {
-		this.cursorRadius = cursorRadius || 2;
+	constructor() {
+		const cursor = cursorPreview({ x: 0, y: 0 });
+		this.cursorRadius = cursor.radius;
 		this.centerAt = null;
-		this.previewRadius = cursorRadius;
+		this.previewRadius = cursor.radius;
 	}
 
 	renderPreview = (painter: IPainterAPI, context: BrushContext): void => {
 		const cursor = context.snappedMousePosition;
 		const { styleContext } = context;
-		let circlePreview: Circle;
+		let circlePreview = cursorPreview(cursor);
 
-		if (!this.centerAt) {
-			circlePreview = {
-				center: cursor,
-				radius: this.cursorRadius,
-				fillColor: 'rgba(0, 0, 0, 0.58)',
-				strokeColor: 'rgba(0, 0, 0, 0.58)',
-			};
-		} else {
+		if (this.centerAt) {
 			const distanceFromCenter = distanceBetweenTwoPoints(cursor, this.centerAt);
 			if (distanceFromCenter < this.cursorRadius) {
 				this.previewRadius = this.cursorRadius;
