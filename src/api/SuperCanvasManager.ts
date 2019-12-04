@@ -157,7 +157,7 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 		mousePosition: this.interactionManager.mousePosition,
 		absoluteMousePosition: this.interactionManager.absoluteMousePosition,
 		isPanning: this.interactionManager.isPanning,
-		styleContext: this.styleContext,
+		styleContext: { ...this.styleContext },
 	});
 
 	private generateCanvasContextForItem = (): CanvasItemContext => ({

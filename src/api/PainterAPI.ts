@@ -162,6 +162,7 @@ export default class PainterAPI implements IPainterAPI {
 				this.context2d.stroke();
 			}, () => {
 				this.context2d.fill();
+				this.context2d.stroke();
 			});
 
 			return;

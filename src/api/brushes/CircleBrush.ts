@@ -41,11 +41,14 @@ export default class CircleBrush implements IBrush {
 				this.previewRadius = Math.floor(distanceFromCenter);
 			}
 
+			const fillColor = withOpacity(styleContext.fillColor, 0.5);
+			const strokeColor = withOpacity(styleContext.strokeColor, 0.5);
+
 			circlePreview = {
 				center: this.centerAt,
 				radius: this.previewRadius,
-				fillColor: withOpacity(styleContext.fillColor, 0.5),
-				strokeColor: withOpacity(styleContext.strokeColor, 0.5),
+				fillColor,
+				strokeColor,
 			};
 		}
 
