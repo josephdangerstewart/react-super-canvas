@@ -1,0 +1,13 @@
+---
+name: Shape Interfaces
+menu: 3. The API
+route: /shapes
+---
+
+# Shape Interfaces
+
+These interfaces are used for performing calculations on and rendering geometric shapes.
+
+## `interface StyledShape`
+
+All shapes extend this interface which provides optional styling information to a shape. When rendering, the [painter api](/painterapi) uses these attributes to determine styling information. All attributes are optional and will be filled with default values if null.
