@@ -43,6 +43,7 @@ interface InterfaceMetadata {
 		description: string;
 		default?: string;
 		inheritedFrom?: string;
+		isArray?: boolean;
 		type: string;
 	};
 }
@@ -66,6 +67,7 @@ export const InterfaceDocumentation: React.FunctionComponent<InterfaceDocumentat
 					default: defaultValue,
 					type,
 					inheritedFrom,
+					isArray,
 				} = interfaceMetadata[key];
 
 				const typeForDefault = [ 'null', 'undefined' ].includes((defaultValue || '').trim()) ? 'nullish' : type;
@@ -75,7 +77,7 @@ export const InterfaceDocumentation: React.FunctionComponent<InterfaceDocumentat
 
 				return (
 					<Property>
-						<PropertyName>{key}</PropertyName>{defaultValue && '?'}: <PropertyType>{type}</PropertyType>
+						<PropertyName>{key}</PropertyName>{defaultValue && '?'}: <PropertyType>{type}</PropertyType>{isArray && '[]'}
 						{defaultValue && (
 							<>
 								&nbsp;-&nbsp;
