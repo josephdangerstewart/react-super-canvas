@@ -6,6 +6,7 @@ route: /shapes
 
 import { InterfaceDocumentation } from '../InterfaceDocumentation';
 import StyledShape from '../../meta/interfaces/StyledShape';
+import Circle from '../../meta/interfaces/Circle';
 
 # Shape Interfaces
 
@@ -16,3 +17,9 @@ These interfaces are used for performing calculations on and rendering geometric
 All shapes extend this interface which provides optional styling information to a shape. When rendering, the [painter api](/painterapi) uses these attributes to determine styling information. All attributes are optional and will be filled with default values if null.
 
 <InterfaceDocumentation interfaceMetadata={StyledShape} />
+
+## `interface Circle`
+
+*Extends StyledShape*
+
+<InterfaceDocumentation interfaceMetadata={Circle} hideInheritedMembers />

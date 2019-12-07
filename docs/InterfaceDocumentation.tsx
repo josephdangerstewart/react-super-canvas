@@ -42,24 +42,36 @@ interface InterfaceMetadata {
 	[propertyName: string]: {
 		description: string;
 		default?: string;
+		inheritedFrom?: string;
 		type: string;
 	};
 }
 
 export interface InterfaceDocumentationProps {
 	interfaceMetadata: InterfaceMetadata;
+	hideInheritedMembers?: boolean;
 }
 
 export const InterfaceDocumentation: React.FunctionComponent<InterfaceDocumentationProps> = ({
 	interfaceMetadata,
+	hideInheritedMembers,
 }) => {
 	const properties = Object.keys(interfaceMetadata);
 
 	return (
 		<CodeSnippet>
 			{properties.map((key) => {
-				const { description, default: defaultValue, type } = interfaceMetadata[key];
+				const {
+					description,
+					default: defaultValue,
+					type,
+					inheritedFrom,
+				} = interfaceMetadata[key];
+
 				const typeForDefault = [ 'null', 'undefined' ].includes((defaultValue || '').trim()) ? 'nullish' : type;
+				if (hideInheritedMembers && inheritedFrom) {
+					return null;
+				}
 
 				return (
 					<Property>

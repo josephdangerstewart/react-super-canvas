@@ -2,13 +2,14 @@
 
 const TypeDoc = require('typedoc');
 const fs = require('fs');
+const path = require('path');
 
 const app = new TypeDoc.Application({
 	ignoreCompilerErrors: true
 });
 
-if (!fs.existsSync('../meta')) {
-	fs.mkdirSync('../meta');
+if (!fs.existsSync(path.resolve('./meta'))) {
+	fs.mkdirSync(path.resolve('./meta'));
 }
 
 function getTypescriptFilesFromDirectory(directory) {
@@ -29,7 +30,7 @@ function getTypescriptFilesFromDirectory(directory) {
 	return files;
 }
 
-const filesToScan = getTypescriptFilesFromDirectory('../src/types');
+const filesToScan = getTypescriptFilesFromDirectory(path.resolve('./src/types'));
 
 const docs = app.convert(filesToScan);
 
@@ -45,19 +46,25 @@ for (const file of filesToScan) {
 		if (reflection.kindString === 'Property') {
 			const commentTags = (reflection.comment && reflection.comment.tags) || [];
 			const type = reflection.type && reflection.type.name;
+			const inheritedFrom =
+				reflection.inheritedFrom &&
+				reflection.inheritedFrom.reflection &&
+				reflection.inheritedFrom.reflection.parent &&
+				reflection.inheritedFrom.reflection.parent.name
 			
 			properties[reflection.name] =  {
 				...commentTags.reduce((total, current) => ({ ...total, [current.tagName]: current.text }), {}),
 				type,
+				inheritedFrom,
 			}
 		}
 	});
 
 	if (Object.keys(properties).some(Boolean)) {
-		if (!fs.existsSync('../meta/interfaces')) {
-			fs.mkdirSync('../meta/interfaces');
+		if (!fs.existsSync(path.resolve('./meta/interfaces'))) {
+			fs.mkdirSync(path.resolve('./meta/interfaces'));
 		}
 
-		fs.writeFileSync(`../meta/interfaces/${fileName}.json`, JSON.stringify(properties));
+		fs.writeFileSync(path.resolve(`./meta/interfaces/${fileName}.json`), JSON.stringify(properties));
 	}
 }
