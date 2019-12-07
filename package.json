@@ -51,6 +51,7 @@
 		"eslint-plugin-prettier": "^3.1.1",
 		"eslint-plugin-react": "^7.16.0",
 		"prettier": "^1.18.2",
+		"react-markdown": "^4.2.2",
 		"source-map-loader": "^0.2.4",
 		"sourcemap-codec": "^1.4.6",
 		"ts-loader": "^6.2.0",

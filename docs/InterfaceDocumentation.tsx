@@ -1,5 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import ReactMarkdown from 'react-markdown';
 
 const colorsForTypes: { [key: string]: string } = {
 	string: '#CE9178',
@@ -25,9 +27,22 @@ const PropertyName = styled.span`
 	color: #9CDCFE;
 `;
 
-const PropertyDescription = styled.p`
+const PropertyDescription = styled.div`
 	font-size: 14px;
 	margin: 0 0 0 12px;
+
+	p {
+		margin: 0;
+	}
+
+	a {
+		color: #D4D4D4;
+
+		&:hover {
+			color: #1E1E1E;
+			background-color: #D4D4D4;
+		}
+	}
 `;
 
 const PropertyType = styled.span`
@@ -85,7 +100,7 @@ export const InterfaceDocumentation: React.FunctionComponent<InterfaceDocumentat
 							</>
 						)}
 						<br />
-						<PropertyDescription>{description}</PropertyDescription>
+						<PropertyDescription><ReactMarkdown source={description} /></PropertyDescription>
 					</Property>
 				);
 			})}

@@ -4,13 +4,13 @@ menu: 3. The API
 route: /painterapi
 ---
 
+import { InterfaceDocumentation } from '../InterfaceDocumentation';
+import IPainterAPI from '../../meta/interfaces/IPainterAPI';
+
 # The Painter API
 
 The painter api is an API for virtually rendering things absolutely to the HTML5 canvas element. This should always be used instead of the canvas rendering context.
 
 ## Methods
 
-1. `drawLine(line: Line) => void` - Draws a line in the virtual canvas space
-2. `drawImage(topLeftCorner: Vector2D, imageUrl: string) => void` - Draws an image in the virtual canvas space
-3. `drawRect(rect: Rectangle) => void` - Draws a rectangle in the virtual canvas space
-4. `drawCircle(circle: Circle) => void` - Draws a circle in the virtual space
+<InterfaceDocumentation interfaceMetadata={IPainterAPI} />
