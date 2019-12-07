@@ -36,5 +36,6 @@ module.exports = {
 		'no-confusing-arrow': 'off',
 		'react/button-has-type': 'off',
 		'react/prop-types': 'off',
+		'react/jsx-one-expression-per-line': 'off',
 	},
 };

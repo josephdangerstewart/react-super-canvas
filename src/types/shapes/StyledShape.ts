@@ -1,3 +1,4 @@
+/** @external */
 export default interface StyledShape {
 	/**
 	 * @description The color of the stroke. A valid CSS color

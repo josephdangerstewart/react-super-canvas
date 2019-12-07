@@ -4,6 +4,9 @@ menu: 3. The API
 route: /shapes
 ---
 
+import { InterfaceDocumentation } from '../InterfaceDocumentation';
+import StyledShape from '../../meta/interfaces/StyledShape';
+
 # Shape Interfaces
 
 These interfaces are used for performing calculations on and rendering geometric shapes.
@@ -11,3 +14,5 @@ These interfaces are used for performing calculations on and rendering geometric
 ## `interface StyledShape`
 
 All shapes extend this interface which provides optional styling information to a shape. When rendering, the [painter api](/painterapi) uses these attributes to determine styling information. All attributes are optional and will be filled with default values if null.
+
+<InterfaceDocumentation interfaceMetadata={StyledShape} />
