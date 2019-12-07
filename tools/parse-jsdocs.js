@@ -34,6 +34,45 @@ const filesToScan = getTypescriptFilesFromDirectory(path.resolve('./src/types'))
 
 const docs = app.convert(filesToScan);
 
+const buildProperties = (reflection) => {
+	const commentTags = (reflection.comment && reflection.comment.tags) || [];
+	const inheritedFrom =
+		reflection.inheritedFrom &&
+		reflection.inheritedFrom.reflection &&
+		reflection.inheritedFrom.reflection.parent &&
+		reflection.inheritedFrom.reflection.parent.name
+
+	let type;
+	let typeFlags = {};
+	if (reflection.type) {
+		if (reflection.type.type === 'array') {
+			type = reflection.type.elementType.name;
+			typeFlags.isArray = true;
+		} else if (reflection.type.type === 'reflection' && reflection.type.declaration) {
+			type = 'callback';
+			const parameters = {};
+			for (const signature of reflection.type.declaration.signatures) {
+				if (signature.kindString === 'Call signature') {
+					for (const parameter of signature.parameters || []) {
+						parameters[parameter.name] = buildProperties(parameter);
+					}
+				}
+			}
+			typeFlags.parameters = parameters;
+			typeFlags.returnType = reflection.type.declaration.type && reflection.declaration.type.name;
+		} else {
+			type = reflection.type.name;
+		}
+	}
+	
+	return {
+		...commentTags.reduce((total, current) => ({ ...total, [current.tagName]: current.text }), {}),
+		...typeFlags,
+		type,
+		inheritedFrom,
+	}
+}
+
 for (const file of filesToScan) {
 	const [, fileName] = /\/(\w*)\.ts/.exec(file);
 	const reflection = docs.findReflectionByName(fileName);
@@ -44,19 +83,7 @@ for (const file of filesToScan) {
 	const properties = {};
 	reflection.traverse(reflection => {
 		if (reflection.kindString === 'Property') {
-			const commentTags = (reflection.comment && reflection.comment.tags) || [];
-			const type = reflection.type && reflection.type.name;
-			const inheritedFrom =
-				reflection.inheritedFrom &&
-				reflection.inheritedFrom.reflection &&
-				reflection.inheritedFrom.reflection.parent &&
-				reflection.inheritedFrom.reflection.parent.name
-			
-			properties[reflection.name] =  {
-				...commentTags.reduce((total, current) => ({ ...total, [current.tagName]: current.text }), {}),
-				type,
-				inheritedFrom,
-			}
+			properties[reflection.name] = buildProperties(reflection);
 		}
 	});
 
