@@ -51,15 +51,17 @@ const buildProperties = (reflection) => {
 		} else if (reflection.type.type === 'reflection' && reflection.type.declaration) {
 			type = 'callback';
 			const parameters = {};
+			const returnTypes = []
 			for (const signature of reflection.type.declaration.signatures) {
 				if (signature.kindString === 'Call signature') {
+					returnTypes.push(signature.type.name);
 					for (const parameter of signature.parameters || []) {
 						parameters[parameter.name] = buildProperties(parameter);
 					}
 				}
 			}
 			typeFlags.parameters = parameters;
-			typeFlags.returnType = reflection.type.declaration.type && reflection.declaration.type.name;
+			typeFlags.returnType = returnTypes[0];
 		} else {
 			type = reflection.type.name;
 		}

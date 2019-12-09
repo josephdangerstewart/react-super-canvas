@@ -9,6 +9,10 @@ const colorsForTypes: { [key: string]: string } = {
 	number: '#7FB347',
 };
 
+const Keyword = styled.span`
+	color: ${colorsForTypes.nullish};
+`;
+
 const CodeSnippet = styled.div`
 	background-color: #1E1E1E;
 	margin-bottom: 5px;
@@ -23,8 +27,8 @@ const Property = styled.p`
 	margin: 12px 0;
 `;
 
-const PropertyName = styled.span`
-	color: #9CDCFE;
+const PropertyName = styled.span<{ isMethod: boolean }>`
+	color: ${({ isMethod }): string => isMethod ? '#DCDCAA' : '#9CDCFE'};
 `;
 
 const PropertyDescription = styled.div`
@@ -59,9 +63,44 @@ interface InterfaceMetadata {
 		default?: string;
 		inheritedFrom?: string;
 		isArray?: boolean;
+		parameters?: InterfaceMetadata;
+		returnType?: string;
 		type: string;
 	};
 }
+
+interface TypeDocumentationProps {
+	type: string;
+	parameters?: InterfaceMetadata;
+	isArray?: boolean;
+	returnType?: string;
+}
+
+const TypeDocumentation: React.FunctionComponent<TypeDocumentationProps> = ({
+	type,
+	parameters,
+	isArray,
+	returnType,
+}) => {
+	if (type === 'callback' && parameters) {
+		return (
+			<span>
+				({parameters && Object.entries(parameters).map(([ parameter, meta ]) => (
+					<span>
+						<PropertyName isMethod={meta.type === 'callback'}>{parameter}</PropertyName>:{' '}
+						<PropertyType>{meta.type}</PropertyType>{meta.isArray && '[]'}
+					</span>
+				)).reduce((prev, cur) => ([ ...prev, ', ', cur ]), []).splice(1)}) <Keyword>=&gt;</Keyword> <PropertyType>{returnType}</PropertyType>
+			</span>
+		);
+	}
+
+	return (
+		<span>
+			<PropertyType>{type}</PropertyType>{isArray && '[]'}
+		</span>
+	);
+};
 
 export interface InterfaceDocumentationProps {
 	interfaceMetadata: InterfaceMetadata;
@@ -83,6 +122,8 @@ export const InterfaceDocumentation: React.FunctionComponent<InterfaceDocumentat
 					type,
 					inheritedFrom,
 					isArray,
+					parameters,
+					returnType,
 				} = interfaceMetadata[key];
 
 				const typeForDefault = [ 'null', 'undefined' ].includes((defaultValue || '').trim()) ? 'nullish' : type;
@@ -92,7 +133,13 @@ export const InterfaceDocumentation: React.FunctionComponent<InterfaceDocumentat
 
 				return (
 					<Property>
-						<PropertyName>{key}</PropertyName>{defaultValue && '?'}: <PropertyType>{type}</PropertyType>{isArray && '[]'}
+						<PropertyName isMethod={type === 'callback'}>{key}</PropertyName>{defaultValue && '?'}:&nbsp;
+						<TypeDocumentation
+							isArray={isArray}
+							type={type}
+							parameters={parameters}
+							returnType={returnType}
+						/>
 						{defaultValue && (
 							<>
 								&nbsp;-&nbsp;
