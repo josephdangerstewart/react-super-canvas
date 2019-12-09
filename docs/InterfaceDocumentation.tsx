@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import ReactMarkdown from 'react-markdown';
+import links from './interface-links';
 
 const colorsForTypes: { [key: string]: string } = {
 	string: '#CE9178',
@@ -23,7 +24,7 @@ const CodeSnippet = styled.div`
 	border-radius: 6px;
 `;
 
-const Property = styled.p`
+const Property = styled.div`
 	margin: 12px 0;
 `;
 
@@ -49,8 +50,18 @@ const PropertyDescription = styled.div`
 	}
 `;
 
-const PropertyType = styled.span`
+const PropertyTypeStyled = styled.span`
 	color: #4EC9B0;
+
+	a {
+		color: #4EC9B0;
+		text-decoration: unset;
+
+		&:hover {
+			background-color: #4EC9B0;
+			color: #1E1E1E;
+		}
+	}
 `;
 
 const PropertyDefault = styled.i<{ type: string }>`
@@ -76,6 +87,22 @@ interface TypeDocumentationProps {
 	returnType?: string;
 }
 
+const PropertyType: React.FunctionComponent<{ link?: string }> = ({ link, children }) => {
+	if (link) {
+		return (
+			<PropertyTypeStyled>
+				<a href={link}>{children}</a>
+			</PropertyTypeStyled>
+		);
+	}
+
+	return (
+		<PropertyTypeStyled>
+			{children}
+		</PropertyTypeStyled>
+	);
+};
+
 const TypeDocumentation: React.FunctionComponent<TypeDocumentationProps> = ({
 	type,
 	parameters,
@@ -86,9 +113,9 @@ const TypeDocumentation: React.FunctionComponent<TypeDocumentationProps> = ({
 		return (
 			<span>
 				({parameters && Object.entries(parameters).map(([ parameter, meta ]) => (
-					<span>
+					<span key={parameter}>
 						<PropertyName isMethod={meta.type === 'callback'}>{parameter}</PropertyName>:{' '}
-						<PropertyType>{meta.type}</PropertyType>{meta.isArray && '[]'}
+						<PropertyType link={links[meta.type]}>{meta.type}</PropertyType>{meta.isArray && '[]'}
 					</span>
 				)).reduce((prev, cur) => ([ ...prev, ', ', cur ]), []).splice(1)}) <Keyword>=&gt;</Keyword> <PropertyType>{returnType}</PropertyType>
 			</span>
@@ -97,7 +124,7 @@ const TypeDocumentation: React.FunctionComponent<TypeDocumentationProps> = ({
 
 	return (
 		<span>
-			<PropertyType>{type}</PropertyType>{isArray && '[]'}
+			<PropertyType link={links[type]}>{type}</PropertyType>{isArray && '[]'}
 		</span>
 	);
 };
@@ -132,7 +159,7 @@ export const InterfaceDocumentation: React.FunctionComponent<InterfaceDocumentat
 				}
 
 				return (
-					<Property>
+					<Property key={key}>
 						<PropertyName isMethod={type === 'callback'}>{key}</PropertyName>{defaultValue && '?'}:&nbsp;
 						<TypeDocumentation
 							isArray={isArray}
