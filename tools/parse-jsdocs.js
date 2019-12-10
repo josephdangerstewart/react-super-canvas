@@ -43,7 +43,9 @@ const buildProperties = (reflection) => {
 		reflection.inheritedFrom &&
 		reflection.inheritedFrom.reflection &&
 		reflection.inheritedFrom.reflection.parent &&
-		reflection.inheritedFrom.reflection.parent.name
+		reflection.inheritedFrom.reflection.parent.name;
+
+	const isOptional = reflection.flags && reflection.flags.isOptional;
 
 	let type;
 	let typeFlags = {};
@@ -75,6 +77,7 @@ const buildProperties = (reflection) => {
 		...typeFlags,
 		type,
 		inheritedFrom,
+		isOptional,
 	}
 }
 

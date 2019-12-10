@@ -14,27 +14,27 @@ export interface ToolbarComponents {
 
 export interface SuperCanvasProps {
 	/**
-	 * The height of the canvas element
+	 * @description The height of the canvas element
 	 */
 	height: number;
 
 	/**
-	 * The width of the canvas element
+	 * @description The width of the canvas element
 	 */
 	width: number;
 
 	/**
-	 * The available brushes that the editor recognizes
+	 * @description The available brushes that the editor recognizes
 	 */
 	availableBrushes: IBrush[];
 
 	/**
-	 * The active background element
+	 * @description The active background element
 	 */
 	activeBackgroundElement: IBackgroundElement;
 
 	/**
-	 * Optional replaceable components for the toolbar
+	 * @description Optional replaceable components for the toolbar
 	 */
 	toolbarComponents?: ToolbarComponents;
 }

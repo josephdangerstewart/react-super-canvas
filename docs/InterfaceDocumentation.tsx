@@ -76,6 +76,7 @@ interface InterfaceMetadata {
 		isArray?: boolean;
 		parameters?: InterfaceMetadata;
 		returnType?: string;
+		isOptional?: boolean;
 		type: string;
 	};
 }
@@ -151,6 +152,7 @@ export const InterfaceDocumentation: React.FunctionComponent<InterfaceDocumentat
 					isArray,
 					parameters,
 					returnType,
+					isOptional,
 				} = interfaceMetadata[key];
 
 				const typeForDefault = [ 'null', 'undefined' ].includes((defaultValue || '').trim()) ? 'nullish' : type;
@@ -160,7 +162,7 @@ export const InterfaceDocumentation: React.FunctionComponent<InterfaceDocumentat
 
 				return (
 					<Property key={key}>
-						<PropertyName isMethod={type === 'callback'}>{key}</PropertyName>{defaultValue && '?'}:&nbsp;
+						<PropertyName isMethod={type === 'callback'}>{key}</PropertyName>{isOptional && '?'}:&nbsp;
 						<TypeDocumentation
 							isArray={isArray}
 							type={type}

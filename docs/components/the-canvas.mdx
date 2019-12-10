@@ -7,7 +7,9 @@ import SuperCanvas from '../../src/components/SuperCanvas';
 import GridBackground from '../../src/api/background-elements/GridBackground';
 import CircleBrush from '../../src/api/brushes/CircleBrush';
 import PolygonBrush from '../../src/api/brushes/PolygonBrush';
-import { Playground, Props } from 'docz';
+import SuperCanvasProps from '../../meta/interfaces/SuperCanvasProps.json';
+import { InterfaceDocumentation } from '../InterfaceDocumentation';
+import { Playground } from 'docz';
 
 # The Super Canvas
 
@@ -31,6 +33,4 @@ The super canvas is super easy to use! Use it just like this:
 
 ## Props
 
-<Props
-	of={SuperCanvas}
-/>
+<InterfaceDocumentation interfaceMetadata={SuperCanvasProps} />
