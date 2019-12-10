@@ -22,7 +22,7 @@ function getTypescriptFilesFromDirectory(directory) {
 			continue;
 		}
 
-		if (/\.ts$/.test(fileName)) {
+		if (/\.tsx?$/.test(fileName)) {
 			files.push(`${directory}/${fileName}`);
 		}
 	}
@@ -30,7 +30,10 @@ function getTypescriptFilesFromDirectory(directory) {
 	return files;
 }
 
-const filesToScan = getTypescriptFilesFromDirectory(path.resolve('./src/types'));
+const filesToScan = [
+	...getTypescriptFilesFromDirectory(path.resolve('./src/types')),
+	...getTypescriptFilesFromDirectory(path.resolve('./src/components')),
+];
 
 const docs = app.convert(filesToScan);
 
@@ -75,13 +78,12 @@ const buildProperties = (reflection) => {
 	}
 }
 
-for (const file of filesToScan) {
-	const [, fileName] = /\/(\w*)\.ts/.exec(file);
-	const reflection = docs.findReflectionByName(fileName);
-	if (!reflection || reflection.kindString !== 'Interface') {
-		continue;
-	}
+const interfaces = docs
+	.files
+	.reduce((total, file) => [...total, ...file.reflections], [])
+	.filter(reflection => reflection && reflection.kindString === 'Interface');
 
+for (const reflection of interfaces) {
 	const properties = {};
 	reflection.traverse(reflection => {
 		if (reflection.kindString === 'Property') {
@@ -94,6 +96,6 @@ for (const file of filesToScan) {
 			fs.mkdirSync(path.resolve('./meta/interfaces'));
 		}
 
-		fs.writeFileSync(path.resolve(`./meta/interfaces/${fileName}.json`), JSON.stringify(properties));
+		fs.writeFileSync(path.resolve(`./meta/interfaces/${reflection.name}.json`), JSON.stringify(properties));
 	}
 }
