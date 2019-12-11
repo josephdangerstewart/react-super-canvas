@@ -13,14 +13,28 @@ const DefaultToolbarContainer = styled.div`
 	border-radius: 4px;
 `;
 
+const VerticalDivider = styled.div`
+	margin: 0 4px;
+	border: solid 1px #F0F0F0;
+	border-radius: 2px;
+`;
+
 export interface ToolbarProps {
+	/**
+	 * @description The brush control components defined by the [brush controls](#brushcontrols)
+	 */
 	brushControls: React.ReactNode;
+
+	/**
+	 * @description The style control components defined by the [style controls](#stylecontrols)
+	 */
 	styleControls: React.ReactNode;
 }
 
 const Toolbar: React.FunctionComponent<ToolbarProps> = ({ brushControls, styleControls }) => (
 	<DefaultToolbarContainer>
 		{brushControls}
+		<VerticalDivider />
 		{styleControls}
 	</DefaultToolbarContainer>
 );
