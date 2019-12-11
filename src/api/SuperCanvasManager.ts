@@ -2,7 +2,7 @@ import ISuperCanvasManager from '../types/ISuperCanvasManager';
 import IPainterAPI from '../types/IPainterAPI';
 import PainterAPI from './PainterAPI';
 import ICanvasItem from '../types/ICanvasItem';
-import IBrush from '../types/IBrush';
+import IBrush, { DefaultBrushKind } from '../types/IBrush';
 import IBackgroundElement from '../types/IBackgroundElement';
 import CanvasItemContext from '../types/context/CanvasItemContext';
 import CanvasInteractionManager from './helpers/CanvasInteractionManager';
@@ -13,6 +13,7 @@ import { MouseEventKind } from '../types/callbacks/DomEventKinds';
 import StyleContext, { defaultStyleContext } from '../types/context/StyleContext';
 import { ActiveBrushChangeCallback } from '../types/callbacks/ActiveBrushChangeCallback';
 import { StyleContextChangeCallback } from '../types/callbacks/StyleContextChangeCallback';
+import SelectionManager from './helpers/SelectionManager';
 
 export default class SuperCanvasManager implements ISuperCanvasManager {
 	/* PRIVATE MEMBERS */
@@ -25,6 +26,9 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 
 	// The object that manages the canvas interactions such as panning and zoom
 	private interactionManager: CanvasInteractionManager;
+
+	// The object that manages the selected canvas items
+	private selectionManager: SelectionManager;
 
 	// The active canvas items on the canvas
 	private canvasItems: ICanvasItem[];
@@ -55,6 +59,7 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 	init = (canvas: HTMLCanvasElement): void => {
 		// This must be the first thing called because it attaches event listeners
 		this.interactionManager = new CanvasInteractionManager(canvas);
+		this.selectionManager = new SelectionManager();
 		this.context2d = canvas.getContext('2d');
 		this.painter = new PainterAPI(this.context2d, this.interactionManager.panOffset, this.interactionManager.scale);
 
@@ -184,7 +189,9 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 	});
 
 	private onMouseDown = (): void => {
-		if (this.activeBrush) {
+		if (this.activeBrush && this.activeBrush.brushName === DefaultBrushKind.Selection) {
+			this.selectionManager.mouseDown(this.generateContext(), this.canvasItems);
+		} else if (this.activeBrush) {
 			this.activeBrush.mouseDown(this.addCanvasItem, this.generateBrushContext());
 		}
 	};

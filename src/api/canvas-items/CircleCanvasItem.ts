@@ -5,6 +5,7 @@ import Vector2D from '../../types/utility/Vector2D';
 import Line from '../../types/shapes/Line';
 import { vector } from '../../utility/shapes-util';
 import StyleContext from '../../types/context/StyleContext';
+import Rectangle from '../../types/shapes/Rectangle';
 
 export default class CircleCanvasItem implements ICanvasItem {
 	private circle: Circle;
@@ -27,5 +28,15 @@ export default class CircleCanvasItem implements ICanvasItem {
 
 	render = (painter: IPainterAPI): void => {
 		painter.drawCircle(this.circle);
+	};
+
+	getBoundingRect = (): Rectangle => {
+		const { radius } = this.circle;
+
+		return {
+			topLeftCorner: vector(radius, radius),
+			width: radius,
+			height: radius,
+		};
 	};
 }

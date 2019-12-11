@@ -1,0 +1,78 @@
+import ISelection from '../../types/ISelection';
+import ICanvasItem from '../../types/ICanvasItem';
+import Context from '../../types/context/Context';
+import { pointInsideRect } from '../../utility/shapes-util';
+
+/**
+ * This class exists to abstract selection logic from the SuperCanvasManager
+ * making it easy for it to manage which canvas items are selected
+ */
+export default class SelectionManager implements ISelection {
+	private _selectedItems: ICanvasItem[];
+
+	constructor() {
+		this._selectedItems = [];
+	}
+
+	/* INTERFACE METHODS */
+
+	get selectedItem(): ICanvasItem {
+		return this._selectedItems[0];
+	}
+
+	get selectedItems(): ICanvasItem[] {
+		return this._selectedItems;
+	}
+
+	get selectedItemCount(): number {
+		return this._selectedItems.length;
+	}
+
+	/* PUBLIC METHODS */
+
+	mouseDown = (context: Context, canvasItems: ICanvasItem[]): void => {
+		const { mousePosition } = context;
+
+		// All the canvas items that hit the point
+		const hits = [];
+
+		// Reverse iterate over the canvas items because the last hit in the array
+		// should be the one that hits
+		for (let i = canvasItems.length - 1; i >= 0; i--) {
+			const canvasItem = canvasItems[i];
+
+			// If the canvas item supplies a pointInsideItem method then use only that to determine if the
+			// point hits the canvas item, otherwise check inside the bounding rectangle
+			if (
+				(canvasItem.pointInsideItem && canvasItem.pointInsideItem(mousePosition))
+				|| (!canvasItem.pointInsideItem && pointInsideRect(mousePosition, canvasItem.getBoundingRect()))
+			) {
+				hits.push(canvasItem);
+			}
+		}
+
+		const selectedIndex = hits.findIndex((canvasItem) => canvasItem === this.selectedItem);
+
+		if (selectedIndex === hits.length - 1) {
+			// The user is already selecting the bottom item in the stack so deselect
+			this.deselectItems();
+		} else {
+			// Select the next item in the hit stack
+			this.setSelectedItem(hits[selectedIndex + 1]);
+		}
+	};
+
+	/* PRIVATE METHODS */
+
+	private setSelectedItem = (item: ICanvasItem): void => {
+		this._selectedItems = [ item ];
+	};
+
+	private addSelectedItem = (item: ICanvasItem): void => {
+		this._selectedItems.push(item);
+	};
+
+	private deselectItems = (): void => {
+		this._selectedItems = [];
+	};
+}
