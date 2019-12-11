@@ -152,7 +152,7 @@ export function vector(x: number, y: number): Vector2D {
  */
 export function pointInsidePolygon(point: Vector2D, polygon: Polygon): boolean {
 	const ray: Line = {
-		point1: vector(-Infinity, point.y),
+		point1: vector(Math.min(...polygon.points.map(({ x }) => x)) - 1, point.y),
 		point2: point,
 	};
 

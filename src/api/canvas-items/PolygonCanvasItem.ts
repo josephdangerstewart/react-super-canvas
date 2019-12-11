@@ -4,7 +4,7 @@ import Polygon from '../../types/shapes/Polygon';
 import Vector2D from '../../types/utility/Vector2D';
 import StyleContext from '../../types/context/StyleContext';
 import Rectangle from '../../types/shapes/Rectangle';
-import { vector } from '../../utility/shapes-util';
+import { vector, pointInsidePolygon } from '../../utility/shapes-util';
 
 export default class PolygonCanvasItem implements ICanvasItem {
 	private polygon: Polygon;
@@ -38,4 +38,6 @@ export default class PolygonCanvasItem implements ICanvasItem {
 			height: maxY - minY,
 		};
 	};
+
+	pointInsideItem = (point: Vector2D): boolean => pointInsidePolygon(point, this.polygon);
 }
