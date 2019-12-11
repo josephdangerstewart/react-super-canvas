@@ -101,6 +101,7 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 	setStyleContext = (styleContext: StyleContext): void => {
 		const copy = { ...styleContext };
 		if (styleContext.fillImageUrl && styleContext.fillColor) {
+			// eslint-disable-next-line
 			console.warn('Both fillImageUrl and fillColor were provided: fillImageUrl will be overridden');
 			copy.fillImageUrl = null;
 		}
@@ -123,6 +124,10 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 	onStyleContextChange = (onChange: StyleContextChangeCallback): void => {
 		onChange(this.styleContext);
 		this._onStyleContextChange = onChange;
+	};
+
+	clear = (): void => {
+		this.canvasItems = [];
 	};
 
 	/* PRIVATE METHODS */

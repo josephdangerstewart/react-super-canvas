@@ -57,4 +57,9 @@ export default interface ISuperCanvasManager {
 	 * @description Calls the callback when the style context is changed
 	 */
 	onStyleContextChange: (onChange: StyleContextChangeCallback) => void;
+
+	/**
+	 * @description Clears the super canvas
+	 */
+	clear: () => void;
 }

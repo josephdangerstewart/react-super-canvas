@@ -90,7 +90,7 @@ const SuperCanvas: React.FunctionComponent<SuperCanvasProps> = ({
 					)}
 					clearButton={(
 						<ClearButton
-							clear={() => console.log('clear')}
+							clear={superCanvasManager && superCanvasManager.clear}
 						/>
 					)}
 				/>
