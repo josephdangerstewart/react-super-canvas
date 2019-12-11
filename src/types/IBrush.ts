@@ -5,6 +5,7 @@ import { AddCanvasItemCallback } from './callbacks/AddCanvasItemCallback';
 export enum DefaultBrushKind {
 	CircleBrush = 'circle',
 	PolygonBrush = 'polygon',
+	Selection = 'selection',
 }
 
 export default interface IBrush {

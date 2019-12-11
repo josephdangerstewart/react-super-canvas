@@ -1,11 +1,12 @@
-import React from 'react';
-import IBrush from '../types/IBrush';
+import React, { useMemo } from 'react';
+import IBrush, { DefaultBrushKind } from '../types/IBrush';
 import IBackgroundElement from '../types/IBackgroundElement';
 import { useSuperCanvasManager } from '../hooks/use-super-canvas-manager';
 import DefaultToolbar, { ToolbarProps } from './toolbar/DefaultToolbar';
 import DefaultBrushControls, { BrushControlsProps } from './toolbar/DefaultBrushControls';
 import DefaultStyleControls, { StyleControlsProps } from './toolbar/DefaultStyleControls';
 import DefaultClearButton, { ClearButtonProps } from './toolbar/DefaultClearButton';
+import SelectionBrush from '../api/brushes/SelectionBrush';
 
 export interface ToolbarComponents {
 	Toolbar?: React.ComponentType<ToolbarProps>;
@@ -44,10 +45,18 @@ export interface SuperCanvasProps {
 const SuperCanvas: React.FunctionComponent<SuperCanvasProps> = ({
 	height,
 	width,
-	availableBrushes,
+	availableBrushes: providedBrushes,
 	activeBackgroundElement,
 	toolbarComponents,
 }) => {
+	const availableBrushes = useMemo(() => {
+		if (!providedBrushes.find((brush) => brush.brushName === DefaultBrushKind.Selection)) {
+			return [ new SelectionBrush(), ...providedBrushes ];
+		}
+
+		return providedBrushes;
+	}, [ providedBrushes ]);
+
 	const {
 		canvasRef,
 		superCanvasManager,
