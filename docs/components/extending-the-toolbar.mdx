@@ -1,0 +1,31 @@
+---
+name: Extending the Toolbar
+menu: 2. Components
+---
+
+import ToolbarProps from '../../meta/interfaces/ToolbarProps.json';
+import BrushControlsProps from '../../meta/interfaces/BrushControlsProps.json';
+import StyleControlsProps from '../../meta/interfaces/StyleControlsProps.json';
+import { InterfaceDocumentation } from '../InterfaceDocumentation';
+
+# Extending The Toolbar
+
+The toolbar in the component was designed using a replaceable component pattern, similarly to how [react-select](https://react-select.com/home) works. It is made up atomic components that can be individually replaced to your use case. This allows you to add custom functionality to the toolbar without having to completely re-implement it.
+
+## Toolbar
+
+### `interface ToolbarProps`
+
+<InterfaceDocumentation interfaceMetadata={ToolbarProps} />
+
+## BrushControls
+
+### `interface BrushControlsProps`
+
+<InterfaceDocumentation interfaceMetadata={BrushControlsProps} />
+
+## StyleControls
+
+### `interface StyleControlsProps`
+
+<InterfaceDocumentation interfaceMetadata={StyleControlsProps} />

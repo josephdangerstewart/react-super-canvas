@@ -37,6 +37,27 @@ const filesToScan = [
 
 const docs = app.convert(filesToScan);
 
+const reflections = docs
+	.files
+	.reduce((total, file) => [...total, ...file.reflections], []);
+
+const interfaces = reflections.filter(reflection => reflection && reflection.kindString === 'Interface');
+const callbacks = reflections
+	.filter(reflection =>
+		reflection &&
+		reflection.kindString === 'Type literal' &&
+		reflection.sources.find(source => /types\/callbacks\//.test(source.fileName))
+	)
+	.map(reflection => reflection.signatures)
+	.reduce((all, signatures) => [...all, ...signatures], [])
+	.reduce((map, signature) => {
+		const [,fileName] = /\/(\w*).tsx?/.exec(signature.sources[0] && signature.sources[0].fileName) || [];
+		if (fileName) {
+			map[fileName] = signature;
+		}
+		return map;
+	}, {});
+
 const buildProperties = (reflection) => {
 	const commentTags = (reflection.comment && reflection.comment.tags) || [];
 	const inheritedFrom =
@@ -50,7 +71,17 @@ const buildProperties = (reflection) => {
 	let type;
 	let typeFlags = {};
 	if (reflection.type) {
-		if (reflection.type.type === 'array') {
+		if (callbacks[reflection.type.name]) {
+			type = 'callback';
+			const signature = callbacks[reflection.type.name];
+			const returnType = signature.type.name;
+			const parameters = {};
+			for (const parameter of signature.parameters || []) {
+				parameters[parameter.name] = buildProperties(parameter);
+			}
+			typeFlags.parameters = parameters;
+			typeFlags.returnType = returnType;
+		} else if (reflection.type.type === 'array') {
 			type = reflection.type.elementType.name;
 			typeFlags.isArray = true;
 		} else if (reflection.type.type === 'reflection' && reflection.type.declaration) {
@@ -80,11 +111,6 @@ const buildProperties = (reflection) => {
 		isOptional,
 	}
 }
-
-const interfaces = docs
-	.files
-	.reduce((total, file) => [...total, ...file.reflections], [])
-	.filter(reflection => reflection && reflection.kindString === 'Interface');
 
 for (const reflection of interfaces) {
 	const properties = {};
