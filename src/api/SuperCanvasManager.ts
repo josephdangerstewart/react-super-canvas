@@ -14,6 +14,7 @@ import StyleContext, { defaultStyleContext } from '../types/context/StyleContext
 import { ActiveBrushChangeCallback } from '../types/callbacks/ActiveBrushChangeCallback';
 import { StyleContextChangeCallback } from '../types/callbacks/StyleContextChangeCallback';
 import SelectionManager from './helpers/SelectionManager';
+import { TransformManager } from './helpers/TransformManager';
 
 export default class SuperCanvasManager implements ISuperCanvasManager {
 	/* PRIVATE MEMBERS */
@@ -29,6 +30,9 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 
 	// The object that manages the selected canvas items
 	private selectionManager: SelectionManager;
+
+	// The object that manages transformations on canvas items
+	private transformManager: TransformManager;
 
 	// The active canvas items on the canvas
 	private canvasItems: ICanvasItem[];
@@ -60,6 +64,7 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 		// This must be the first thing called because it attaches event listeners
 		this.interactionManager = new CanvasInteractionManager(canvas);
 		this.selectionManager = new SelectionManager();
+		this.transformManager = new TransformManager(this.selectionManager);
 		this.context2d = canvas.getContext('2d');
 		this.painter = new PainterAPI(this.context2d, this.interactionManager.panOffset, this.interactionManager.scale);
 
@@ -157,7 +162,7 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 			item.render(this.painter, context);
 		});
 
-		this.selectionManager.render(this.painter);
+		this.transformManager.render(this.painter, this.generateContext());
 
 		if (this.activeBrush) {
 			this.activeBrush.renderPreview(this.painter, this.generateBrushContext());
