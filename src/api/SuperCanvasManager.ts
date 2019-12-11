@@ -70,6 +70,8 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 		this.isActive = true;
 
 		this.interactionManager.registerMouseEvent(MouseEventKind.MouseDown, this.onMouseDown);
+		this.interactionManager.registerMouseEvent(MouseEventKind.MouseUp, this.onMouseUp);
+		this.interactionManager.registerMouseEvent(MouseEventKind.MouseMove, this.onMouseDrag);
 
 		this.update();
 	};
@@ -193,9 +195,21 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 
 	private onMouseDown = (): void => {
 		if (this.activeBrush && this.activeBrush.brushName === DefaultBrushKind.Selection) {
-			this.selectionManager.mouseDown(this.generateContext(), this.canvasItems);
+			this.selectionManager.mouseDown();
 		} else if (this.activeBrush) {
 			this.activeBrush.mouseDown(this.addCanvasItem, this.generateBrushContext());
+		}
+	};
+
+	private onMouseUp = (): void => {
+		if (this.activeBrush && this.activeBrush.brushName === DefaultBrushKind.Selection) {
+			this.selectionManager.mouseUp(this.generateContext(), this.canvasItems);
+		}
+	};
+
+	private onMouseDrag = (): void => {
+		if (this.activeBrush && this.activeBrush.brushName === DefaultBrushKind.Selection) {
+			this.selectionManager.mouseDragged();
 		}
 	};
 

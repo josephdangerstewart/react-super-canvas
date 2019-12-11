@@ -7,4 +7,5 @@ export enum MouseEventKind {
 	MouseDown = 'mousedown',
 	MouseUp = 'mouseup',
 	MouseMove = 'mousemove',
+	MouseClick = 'click',
 }

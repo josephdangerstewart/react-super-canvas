@@ -10,9 +10,11 @@ import IPainterAPI from '../../types/IPainterAPI';
  */
 export default class SelectionManager implements ISelection {
 	private _selectedItems: ICanvasItem[];
+	private _mouseDragged: boolean;
 
 	constructor() {
 		this._selectedItems = [];
+		this._mouseDragged = false;
 	}
 
 	/* INTERFACE METHODS */
@@ -31,7 +33,19 @@ export default class SelectionManager implements ISelection {
 
 	/* PUBLIC METHODS */
 
-	mouseDown = (context: Context, canvasItems: ICanvasItem[]): void => {
+	mouseDown = (): void => {
+		this._mouseDragged = false;
+	};
+
+	mouseDragged = (): void => {
+		this._mouseDragged = true;
+	};
+
+	mouseUp = (context: Context, canvasItems: ICanvasItem[]): void => {
+		if (this._mouseDragged) {
+			return;
+		}
+
 		const { mousePosition } = context;
 
 		// All the canvas items that hit the point

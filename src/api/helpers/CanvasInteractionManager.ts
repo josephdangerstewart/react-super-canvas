@@ -49,6 +49,7 @@ export default class CanvasInteractionManager {
 			mousedown: [],
 			mousemove: [],
 			mouseup: [],
+			click: [],
 		};
 		this.isMouseIn = false;
 
@@ -61,6 +62,7 @@ export default class CanvasInteractionManager {
 		this.canvas.addEventListener('mouseout', this.onMouseOut);
 		this.canvas.addEventListener('mousemove', this.onMouseMove);
 		this.canvas.addEventListener('mouseenter', this.onMouseIn);
+		this.canvas.addEventListener('click', this.onMouseClick);
 
 		this.update();
 	}
@@ -213,6 +215,10 @@ export default class CanvasInteractionManager {
 		this._isPanning = false;
 		this.mouseDownAt = null;
 		this.panDiff = vector(0, 0);
+	};
+
+	private onMouseClick = (event: MouseEvent): void => {
+		this.mouseEvents[MouseEventKind.MouseClick].forEach((callback) => callback(event));
 	};
 
 	private onMouseIn = (): void => {
