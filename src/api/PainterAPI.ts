@@ -119,7 +119,9 @@ export default class PainterAPI implements IPainterAPI {
 		const canvasRect = getCanvasRect(this.context2d);
 
 		if (rectCollidesWithRect(rect, canvasRect)) {
+			this.context2d.beginPath();
 			this.context2d.rect(x, y, width * this.scale, height * this.scale);
+			this.context2d.closePath();
 			this.drawWithStyles(rect, rect);
 		}
 		this.context2d.restore();
