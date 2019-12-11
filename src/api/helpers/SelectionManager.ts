@@ -2,6 +2,7 @@ import ISelection from '../../types/ISelection';
 import ICanvasItem from '../../types/ICanvasItem';
 import Context from '../../types/context/Context';
 import { pointInsideRect } from '../../utility/shapes-util';
+import IPainterAPI from '../../types/IPainterAPI';
 
 /**
  * This class exists to abstract selection logic from the SuperCanvasManager
@@ -62,6 +63,18 @@ export default class SelectionManager implements ISelection {
 		}
 	};
 
+	deselectItems = (): void => {
+		this._selectedItems = [];
+	};
+
+	render = (painter: IPainterAPI): void => {
+		if (!this.selectedItem) {
+			return;
+		}
+
+		painter.drawRect(this.selectedItem.getBoundingRect());
+	};
+
 	/* PRIVATE METHODS */
 
 	private setSelectedItem = (item: ICanvasItem): void => {
@@ -70,9 +83,5 @@ export default class SelectionManager implements ISelection {
 
 	private addSelectedItem = (item: ICanvasItem): void => {
 		this._selectedItems.push(item);
-	};
-
-	private deselectItems = (): void => {
-		this._selectedItems = [];
 	};
 }

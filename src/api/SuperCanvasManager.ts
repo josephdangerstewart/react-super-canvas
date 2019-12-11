@@ -132,6 +132,7 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 	};
 
 	clear = (): void => {
+		this.selectionManager.deselectItems();
 		this.canvasItems = [];
 	};
 
@@ -153,6 +154,8 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 			const context = this.generateCanvasContextForItem();
 			item.render(this.painter, context);
 		});
+
+		this.selectionManager.render(this.painter);
 
 		if (this.activeBrush) {
 			this.activeBrush.renderPreview(this.painter, this.generateBrushContext());

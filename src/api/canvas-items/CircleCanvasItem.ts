@@ -32,11 +32,12 @@ export default class CircleCanvasItem implements ICanvasItem {
 
 	getBoundingRect = (): Rectangle => {
 		const { radius } = this.circle;
+		const { x, y } = this.circle.center;
 
 		return {
-			topLeftCorner: vector(radius, radius),
-			width: radius,
-			height: radius,
+			topLeftCorner: vector(x - radius, y - radius),
+			width: radius * 2,
+			height: radius * 2,
 		};
 	};
 }
