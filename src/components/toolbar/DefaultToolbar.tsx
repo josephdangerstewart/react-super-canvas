@@ -7,16 +7,19 @@ const DefaultToolbarContainer = styled.div`
 	left: 10px;
 
 	box-shadow: 0px 0px 27px -1px rgba(0,0,0,.5);
-	padding: 8px;
 	background-color: #F8F8F8;
 	display: flex;
 	border-radius: 4px;
 `;
 
 const VerticalDivider = styled.div`
-	margin: 0 4px;
-	border: solid 1px #F0F0F0;
+	border: solid 1px #E0E0E0;
 	border-radius: 2px;
+`;
+
+const ToolbarSection = styled.div`
+	padding: 8px;
+	display: flex;
 `;
 
 export interface ToolbarProps {
@@ -38,11 +41,17 @@ export interface ToolbarProps {
 
 const Toolbar: React.FunctionComponent<ToolbarProps> = ({ brushControls, styleControls, clearButton }) => (
 	<DefaultToolbarContainer>
-		{brushControls}
+		<ToolbarSection>
+			{brushControls}
+		</ToolbarSection>
 		<VerticalDivider />
-		{styleControls}
+		<ToolbarSection>
+			{styleControls}
+		</ToolbarSection>
 		<VerticalDivider />
-		{clearButton}
+		<ToolbarSection>
+			{clearButton}
+		</ToolbarSection>
 	</DefaultToolbarContainer>
 );
 
