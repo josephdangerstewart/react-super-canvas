@@ -5,11 +5,13 @@ import { useSuperCanvasManager } from '../hooks/use-super-canvas-manager';
 import DefaultToolbar, { ToolbarProps } from './toolbar/DefaultToolbar';
 import DefaultBrushControls, { BrushControlsProps } from './toolbar/DefaultBrushControls';
 import DefaultStyleControls, { StyleControlsProps } from './toolbar/DefaultStyleControls';
+import DefaultClearButton, { ClearButtonProps } from './toolbar/DefaultClearButton';
 
 export interface ToolbarComponents {
 	Toolbar?: React.ComponentType<ToolbarProps>;
 	BrushControls?: React.ComponentType<BrushControlsProps>;
 	StyleControls?: React.ComponentType<StyleControlsProps>;
+	ClearButton?: React.ComponentType<ClearButtonProps>;
 }
 
 export interface SuperCanvasProps {
@@ -56,11 +58,13 @@ const SuperCanvas: React.FunctionComponent<SuperCanvasProps> = ({
 		Toolbar: CustomToolbar,
 		BrushControls: CustomBrushControls,
 		StyleControls: CustomStyleControls,
+		ClearButton: CustomClearButton,
 	} = (toolbarComponents || {}) as ToolbarComponents;
 
 	const Toolbar = CustomToolbar || DefaultToolbar as React.ComponentType<ToolbarProps>;
 	const BrushControls = CustomBrushControls || DefaultBrushControls as React.ComponentType<BrushControlsProps>;
 	const StyleControls = CustomStyleControls || DefaultStyleControls as React.ComponentType<StyleControlsProps>;
+	const ClearButton = CustomClearButton || DefaultClearButton as React.ComponentType<ClearButtonProps>;
 
 	return (
 		<div style={{ position: 'relative' }}>
@@ -82,6 +86,11 @@ const SuperCanvas: React.FunctionComponent<SuperCanvasProps> = ({
 						<StyleControls
 							setStyleContext={superCanvasManager.setStyleContext}
 							styleContext={styleContext}
+						/>
+					)}
+					clearButton={(
+						<ClearButton
+							clear={() => console.log('clear')}
 						/>
 					)}
 				/>

@@ -29,13 +29,20 @@ export interface ToolbarProps {
 	 * @description The style control components defined by the [style controls](#stylecontrols)
 	 */
 	styleControls: React.ReactNode;
+
+	/**
+	 * @description The clear button defined by the [clear button](#clearbutton)
+	 */
+	clearButton: React.ReactNode;
 }
 
-const Toolbar: React.FunctionComponent<ToolbarProps> = ({ brushControls, styleControls }) => (
+const Toolbar: React.FunctionComponent<ToolbarProps> = ({ brushControls, styleControls, clearButton }) => (
 	<DefaultToolbarContainer>
 		{brushControls}
 		<VerticalDivider />
 		{styleControls}
+		<VerticalDivider />
+		{clearButton}
 	</DefaultToolbarContainer>
 );
 
