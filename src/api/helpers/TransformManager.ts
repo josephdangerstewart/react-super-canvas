@@ -3,10 +3,13 @@ import IPainterAPI from '../../types/IPainterAPI';
 import ISelection from '../../types/ISelection';
 import Rectangle from '../../types/shapes/Rectangle';
 import StyledShape from '../../types/shapes/StyledShape';
-import { vector, pointInsideRect } from '../../utility/shapes-util';
+import { vector, pointInsideRect, pointInsideCircle } from '../../utility/shapes-util';
 import { ScalingNode } from '../../types/utility/ScalingNode';
+import Circle from '../../types/shapes/Circle';
+import Line from '../../types/shapes/Line';
 
-const HANDLE_RADIUS = 6;
+const HANDLE_DIAMETER = 12;
+const ROTATE_HANDLE_HEIGHT = 20;
 
 const boundingRectangleStyles: StyledShape = {
 	fillColor: null,
@@ -20,6 +23,11 @@ const handleStyles: StyledShape = {
 	strokeColor: '#7FC8DE',
 	strokeWeight: null,
 	fillImageUrl: null,
+};
+
+const handleStylesHovered: StyledShape = {
+	...handleStyles,
+	fillColor: '#72B5C8',
 };
 
 enum Action {
@@ -49,6 +57,12 @@ export class TransformManager {
 		}
 
 		const boundingRect = canvasItem.getBoundingRect();
+		const [ rotateHandle, rotateHandleLine ] = this.getRotateHandle(boundingRect, context);
+
+		painter.drawLine({
+			...rotateHandleLine,
+			...boundingRectangleStyles,
+		});
 
 		painter.drawRect({
 			...boundingRect,
@@ -56,6 +70,8 @@ export class TransformManager {
 		});
 
 		this.getScaleNodes(boundingRect, context).map(({ node }) => node).forEach(painter.drawRect);
+
+		painter.drawCircle(rotateHandle);
 	};
 
 	mouseDown = (context: Context): void => {
@@ -76,6 +92,12 @@ export class TransformManager {
 			return;
 		}
 
+		const [ rotateHandle ] = this.getRotateHandle(boundingRect);
+		if (pointInsideCircle(mousePosition, rotateHandle)) {
+			this.dragAction = Action.Rotate;
+			return;
+		}
+
 		if (pointInsideRect(mousePosition, boundingRect)) {
 			this.dragAction = Action.Move;
 		}
@@ -88,6 +110,10 @@ export class TransformManager {
 
 		if (this.dragAction === Action.Scale) {
 			console.log(`Scaling on ${this.scalingNode}`);
+		} else if (this.dragAction === Action.Rotate) {
+			console.log('Rotating');
+		} else if (this.dragAction === Action.Move) {
+			console.log('Moving');
 		}
 	};
 
@@ -95,6 +121,28 @@ export class TransformManager {
 		this.isMouseDown = false;
 		this.dragAction = null;
 		this.scalingNode = null;
+	};
+
+	private getRotateHandle = (rect: Rectangle, context?: Context): [Circle, Line] => {
+		const { x, y } = rect.topLeftCorner;
+		const { width } = rect;
+		const { mousePosition } = context || { mousePosition: null };
+		const halfWidth = Math.floor(width / 2);
+
+		const point1 = vector(x + halfWidth, y);
+		const point2 = vector(x + halfWidth, y - ROTATE_HANDLE_HEIGHT);
+
+		const circle: Circle = {
+			center: vector(x + halfWidth, y - ROTATE_HANDLE_HEIGHT - HANDLE_DIAMETER / 2),
+			radius: HANDLE_DIAMETER / 2,
+		};
+
+		const styles = mousePosition && pointInsideCircle(mousePosition, circle) ? handleStylesHovered : handleStyles;
+
+		return [
+			{ ...circle, ...styles },
+			{ point1, point2 },
+		];
 	};
 
 	private getScaleNodes = (rect: Rectangle, context?: Context): { type: ScalingNode; node: Rectangle }[] => {
@@ -142,17 +190,15 @@ export class TransformManager {
 	private scaleHandle = (x: number, y: number, context?: Context): Rectangle => {
 		const { mousePosition } = context || { mousePosition: null };
 		const rect = {
-			topLeftCorner: vector(x - HANDLE_RADIUS / 2, y - HANDLE_RADIUS / 2),
-			width: HANDLE_RADIUS,
-			height: HANDLE_RADIUS,
+			topLeftCorner: vector(x - HANDLE_DIAMETER / 2, y - HANDLE_DIAMETER / 2),
+			width: HANDLE_DIAMETER,
+			height: HANDLE_DIAMETER,
 		};
 
-		const styles = {
-			...handleStyles,
-		};
+		let styles = handleStyles;
 
 		if (mousePosition && pointInsideRect(mousePosition, rect)) {
-			styles.fillColor = '#72B5C8';
+			styles = handleStylesHovered;
 		}
 
 		return {
