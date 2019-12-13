@@ -1,5 +1,4 @@
 import ISuperCanvasManager from '../types/ISuperCanvasManager';
-import IPainterAPI from '../types/IPainterAPI';
 import PainterAPI from './PainterAPI';
 import ICanvasItem from '../types/ICanvasItem';
 import IBrush, { DefaultBrushKind } from '../types/IBrush';
@@ -22,7 +21,7 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 	/* PRIVATE MEMBERS */
 
 	// The painter object used for drawing with virtual coordinates
-	private painter: IPainterAPI;
+	private painter: PainterAPI;
 
 	// The canvas rendering context to be passed to the active background element for rendering
 	private context2d: CanvasRenderingContext2D;

@@ -34,23 +34,6 @@ export default class PainterAPI implements IPainterAPI {
 
 	/* INTERFACE METHODS */
 
-	setPan = (pan: Vector2D): void => {
-		this.panOffset = pan;
-	};
-
-	setScale = (scale: number): void => {
-		this.scale = scale;
-	};
-
-	clearCanvas = (): void => {
-		this.context2d.clearRect(0, 0, this.context2d.canvas.width, this.context2d.canvas.height);
-	};
-
-	setContext2D = (context: CanvasRenderingContext2D): void => {
-		this.context2d = context;
-		context.translate(0.5, 0.5);
-	};
-
 	drawLine = (arg: Line): void => {
 		const line = fillDefaults(arg, LineDefaults);
 
@@ -140,6 +123,25 @@ export default class PainterAPI implements IPainterAPI {
 			this.context2d.closePath();
 			this.drawWithStyles(circle, boundingRectOfCircle(circle));
 		}
+	};
+
+	/* PUBLIC METHODS */
+
+	setPan = (pan: Vector2D): void => {
+		this.panOffset = pan;
+	};
+
+	setScale = (scale: number): void => {
+		this.scale = scale;
+	};
+
+	clearCanvas = (): void => {
+		this.context2d.clearRect(0, 0, this.context2d.canvas.width, this.context2d.canvas.height);
+	};
+
+	setContext2D = (context: CanvasRenderingContext2D): void => {
+		this.context2d = context;
+		context.translate(0.5, 0.5);
 	};
 
 	/* UTILITY METHODS */
