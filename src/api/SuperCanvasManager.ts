@@ -15,6 +15,12 @@ import { ActiveBrushChangeCallback } from '../types/callbacks/ActiveBrushChangeC
 import { StyleContextChangeCallback } from '../types/callbacks/StyleContextChangeCallback';
 import SelectionManager from './helpers/SelectionManager';
 import { TransformManager } from './helpers/TransformManager';
+import TransformContext from '../types/context/TransformContext';
+
+interface CanvasItemInstance {
+	item: ICanvasItem;
+	transform: TransformContext;
+}
 
 export default class SuperCanvasManager implements ISuperCanvasManager {
 	/* PRIVATE MEMBERS */
@@ -35,7 +41,7 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 	private transformManager: TransformManager;
 
 	// The active canvas items on the canvas
-	private canvasItems: ICanvasItem[];
+	private canvasItems: CanvasItemInstance[];
 
 	// The available bushes the user can paint with
 	private availableBrushes: IBrush[];
@@ -86,10 +92,10 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 	};
 
 	setCanvasItems = (items: ICanvasItem[]): void => {
-		this.canvasItems = items;
+		this.canvasItems = items.map((item) => ({ item, transform: {} }));
 	};
 
-	getCanvasItems = (): ICanvasItem[] => this.canvasItems;
+	getCanvasItems = (): ICanvasItem[] => this.canvasItems.map(({ item }) => item);
 
 	setActiveBackgroundElement = (element: IBackgroundElement): void => {
 		this.activeBackgroundElement = element;
@@ -157,7 +163,7 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 			this.activeBackgroundElement.renderBackground(this.painter, this.context2d, this.generateBackgroundElementContext());
 		}
 
-		this.canvasItems.forEach((item) => {
+		this.canvasItems.forEach(({ item }) => {
 			const context = this.generateCanvasContextForItem();
 			item.render(this.painter, context);
 		});
@@ -208,7 +214,7 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 
 	private onMouseUp = (): void => {
 		if (this.activeBrush && this.activeBrush.brushName === DefaultBrushKind.Selection) {
-			this.selectionManager.mouseUp(this.generateContext(), this.canvasItems);
+			this.selectionManager.mouseUp(this.generateContext(), this.canvasItems.map(({ item }) => item));
 		}
 	};
 
@@ -218,7 +224,7 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 		}
 	};
 
-	private addCanvasItem = (canvasItem: ICanvasItem): void => {
-		this.canvasItems.push(canvasItem);
+	private addCanvasItem = (item: ICanvasItem): void => {
+		this.canvasItems.push({ item, transform: {} });
 	};
 }
