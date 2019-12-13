@@ -49,11 +49,11 @@ export class TransformManager {
 	private scalingNode: ScalingNode;
 	private isMouseDown: boolean;
 
-	private mouseDelta: Vector2D;
 	private lastMousePosition: Vector2D;
 
 	constructor(selectionManager: ISelection) {
 		this.selectionManager = selectionManager;
+		this.lastMousePosition = vector(0, 0);
 	}
 
 	render = (painter: IPainterAPI, context: Context): void => {
@@ -117,8 +117,12 @@ export class TransformManager {
 			return;
 		}
 
+		const { x: lastX, y: lastY } = this.lastMousePosition;
+		const { x: curX, y: curY } = context.mousePosition;
+
 		if (this.dragAction === Action.Scale) {
-			console.log(`Scaling on ${this.scalingNode}`);
+			const delta = vector(curX - lastX, curY - lastY);
+			setTransform({ scale: delta });
 		} else if (this.dragAction === Action.Rotate) {
 			console.log('Rotating');
 		} else if (this.dragAction === Action.Move) {

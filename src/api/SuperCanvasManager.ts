@@ -69,6 +69,7 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 		// This must be the first thing called because it attaches event listeners
 		this.interactionManager = new CanvasInteractionManager(canvas);
 		this.selectionManager = new SelectionManager();
+		this.selectionManager.onSelectionChange(this.onSelectionChange);
 		this.transformManager = new TransformManager(this.selectionManager);
 		this.setTransformCallback = (): void => {};
 		this.context2d = canvas.getContext('2d');
