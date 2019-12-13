@@ -15,12 +15,8 @@ import { ActiveBrushChangeCallback } from '../types/callbacks/ActiveBrushChangeC
 import { StyleContextChangeCallback } from '../types/callbacks/StyleContextChangeCallback';
 import SelectionManager from './helpers/SelectionManager';
 import { TransformManager } from './helpers/TransformManager';
-import TransformContext from '../types/context/TransformContext';
-
-interface CanvasItemInstance {
-	item: ICanvasItem;
-	transform: TransformContext;
-}
+import TransformContext, { merge } from '../types/context/TransformContext';
+import CanvasItemInstance from '../types/utility/CanvasItemInstance';
 
 export default class SuperCanvasManager implements ISuperCanvasManager {
 	/* PRIVATE MEMBERS */
@@ -96,10 +92,10 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 	};
 
 	setCanvasItems = (items: ICanvasItem[]): void => {
-		this.canvasItems = items.map((item) => ({ item, transform: {} }));
+		this.canvasItems = items.map((item) => ({ ...item, $transform: {} }));
 	};
 
-	getCanvasItems = (): ICanvasItem[] => this.canvasItems.map(({ item }) => item);
+	getCanvasItems = (): ICanvasItem[] => this.canvasItems;
 
 	setActiveBackgroundElement = (element: IBackgroundElement): void => {
 		this.activeBackgroundElement = element;
@@ -167,7 +163,7 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 			this.activeBackgroundElement.renderBackground(this.painter, this.context2d, this.generateBackgroundElementContext());
 		}
 
-		this.canvasItems.forEach(({ item }) => {
+		this.canvasItems.forEach((item) => {
 			const context = this.generateCanvasContextForItem();
 			item.render(this.painter, context);
 		});
@@ -220,19 +216,7 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 	private onMouseUp = (): void => {
 		if (this.activeBrush && this.activeBrush.brushName === DefaultBrushKind.Selection) {
 			this.transformManager.mouseUp();
-			this.selectionManager.mouseUp(this.generateContext(), this.canvasItems.map(({ item }) => item));
-
-			if (this.selectionManager.selectedItemCount === 1) {
-				const instance = this.canvasItems.find(({ item }) => item === this.selectionManager.selectedItem);
-				this.setTransformCallback = (transform: TransformContext): void => {
-					instance.transform = {
-						...(instance.transform || {}),
-						...transform,
-					};
-				};
-			} else {
-				this.setTransformCallback = (): void => {};
-			}
+			this.selectionManager.mouseUp(this.generateContext(), this.canvasItems);
 		}
 	};
 
@@ -244,6 +228,20 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 	};
 
 	private addCanvasItem = (item: ICanvasItem): void => {
-		this.canvasItems.push({ item, transform: {} });
+		this.canvasItems.push({ ...item, $transform: {} });
+	};
+
+	private onSelectionChange = (): void => {
+		if (this.selectionManager.selectedItemCount > 0) {
+			const instances = this.canvasItems.filter((item) => !this.selectionManager.isSelected(item));
+			this.setTransformCallback = (transform: TransformContext): void => {
+				for (let i = 0; i < instances.length; i++) {
+					const instance = instances[i];
+					instance.$transform = merge(transform, instance.$transform);
+				}
+			};
+		} else {
+			this.setTransformCallback = (): void => {};
+		}
 	};
 }

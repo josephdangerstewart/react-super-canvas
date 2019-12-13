@@ -8,6 +8,7 @@ import { ScalingNode } from '../../types/utility/ScalingNode';
 import Circle from '../../types/shapes/Circle';
 import Line from '../../types/shapes/Line';
 import TransformContext from '../../types/context/TransformContext';
+import Vector2D from '../../types/utility/Vector2D';
 
 const HANDLE_DIAMETER = 12;
 const ROTATE_HANDLE_HEIGHT = 20;
@@ -48,6 +49,9 @@ export class TransformManager {
 	private scalingNode: ScalingNode;
 	private isMouseDown: boolean;
 
+	private mouseDelta: Vector2D;
+	private lastMousePosition: Vector2D;
+
 	constructor(selectionManager: ISelection) {
 		this.selectionManager = selectionManager;
 	}
@@ -81,6 +85,8 @@ export class TransformManager {
 		this.isMouseDown = true;
 		const canvasItem = this.selectionManager.selectedItem;
 		const { mousePosition } = context;
+
+		this.lastMousePosition = { ...mousePosition };
 
 		if (!canvasItem) {
 			return;

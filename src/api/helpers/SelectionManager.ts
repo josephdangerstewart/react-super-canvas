@@ -3,17 +3,21 @@ import ICanvasItem from '../../types/ICanvasItem';
 import Context from '../../types/context/Context';
 import { pointInsideRect } from '../../utility/shapes-util';
 
+type OnSelectionChangeCallback = () => void;
+
 /**
  * This class exists to abstract selection logic from the SuperCanvasManager
  * making it easy for it to manage which canvas items are selected
  */
 export default class SelectionManager implements ISelection {
+	private onSelectionChangeHandlers: OnSelectionChangeCallback[];
 	private _selectedItems: ICanvasItem[];
 	private _mouseDragged: boolean;
 
 	constructor() {
 		this._selectedItems = [];
 		this._mouseDragged = false;
+		this.onSelectionChangeHandlers = [];
 	}
 
 	/* INTERFACE METHODS */
@@ -31,6 +35,12 @@ export default class SelectionManager implements ISelection {
 	}
 
 	/* PUBLIC METHODS */
+
+	isSelected = (item: ICanvasItem): boolean => this._selectedItems.includes(item);
+
+	onSelectionChange = (callback: OnSelectionChangeCallback): void => {
+		this.onSelectionChangeHandlers.push(callback);
+	};
 
 	mouseDown = (): void => {
 		this._mouseDragged = false;
@@ -84,9 +94,11 @@ export default class SelectionManager implements ISelection {
 
 	private setSelectedItem = (item: ICanvasItem): void => {
 		this._selectedItems = [ item ];
+		this.onSelectionChangeHandlers.forEach((handler): void => handler());
 	};
 
 	private addSelectedItem = (item: ICanvasItem): void => {
 		this._selectedItems.push(item);
+		this.onSelectionChangeHandlers.forEach((handler): void => handler());
 	};
 }
