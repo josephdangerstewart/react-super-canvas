@@ -7,6 +7,7 @@ import { vector, pointInsideRect, pointInsideCircle } from '../../utility/shapes
 import { ScalingNode } from '../../types/utility/ScalingNode';
 import Circle from '../../types/shapes/Circle';
 import Line from '../../types/shapes/Line';
+import TransformContext from '../../types/context/TransformContext';
 
 const HANDLE_DIAMETER = 12;
 const ROTATE_HANDLE_HEIGHT = 20;
@@ -35,6 +36,8 @@ enum Action {
 	Rotate,
 	Move,
 }
+
+type SetTransformCallback = (transform: TransformContext) => void;
 
 /**
  * This class exists to abstract the canvas item transform logic away from the SuperCanvasManager
@@ -103,7 +106,7 @@ export class TransformManager {
 		}
 	};
 
-	mouseDragged = (): void => {
+	mouseDragged = (setTransform: SetTransformCallback, context: Context): void => {
 		if (!this.isMouseDown) {
 			return;
 		}

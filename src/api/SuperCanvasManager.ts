@@ -64,6 +64,9 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 	// The custom callback when the style context changes
 	private _onStyleContextChange: StyleContextChangeCallback;
 
+	// Used as a caching for the set transform callback passed into TransformManager.mouseDown
+	private setTransformCallback: (transform: TransformContext) => void;
+
 	/* PUBLIC METHODS */
 
 	init = (canvas: HTMLCanvasElement): void => {
@@ -71,6 +74,7 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 		this.interactionManager = new CanvasInteractionManager(canvas);
 		this.selectionManager = new SelectionManager();
 		this.transformManager = new TransformManager(this.selectionManager);
+		this.setTransformCallback = (): void => {};
 		this.context2d = canvas.getContext('2d');
 		this.painter = new PainterAPI(this.context2d, this.interactionManager.panOffset, this.interactionManager.scale);
 
@@ -217,12 +221,24 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 		if (this.activeBrush && this.activeBrush.brushName === DefaultBrushKind.Selection) {
 			this.transformManager.mouseUp();
 			this.selectionManager.mouseUp(this.generateContext(), this.canvasItems.map(({ item }) => item));
+
+			if (this.selectionManager.selectedItemCount === 1) {
+				const instance = this.canvasItems.find(({ item }) => item === this.selectionManager.selectedItem);
+				this.setTransformCallback = (transform: TransformContext): void => {
+					instance.transform = {
+						...(instance.transform || {}),
+						...transform,
+					};
+				};
+			} else {
+				this.setTransformCallback = (): void => {};
+			}
 		}
 	};
 
 	private onMouseDrag = (): void => {
 		if (this.activeBrush && this.activeBrush.brushName === DefaultBrushKind.Selection) {
-			this.transformManager.mouseDragged();
+			this.transformManager.mouseDragged(this.setTransformCallback, this.generateContext());
 			this.selectionManager.mouseDragged();
 		}
 	};
