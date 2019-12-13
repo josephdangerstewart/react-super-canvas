@@ -34,6 +34,8 @@ enum Action {
 export class TransformManager {
 	private selectionManager: ISelection;
 	private dragAction: Action;
+	private scalingNode: ScalingNode;
+	private isMouseDown: boolean;
 
 	constructor(selectionManager: ISelection) {
 		this.selectionManager = selectionManager;
@@ -56,8 +58,43 @@ export class TransformManager {
 		this.getScaleNodes(boundingRect, context).map(({ node }) => node).forEach(painter.drawRect);
 	};
 
-	mouseDown = (): void => {
+	mouseDown = (context: Context): void => {
+		this.isMouseDown = true;
+		const canvasItem = this.selectionManager.selectedItem;
+		const { mousePosition } = context;
 
+		if (!canvasItem) {
+			return;
+		}
+
+		const boundingRect = canvasItem.getBoundingRect();
+		const scaleNode = this.getScaleNodes(boundingRect).find(({ node }) => pointInsideRect(mousePosition, node));
+
+		if (scaleNode) {
+			this.scalingNode = scaleNode.type;
+			this.dragAction = Action.Scale;
+			return;
+		}
+
+		if (pointInsideRect(mousePosition, boundingRect)) {
+			this.dragAction = Action.Move;
+		}
+	};
+
+	mouseDragged = (): void => {
+		if (!this.isMouseDown) {
+			return;
+		}
+
+		if (this.dragAction === Action.Scale) {
+			console.log(`Scaling on ${this.scalingNode}`);
+		}
+	};
+
+	mouseUp = (): void => {
+		this.isMouseDown = false;
+		this.dragAction = null;
+		this.scalingNode = null;
 	};
 
 	private getScaleNodes = (rect: Rectangle, context?: Context): { type: ScalingNode; node: Rectangle }[] => {

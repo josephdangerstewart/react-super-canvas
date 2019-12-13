@@ -206,6 +206,7 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 
 	private onMouseDown = (): void => {
 		if (this.activeBrush && this.activeBrush.brushName === DefaultBrushKind.Selection) {
+			this.transformManager.mouseDown(this.generateContext());
 			this.selectionManager.mouseDown();
 		} else if (this.activeBrush) {
 			this.activeBrush.mouseDown(this.addCanvasItem, this.generateBrushContext());
@@ -214,12 +215,14 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 
 	private onMouseUp = (): void => {
 		if (this.activeBrush && this.activeBrush.brushName === DefaultBrushKind.Selection) {
+			this.transformManager.mouseUp();
 			this.selectionManager.mouseUp(this.generateContext(), this.canvasItems.map(({ item }) => item));
 		}
 	};
 
 	private onMouseDrag = (): void => {
 		if (this.activeBrush && this.activeBrush.brushName === DefaultBrushKind.Selection) {
+			this.transformManager.mouseDragged();
 			this.selectionManager.mouseDragged();
 		}
 	};
