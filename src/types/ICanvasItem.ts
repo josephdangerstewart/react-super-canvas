@@ -2,7 +2,6 @@ import IPainterAPI from './IPainterAPI';
 import CanvasItemContext from './context/CanvasItemContext';
 import Rectangle from './shapes/Rectangle';
 import Vector2D from './utility/Vector2D';
-import { ScalingMode } from './utility/ScalingMode';
 
 export default interface ICanvasItem {
 	/**
@@ -26,22 +25,4 @@ export default interface ICanvasItem {
 	 * @param point The user's mouse coordinates in the virtual space
 	 */
 	pointInsideItem?: (point: Vector2D) => boolean;
-
-	/**
-	 * @description Allows the canvas item to define it's scaling behavior. Stretching will not be
-	 * allowed on this item if it is not defined
-	 */
-	onScale?: (mode: ScalingMode, context: CanvasItemContext) => void;
-
-	/**
-	 * @description Allows the canvas item to define it's rotation behavior. Rotating will not be
-	 * allowed on this item if it is not defined
-	 */
-	onRotate?: (context: CanvasItemContext) => void;
-
-	/**
-	 * @description Allows the canvas item to define it's move behavior. Moving will not be
-	 * allowed on this item if it is not defined
-	 */
-	onMove?: (context: CanvasItemContext) => void;
 }

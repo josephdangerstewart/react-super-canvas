@@ -4,8 +4,9 @@ import ISelection from '../../types/ISelection';
 import Rectangle from '../../types/shapes/Rectangle';
 import StyledShape from '../../types/shapes/StyledShape';
 import { vector, pointInsideRect } from '../../utility/shapes-util';
+import { ScalingNode } from '../../types/utility/ScalingNode';
 
-const HANDLE_RADIUS = 4;
+const HANDLE_RADIUS = 6;
 
 const boundingRectangleStyles: StyledShape = {
 	fillColor: null,
@@ -21,11 +22,18 @@ const handleStyles: StyledShape = {
 	fillImageUrl: null,
 };
 
+enum Action {
+	Scale,
+	Rotate,
+	Move,
+}
+
 /**
  * This class exists to abstract the canvas item transform logic away from the SuperCanvasManager
  */
 export class TransformManager {
 	private selectionManager: ISelection;
+	private dragAction: Action;
 
 	constructor(selectionManager: ISelection) {
 		this.selectionManager = selectionManager;
@@ -40,32 +48,62 @@ export class TransformManager {
 
 		const boundingRect = canvasItem.getBoundingRect();
 
-		this.renderBoundingRectangle(painter, boundingRect);
-
-		if (canvasItem.onScale) {
-			this.renderScaleHandles(painter, boundingRect, context);
-		}
-	};
-
-	private renderBoundingRectangle = (painter: IPainterAPI, rect: Rectangle): void => {
 		painter.drawRect({
-			...rect,
+			...boundingRect,
 			...boundingRectangleStyles,
 		});
+
+		this.getScaleNodes(boundingRect, context).map(({ node }) => node).forEach(painter.drawRect);
 	};
 
-	private renderScaleHandles = (painter: IPainterAPI, rect: Rectangle, context: Context): void => {
+	mouseDown = (): void => {
+
+	};
+
+	private getScaleNodes = (rect: Rectangle, context?: Context): { type: ScalingNode; node: Rectangle }[] => {
 		const { x, y } = rect.topLeftCorner;
 		const { width, height } = rect;
+		const halfWidth = Math.floor(width / 2);
+		const halfHeight = Math.floor(height / 2);
 
-		painter.drawRect(this.scaleHandle(x, y, context));
-		painter.drawRect(this.scaleHandle(x, y + height, context));
-		painter.drawRect(this.scaleHandle(x + width, y + height, context));
-		painter.drawRect(this.scaleHandle(x + width, y, context));
+		return [
+			{
+				type: ScalingNode.TopLeft,
+				node: this.scaleHandle(x, y, context),
+			},
+			{
+				type: ScalingNode.TopMiddle,
+				node: this.scaleHandle(x + halfWidth, y, context),
+			},
+			{
+				type: ScalingNode.TopLeft,
+				node: this.scaleHandle(x + width, y, context),
+			},
+			{
+				type: ScalingNode.MiddleLeft,
+				node: this.scaleHandle(x, y + halfHeight, context),
+			},
+			{
+				type: ScalingNode.MiddleRight,
+				node: this.scaleHandle(x + width, y + halfHeight, context),
+			},
+			{
+				type: ScalingNode.BottomLeft,
+				node: this.scaleHandle(x, y + height, context),
+			},
+			{
+				type: ScalingNode.BottomMiddle,
+				node: this.scaleHandle(x + halfWidth, y + height, context),
+			},
+			{
+				type: ScalingNode.BottomRight,
+				node: this.scaleHandle(x + width, y + width, context),
+			},
+		];
 	};
 
-	private scaleHandle = (x: number, y: number, context: Context): Rectangle => {
-		const { mousePosition } = context;
+	private scaleHandle = (x: number, y: number, context?: Context): Rectangle => {
+		const { mousePosition } = context || { mousePosition: null };
 		const rect = {
 			topLeftCorner: vector(x - HANDLE_RADIUS / 2, y - HANDLE_RADIUS / 2),
 			width: HANDLE_RADIUS,
@@ -76,7 +114,7 @@ export class TransformManager {
 			...handleStyles,
 		};
 
-		if (pointInsideRect(mousePosition, rect)) {
+		if (mousePosition && pointInsideRect(mousePosition, rect)) {
 			styles.fillColor = '#72B5C8';
 		}
 
