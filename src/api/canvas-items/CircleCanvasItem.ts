@@ -32,4 +32,8 @@ export default class CircleCanvasItem implements ICanvasItem {
 			height: radius * 2,
 		};
 	};
+
+	applyTransform = (): void => {
+
+	};
 }

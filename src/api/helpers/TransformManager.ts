@@ -7,8 +7,8 @@ import { vector, pointInsideRect, pointInsideCircle } from '../../utility/shapes
 import { ScalingNode } from '../../types/transform/ScalingNode';
 import Circle from '../../types/shapes/Circle';
 import Line from '../../types/shapes/Line';
-import Vector2D from '../../types/utility/Vector2D';
 import { TransformKind } from '../../types/transform/TransformKind';
+import { TransformOperation } from '../../types/transform/TransformOperation';
 
 const HANDLE_DIAMETER = 12;
 const ROTATE_HANDLE_HEIGHT = 20;
@@ -37,26 +37,24 @@ const handleStylesHovered: StyledShape = {
  */
 export class TransformManager {
 	private selectionManager: ISelection;
-	private dragTransformKind: TransformKind;
-	private scalingNode: ScalingNode;
 	private isMouseDown: boolean;
 
-	private mouseDownPosition: Vector2D;
+	private transformOperation: TransformOperation;
 	private selectedItemBoundingRect: Rectangle;
+	private previewRect: Rectangle;
 
 	constructor(selectionManager: ISelection) {
 		this.selectionManager = selectionManager;
-		this.mouseDownPosition = vector(0, 0);
 	}
 
 	render = (painter: IPainterAPI, context: Context): void => {
 		const canvasItem = this.selectionManager.selectedItem;
 
-		if (!canvasItem) {
+		if (!canvasItem || !canvasItem.applyTransform) {
 			return;
 		}
 
-		const boundingRect = canvasItem.getBoundingRect();
+		const boundingRect = this.previewRect || canvasItem.getBoundingRect();
 		const [ rotateHandle, rotateHandleLine ] = this.getRotateHandle(boundingRect, context);
 
 		painter.drawLine({
@@ -79,30 +77,42 @@ export class TransformManager {
 		const canvasItem = this.selectionManager.selectedItem;
 		const { mousePosition } = context;
 
-		this.mouseDownPosition = { ...mousePosition };
-
 		if (!canvasItem) {
 			return;
 		}
 
 		const boundingRect = canvasItem.getBoundingRect();
 		this.selectedItemBoundingRect = boundingRect;
+		this.previewRect = boundingRect;
 		const scaleNode = this.getScaleNodes(boundingRect).find(({ node }) => pointInsideRect(mousePosition, node));
 
 		if (scaleNode) {
-			this.scalingNode = scaleNode.type;
-			this.dragTransformKind = TransformKind.Scale;
+			this.transformOperation = {
+				action: TransformKind.Scale,
+				scale: {
+					value: vector(1, 1),
+					node: scaleNode.type,
+				},
+			};
+
 			return;
 		}
 
 		const [ rotateHandle ] = this.getRotateHandle(boundingRect);
 		if (pointInsideCircle(mousePosition, rotateHandle)) {
-			this.dragTransformKind = TransformKind.Rotate;
+			this.transformOperation = {
+				action: TransformKind.Rotate,
+				rotation: 0,
+			};
+
 			return;
 		}
 
 		if (pointInsideRect(mousePosition, boundingRect)) {
-			this.dragTransformKind = TransformKind.Move;
+			this.transformOperation = {
+				action: TransformKind.Move,
+				move: vector(0, 0),
+			};
 		}
 	};
 
@@ -111,19 +121,61 @@ export class TransformManager {
 			return;
 		}
 
-		if (this.dragTransformKind === TransformKind.Scale) {
-			console.log('Scaling');
-		} else if (this.dragTransformKind === TransformKind.Rotate) {
+		const { action } = this.transformOperation || { action: null };
+
+		const { x: curX, y: curY } = context.mousePosition;
+		const { width, height } = this.selectedItemBoundingRect;
+		const { x: left, y: top } = this.selectedItemBoundingRect.topLeftCorner;
+		const right = left + width;
+		const bottom = top + height;
+
+		if (action === TransformKind.Scale) {
+			const { node } = this.transformOperation.scale;
+
+			let newTopLeft = vector(left, top);
+			let delta = vector(0, 0);
+			console.log(node);
+			switch (node) {
+				case ScalingNode.TopLeft:
+					delta = vector(left - curX, top - curY);
+					newTopLeft = vector(curX, curY);
+					break;
+				case ScalingNode.TopRight:
+					delta = vector(curX - right, top - curY);
+					newTopLeft = vector(left, curY);
+					break;
+				case ScalingNode.BottomLeft:
+					delta = vector(left - curX, curY - bottom);
+					newTopLeft = vector(curX, top);
+					break;
+				case ScalingNode.BottomRight:
+					delta = vector(curX - right, curY - bottom);
+					newTopLeft = vector(left, top);
+					break;
+				default:
+					break;
+			}
+
+			this.previewRect = {
+				topLeftCorner: newTopLeft,
+				width: width + delta.x,
+				height: height + delta.y,
+			};
+
+			console.log(delta, this.previewRect);
+
+			this.transformOperation.scale.value = vector((width + delta.x) / width, (height + delta.y) / height);
+		} else if (action === TransformKind.Rotate) {
 			console.log('Rotating');
-		} else if (this.dragTransformKind === TransformKind.Move) {
+		} else if (action === TransformKind.Move) {
 			console.log('Moving');
 		}
 	};
 
 	mouseUp = (): void => {
 		this.isMouseDown = false;
-		this.dragTransformKind = null;
-		this.scalingNode = null;
+		this.transformOperation = null;
+		this.previewRect = null;
 	};
 
 	private getRotateHandle = (rect: Rectangle, context?: Context): [Circle, Line] => {
@@ -164,7 +216,7 @@ export class TransformManager {
 				node: this.scaleHandle(x + halfWidth, y, context),
 			},
 			{
-				type: ScalingNode.TopLeft,
+				type: ScalingNode.TopRight,
 				node: this.scaleHandle(x + width, y, context),
 			},
 			{
@@ -185,7 +237,7 @@ export class TransformManager {
 			},
 			{
 				type: ScalingNode.BottomRight,
-				node: this.scaleHandle(x + width, y + width, context),
+				node: this.scaleHandle(x + width, y + height, context),
 			},
 		];
 	};
