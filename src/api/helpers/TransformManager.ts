@@ -4,10 +4,11 @@ import ISelection from '../../types/ISelection';
 import Rectangle from '../../types/shapes/Rectangle';
 import StyledShape from '../../types/shapes/StyledShape';
 import { vector, pointInsideRect, pointInsideCircle } from '../../utility/shapes-util';
-import { ScalingNode } from '../../types/utility/ScalingNode';
+import { ScalingNode } from '../../types/transform/ScalingNode';
 import Circle from '../../types/shapes/Circle';
 import Line from '../../types/shapes/Line';
 import Vector2D from '../../types/utility/Vector2D';
+import { TransformKind } from '../../types/transform/TransformKind';
 
 const HANDLE_DIAMETER = 12;
 const ROTATE_HANDLE_HEIGHT = 20;
@@ -31,18 +32,12 @@ const handleStylesHovered: StyledShape = {
 	fillColor: '#72B5C8',
 };
 
-enum Action {
-	Scale,
-	Rotate,
-	Move,
-}
-
 /**
  * This class exists to abstract the canvas item transform logic away from the SuperCanvasManager
  */
 export class TransformManager {
 	private selectionManager: ISelection;
-	private dragAction: Action;
+	private dragTransformKind: TransformKind;
 	private scalingNode: ScalingNode;
 	private isMouseDown: boolean;
 
@@ -96,18 +91,18 @@ export class TransformManager {
 
 		if (scaleNode) {
 			this.scalingNode = scaleNode.type;
-			this.dragAction = Action.Scale;
+			this.dragTransformKind = TransformKind.Scale;
 			return;
 		}
 
 		const [ rotateHandle ] = this.getRotateHandle(boundingRect);
 		if (pointInsideCircle(mousePosition, rotateHandle)) {
-			this.dragAction = Action.Rotate;
+			this.dragTransformKind = TransformKind.Rotate;
 			return;
 		}
 
 		if (pointInsideRect(mousePosition, boundingRect)) {
-			this.dragAction = Action.Move;
+			this.dragTransformKind = TransformKind.Move;
 		}
 	};
 
@@ -116,18 +111,18 @@ export class TransformManager {
 			return;
 		}
 
-		if (this.dragAction === Action.Scale) {
+		if (this.dragTransformKind === TransformKind.Scale) {
 			console.log('Scaling');
-		} else if (this.dragAction === Action.Rotate) {
+		} else if (this.dragTransformKind === TransformKind.Rotate) {
 			console.log('Rotating');
-		} else if (this.dragAction === Action.Move) {
+		} else if (this.dragTransformKind === TransformKind.Move) {
 			console.log('Moving');
 		}
 	};
 
 	mouseUp = (): void => {
 		this.isMouseDown = false;
-		this.dragAction = null;
+		this.dragTransformKind = null;
 		this.scalingNode = null;
 	};
 

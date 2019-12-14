@@ -2,6 +2,7 @@ import IPainterAPI from './IPainterAPI';
 import CanvasItemContext from './context/CanvasItemContext';
 import Rectangle from './shapes/Rectangle';
 import Vector2D from './utility/Vector2D';
+import { TransformOperation } from './transform/TransformOperation';
 
 export default interface ICanvasItem {
 	/**
@@ -25,4 +26,9 @@ export default interface ICanvasItem {
 	 * @param point The user's mouse coordinates in the virtual space
 	 */
 	pointInsideItem?: (point: Vector2D) => boolean;
+
+	/**
+	 * @description Applies a transformation to the canvas item
+	 */
+	applyTransform?: (transform: TransformOperation) => void;
 }
