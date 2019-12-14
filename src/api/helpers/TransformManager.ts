@@ -7,7 +7,6 @@ import { vector, pointInsideRect, pointInsideCircle } from '../../utility/shapes
 import { ScalingNode } from '../../types/utility/ScalingNode';
 import Circle from '../../types/shapes/Circle';
 import Line from '../../types/shapes/Line';
-import TransformContext from '../../types/context/TransformContext';
 import Vector2D from '../../types/utility/Vector2D';
 
 const HANDLE_DIAMETER = 12;
@@ -38,8 +37,6 @@ enum Action {
 	Move,
 }
 
-type SetTransformCallback = (transform: TransformContext) => void;
-
 /**
  * This class exists to abstract the canvas item transform logic away from the SuperCanvasManager
  */
@@ -49,11 +46,12 @@ export class TransformManager {
 	private scalingNode: ScalingNode;
 	private isMouseDown: boolean;
 
-	private lastMousePosition: Vector2D;
+	private mouseDownPosition: Vector2D;
+	private selectedItemBoundingRect: Rectangle;
 
 	constructor(selectionManager: ISelection) {
 		this.selectionManager = selectionManager;
-		this.lastMousePosition = vector(0, 0);
+		this.mouseDownPosition = vector(0, 0);
 	}
 
 	render = (painter: IPainterAPI, context: Context): void => {
@@ -86,13 +84,14 @@ export class TransformManager {
 		const canvasItem = this.selectionManager.selectedItem;
 		const { mousePosition } = context;
 
-		this.lastMousePosition = { ...mousePosition };
+		this.mouseDownPosition = { ...mousePosition };
 
 		if (!canvasItem) {
 			return;
 		}
 
 		const boundingRect = canvasItem.getBoundingRect();
+		this.selectedItemBoundingRect = boundingRect;
 		const scaleNode = this.getScaleNodes(boundingRect).find(({ node }) => pointInsideRect(mousePosition, node));
 
 		if (scaleNode) {
@@ -112,17 +111,13 @@ export class TransformManager {
 		}
 	};
 
-	mouseDragged = (setTransform: SetTransformCallback, context: Context): void => {
+	mouseDragged = (context: Context): void => {
 		if (!this.isMouseDown) {
 			return;
 		}
 
-		const { x: lastX, y: lastY } = this.lastMousePosition;
-		const { x: curX, y: curY } = context.mousePosition;
-
 		if (this.dragAction === Action.Scale) {
-			const delta = vector(curX - lastX, curY - lastY);
-			setTransform({ scale: delta });
+			console.log('Scaling');
 		} else if (this.dragAction === Action.Rotate) {
 			console.log('Rotating');
 		} else if (this.dragAction === Action.Move) {

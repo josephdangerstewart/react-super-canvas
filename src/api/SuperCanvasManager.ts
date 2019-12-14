@@ -14,7 +14,6 @@ import { ActiveBrushChangeCallback } from '../types/callbacks/ActiveBrushChangeC
 import { StyleContextChangeCallback } from '../types/callbacks/StyleContextChangeCallback';
 import SelectionManager from './helpers/SelectionManager';
 import { TransformManager } from './helpers/TransformManager';
-import TransformContext, { merge } from '../types/context/TransformContext';
 import CanvasItemInstance from '../types/utility/CanvasItemInstance';
 
 export default class SuperCanvasManager implements ISuperCanvasManager {
@@ -59,18 +58,13 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 	// The custom callback when the style context changes
 	private _onStyleContextChange: StyleContextChangeCallback;
 
-	// Used as a caching for the set transform callback passed into TransformManager.mouseDown
-	private setTransformCallback: (transform: TransformContext) => void;
-
 	/* PUBLIC METHODS */
 
 	init = (canvas: HTMLCanvasElement): void => {
 		// This must be the first thing called because it attaches event listeners
 		this.interactionManager = new CanvasInteractionManager(canvas);
 		this.selectionManager = new SelectionManager();
-		this.selectionManager.onSelectionChange(this.onSelectionChange);
 		this.transformManager = new TransformManager(this.selectionManager);
-		this.setTransformCallback = (): void => {};
 		this.context2d = canvas.getContext('2d');
 		this.painter = new PainterAPI(this.context2d, this.interactionManager.panOffset, this.interactionManager.scale);
 
@@ -222,26 +216,12 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 
 	private onMouseDrag = (): void => {
 		if (this.activeBrush && this.activeBrush.brushName === DefaultBrushKind.Selection) {
-			this.transformManager.mouseDragged(this.setTransformCallback, this.generateContext());
+			this.transformManager.mouseDragged(this.generateContext());
 			this.selectionManager.mouseDragged();
 		}
 	};
 
 	private addCanvasItem = (item: ICanvasItem): void => {
 		this.canvasItems.push({ ...item, $transform: {} });
-	};
-
-	private onSelectionChange = (): void => {
-		if (this.selectionManager.selectedItemCount > 0) {
-			const instances = this.canvasItems.filter((item) => !this.selectionManager.isSelected(item));
-			this.setTransformCallback = (transform: TransformContext): void => {
-				for (let i = 0; i < instances.length; i++) {
-					const instance = instances[i];
-					instance.$transform = merge(transform, instance.$transform);
-				}
-			};
-		} else {
-			this.setTransformCallback = (): void => {};
-		}
 	};
 }
