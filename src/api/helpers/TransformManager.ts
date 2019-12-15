@@ -9,6 +9,7 @@ import Circle from '../../types/shapes/Circle';
 import Line from '../../types/shapes/Line';
 import { TransformKind } from '../../types/transform/TransformKind';
 import { TransformOperation } from '../../types/transform/TransformOperation';
+import Vector2D from '../../types/utility/Vector2D';
 
 const HANDLE_DIAMETER = 12;
 const ROTATE_HANDLE_HEIGHT = 20;
@@ -43,8 +44,11 @@ export class TransformManager {
 	private selectedItemBoundingRect: Rectangle;
 	private previewRect: Rectangle;
 
+	private mouseDownAt: Vector2D;
+
 	constructor(selectionManager: ISelection) {
 		this.selectionManager = selectionManager;
+		this.mouseDownAt = vector(0, 0);
 	}
 
 	render = (painter: IPainterAPI, context: Context): void => {
@@ -117,6 +121,8 @@ export class TransformManager {
 		const canvasItem = this.selectionManager.selectedItem;
 		const { mousePosition } = context;
 
+		this.mouseDownAt = { ...mousePosition };
+
 		if (!canvasItem) {
 			return;
 		}
@@ -163,6 +169,7 @@ export class TransformManager {
 
 		const { action } = this.transformOperation || { action: null };
 
+		const { x: prevX, y: prevY } = this.mouseDownAt;
 		const { x: curX, y: curY } = context.mousePosition;
 		const { width, height } = this.selectedItemBoundingRect;
 		const { x: left, y: top } = this.selectedItemBoundingRect.topLeftCorner;
@@ -222,7 +229,13 @@ export class TransformManager {
 		} else if (action === TransformKind.Rotate) {
 			console.log('Rotating');
 		} else if (action === TransformKind.Move) {
-			console.log('Moving');
+			this.previewRect = {
+				topLeftCorner: vector(curX - (prevX - left), curY - (prevY - top)),
+				width,
+				height,
+			};
+
+			this.transformOperation.move = vector(curX - prevX, curY - prevY);
 		}
 	};
 

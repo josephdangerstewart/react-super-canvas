@@ -88,3 +88,17 @@ export function scaleCircle(circle: Circle, scale: Vector2D, node: ScalingNode):
 		radius: newRadius,
 	};
 }
+
+/**
+ * @description Moves a circle by a certain amount of units
+ *
+ * @param circle The circle to move
+ * @param diff The x and y difference to move the circle by
+ */
+export function moveCircle(circle: Circle, diff: Vector2D): Circle {
+	const { x, y } = circle.center;
+	return {
+		...circle,
+		center: vector(x + diff.x, y + diff.y),
+	};
+}
