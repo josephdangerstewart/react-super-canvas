@@ -86,7 +86,7 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 	};
 
 	setCanvasItems = (items: ICanvasItem[]): void => {
-		this.canvasItems = items.map((item) => ({ ...item, $transform: {} }));
+		this.canvasItems = items.map((item) => ({ ...item, $rotation: 0 }));
 	};
 
 	getCanvasItems = (): ICanvasItem[] => this.canvasItems;
@@ -224,6 +224,6 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 	};
 
 	private addCanvasItem = (item: ICanvasItem): void => {
-		this.canvasItems.push({ ...item, $transform: {} });
+		this.canvasItems.push({ ...item, $rotation: 0 });
 	};
 }
