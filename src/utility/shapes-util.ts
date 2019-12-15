@@ -318,32 +318,19 @@ export function boundingRectOfLine(line: Line): Rectangle {
  */
 export function boundingRectOfPolygon(polygon: Polygon): Rectangle {
 	const { points } = polygon;
+	const xValues = points.map((point) => point.x);
+	const yValues = points.map((point) => point.y);
 
-	let maxX = -Infinity;
-	let maxY = -Infinity;
-	let minX = Infinity;
-	let minY = Infinity;
+	const minX = Math.min(...xValues);
+	const minY = Math.min(...yValues);
 
-	points.forEach((point) => {
-		const { x, y } = point;
-		if (x > maxX) {
-			maxX = x;
-		}
-		if (x < minX) {
-			minX = x;
-		}
-		if (y > maxY) {
-			maxY = y;
-		}
-		if (y < minY) {
-			minY = y;
-		}
-	});
+	const maxX = Math.max(...xValues);
+	const maxY = Math.max(...yValues);
 
 	return {
-		topLeftCorner: vector(minX, maxY),
-		height: maxY - minY,
+		topLeftCorner: vector(minX, minY),
 		width: maxX - minX,
+		height: maxY - minY,
 	};
 }
 

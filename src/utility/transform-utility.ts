@@ -1,8 +1,9 @@
 import Vector2D from '../types/utility/Vector2D';
 import { ScalingNode } from '../types/transform/ScalingNode';
 import Rectangle from '../types/shapes/Rectangle';
-import { vector } from './shapes-util';
+import { vector, boundingRectOfCircle, boundingRectOfPolygon } from './shapes-util';
 import Circle from '../types/shapes/Circle';
+import Polygon from '../types/shapes/Polygon';
 
 /**
  * @description Scales a rectangle by a scale vector
@@ -60,14 +61,7 @@ export function scaleRectangle(rect: Rectangle, scale: Vector2D, node: ScalingNo
  * @param node The node that the user is scaling on
  */
 export function scaleCircle(circle: Circle, scale: Vector2D, node: ScalingNode): Circle {
-	const { radius } = circle;
-	const { x, y } = circle.center;
-
-	const boundingRect: Rectangle = {
-		topLeftCorner: vector(x - radius, y - radius),
-		width: radius * 2,
-		height: radius * 2,
-	};
+	const boundingRect = boundingRectOfCircle(circle);
 
 	const scaledBoundingRect = scaleRectangle(boundingRect, scale, node);
 	const { width, height } = scaledBoundingRect;
@@ -90,6 +84,32 @@ export function scaleCircle(circle: Circle, scale: Vector2D, node: ScalingNode):
 }
 
 /**
+ * @description Scales a polygon by a given scale vector
+ *
+ * @param polygon The polygon to be scaled
+ * @param scale The scale vector in the form (scaleX, scaleY). Note that polygons are not locked
+ * into any aspect ratio
+ * @param node The scaling node that was dragged by the user to
+ */
+export function scalePolygon(polygon: Polygon, scale: Vector2D, node: ScalingNode): Polygon {
+	const boundingRect = boundingRectOfPolygon(polygon);
+	const { x: left, y: top } = boundingRect.topLeftCorner;
+
+	const scaledBoundingRect = scaleRectangle(boundingRect, scale, node);
+	const { x: scaledLeft, y: scaledTop } = scaledBoundingRect.topLeftCorner;
+
+	const points = polygon.points.map((point) => ({
+		x: ((point.x - left) * scale.x) + scaledLeft,
+		y: ((point.y - top) * scale.y) + scaledTop,
+	}));
+
+	return {
+		...polygon,
+		points,
+	};
+}
+
+/**
  * @description Moves a circle by a certain amount of units
  *
  * @param circle The circle to move
@@ -100,5 +120,21 @@ export function moveCircle(circle: Circle, diff: Vector2D): Circle {
 	return {
 		...circle,
 		center: vector(x + diff.x, y + diff.y),
+	};
+}
+
+/**
+ * @description Moves a polygon by a certain amount of units
+ *
+ * @param polygon The polygon to move
+ * @param diff The x and y difference to move the polygon by
+ */
+export function movePolygon(polygon: Polygon, diff: Vector2D): Polygon {
+	return {
+		...polygon,
+		points: polygon.points.map(({ x, y }) => ({
+			x: x + diff.x,
+			y: y + diff.y,
+		})),
 	};
 }
