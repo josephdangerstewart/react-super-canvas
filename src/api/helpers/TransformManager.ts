@@ -180,13 +180,29 @@ export class TransformManager {
 					delta = vector(left - curX, top - curY);
 					newTopLeft = vector(curX, curY);
 					break;
+				case ScalingNode.TopMiddle:
+					delta = vector(0, top - curY);
+					newTopLeft = vector(left, curY);
+					break;
 				case ScalingNode.TopRight:
 					delta = vector(curX - right, top - curY);
 					newTopLeft = vector(left, curY);
 					break;
+				case ScalingNode.MiddleLeft:
+					delta = vector(left - curX, 0);
+					newTopLeft = vector(curX, top);
+					break;
+				case ScalingNode.MiddleRight:
+					delta = vector(curX - right, 0);
+					newTopLeft = vector(left, top);
+					break;
 				case ScalingNode.BottomLeft:
 					delta = vector(left - curX, curY - bottom);
 					newTopLeft = vector(curX, top);
+					break;
+				case ScalingNode.BottomMiddle:
+					delta = vector(0, curY - bottom);
+					newTopLeft = vector(left, top);
 					break;
 				case ScalingNode.BottomRight:
 					delta = vector(curX - right, curY - bottom);

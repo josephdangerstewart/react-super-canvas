@@ -27,12 +27,16 @@ export function scaleRectangle(rect: Rectangle, scale: Vector2D, node: ScalingNo
 			newTopLeft = vector(x - diff.x, y - diff.y);
 			break;
 		case ScalingNode.TopRight:
+		case ScalingNode.TopMiddle:
 			newTopLeft = vector(x, y - diff.y);
 			break;
 		case ScalingNode.BottomLeft:
+		case ScalingNode.MiddleLeft:
 			newTopLeft = vector(x - diff.x, y);
 			break;
+		case ScalingNode.MiddleRight:
 		case ScalingNode.BottomRight:
+		case ScalingNode.BottomMiddle:
 			newTopLeft = vector(x, y);
 			break;
 		default:
