@@ -17,4 +17,19 @@ export default interface ISelection {
 	 * @description The number of items that are selected
 	 */
 	selectedItemCount: number;
+
+	/**
+	 * @description Whether or not the scale operation can be performed on this selection
+	 */
+	canScale: boolean;
+
+	/**
+	 * @description Whether or not the move operation can be performed on this selection
+	 */
+	canMove: boolean;
+
+	/**
+	 * @description Whether or not the rotation operation can be performed on this selection
+	 */
+	canRotate: boolean;
 }

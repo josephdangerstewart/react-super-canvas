@@ -2,7 +2,7 @@ import IPainterAPI from './IPainterAPI';
 import CanvasItemContext from './context/CanvasItemContext';
 import Rectangle from './shapes/Rectangle';
 import Vector2D from './utility/Vector2D';
-import { TransformOperation } from './transform/TransformOperation';
+import { ScalingNode } from './transform/ScalingNode';
 
 export default interface ICanvasItem {
 	/**
@@ -28,7 +28,24 @@ export default interface ICanvasItem {
 	pointInsideItem?: (point: Vector2D) => boolean;
 
 	/**
-	 * @description Applies a transformation to the canvas item
+	 * @description Applies a scaling transformation to the canvas item.
+	 * scales should be invertible so that `applyScale({ -x, -y }, node)`
+	 * undos `applyScale({ x, y }, node)`
 	 */
-	applyTransform?: (transform: TransformOperation) => void;
+	applyScale?: (scale: Vector2D, node: ScalingNode) => void;
+
+	/**
+	 * @description Applies a move transformation to the canvas item.
+	 * Moves should be invertable so that `applyMove({ -x, -y })` undos
+	 * `applyMove({ x, y })`
+	 */
+	applyMove?: (move: Vector2D) => void;
+
+	/**
+	 * @description Applies a rotation to the canvas item. Rotations
+	 * should be invertable so that `applyRotation(-angle)` undos
+	 * `applyRotation(angle)`. Note that all angles should be in
+	 * radians
+	 */
+	applyRotation?: (angle: number) => void;
 }

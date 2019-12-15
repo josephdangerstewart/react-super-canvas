@@ -8,6 +8,7 @@ import Rectangle from '../../types/shapes/Rectangle';
 import { TransformOperation } from '../../types/transform/TransformOperation';
 import { TransformKind } from '../../types/transform/TransformKind';
 import { scaleCircle, moveCircle } from '../../utility/transform-utility';
+import { ScalingNode } from '../../types/transform/ScalingNode';
 
 export default class CircleCanvasItem implements ICanvasItem {
 	private circle: Circle;
@@ -33,5 +34,13 @@ export default class CircleCanvasItem implements ICanvasItem {
 		} if (operation.action === TransformKind.Move) {
 			this.circle = moveCircle(this.circle, operation.move);
 		}
+	};
+
+	applyScale = (scale: Vector2D, node: ScalingNode): void => {
+		this.circle = scaleCircle(this.circle, scale, node);
+	};
+
+	applyMove = (move: Vector2D): void => {
+		this.circle = moveCircle(this.circle, move);
 	};
 }
