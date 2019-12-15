@@ -173,6 +173,10 @@ export class TransformManager {
 	};
 
 	mouseUp = (): void => {
+		if (this.transformOperation && this.selectionManager.selectedItem && this.selectionManager.selectedItem.applyTransform) {
+			this.selectionManager.selectedItem.applyTransform(this.transformOperation);
+		}
+
 		this.isMouseDown = false;
 		this.transformOperation = null;
 		this.previewRect = null;
