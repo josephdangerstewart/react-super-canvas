@@ -120,7 +120,7 @@ export default class PainterAPI implements IPainterAPI {
 
 		if (circleCollidesWithRect(circle, canvasRect)) {
 			this.context2d.beginPath();
-			this.context2d.arc(x, y, radius * this.scale, 0, Math.PI * 2);
+			this.context2d.arc(x, y, Math.abs(radius) * this.scale, 0, Math.PI * 2);
 			this.context2d.closePath();
 			this.drawWithStyles(circle, boundingRectOfCircle(circle));
 		}

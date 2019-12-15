@@ -30,7 +30,7 @@ export function scaleRectangle(rect: Rectangle, scale: Vector2D, node: ScalingNo
 			newTopLeft = vector(x, y - diff.y);
 			break;
 		case ScalingNode.BottomLeft:
-			newTopLeft = vector(x - diff.x, y - diff.y);
+			newTopLeft = vector(x - diff.x, y);
 			break;
 		case ScalingNode.BottomRight:
 			newTopLeft = vector(x, y);
@@ -66,8 +66,16 @@ export function scaleCircle(circle: Circle, scale: Vector2D, node: ScalingNode):
 
 	const scaledBoundingRect = scaleRectangle(boundingRect, scale, node);
 	const { width, height } = scaledBoundingRect;
-	const newRadius = Math.floor(Math.min(width, height) / 2);
+	const newRadius = Math.abs(Math.floor(Math.min(width, height) / 2));
 	const newCenter = vector(scaledBoundingRect.topLeftCorner.x + newRadius, scaledBoundingRect.topLeftCorner.y + newRadius);
+
+	if (width < 0) {
+		newCenter.x -= newRadius * 2;
+	}
+
+	if (height < 0) {
+		newCenter.y -= newRadius * 2;
+	}
 
 	return {
 		center: newCenter,
