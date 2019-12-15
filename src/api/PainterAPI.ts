@@ -106,9 +106,8 @@ export default class PainterAPI implements IPainterAPI {
 			this.context2d.rect(x, y, width * this.scale, height * this.scale);
 			this.context2d.closePath();
 			this.drawWithStyles(rect, rect);
-		} else {
-			console.log('Something is wrong with rectangle collision', rect, canvasRect);
 		}
+
 		this.context2d.restore();
 	};
 

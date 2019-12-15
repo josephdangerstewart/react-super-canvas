@@ -134,7 +134,7 @@ export class TransformManager {
 
 			let newTopLeft = vector(left, top);
 			let delta = vector(0, 0);
-			console.log(node);
+
 			switch (node) {
 				case ScalingNode.TopLeft:
 					delta = vector(left - curX, top - curY);
@@ -161,8 +161,6 @@ export class TransformManager {
 				width: width + delta.x,
 				height: height + delta.y,
 			};
-
-			console.log(delta, this.previewRect);
 
 			this.transformOperation.scale.value = vector((width + delta.x) / width, (height + delta.y) / height);
 		} else if (action === TransformKind.Rotate) {
