@@ -74,7 +74,7 @@ export default class PainterAPI implements IPainterAPI {
 			return;
 		}
 
-		const canvasRect = getCanvasRect(this.context2d);
+		const canvasRect = this.getViewport();
 		if (polygonCollidesWithRect(polygon, canvasRect)) {
 			const [ firstPoint, ...restOfPoints ] = polygon.points.map(this.toAbsolutePoint);
 			const { x: firstX, y: firstY } = firstPoint;
@@ -99,13 +99,15 @@ export default class PainterAPI implements IPainterAPI {
 
 		const { x, y } = this.toAbsolutePoint(rect.topLeftCorner);
 		const { width, height } = rect;
-		const canvasRect = getCanvasRect(this.context2d);
+		const canvasRect = this.getViewport();
 
 		if (rectCollidesWithRect(rect, canvasRect)) {
 			this.context2d.beginPath();
 			this.context2d.rect(x, y, width * this.scale, height * this.scale);
 			this.context2d.closePath();
 			this.drawWithStyles(rect, rect);
+		} else {
+			console.log('Something is wrong with rectangle collision', rect, canvasRect);
 		}
 		this.context2d.restore();
 	};
@@ -115,7 +117,7 @@ export default class PainterAPI implements IPainterAPI {
 
 		const { x, y } = this.toAbsolutePoint(circle.center);
 		const { radius } = circle;
-		const canvasRect = getCanvasRect(this.context2d);
+		const canvasRect = this.getViewport();
 
 		if (circleCollidesWithRect(circle, canvasRect)) {
 			this.context2d.beginPath();
@@ -145,6 +147,16 @@ export default class PainterAPI implements IPainterAPI {
 	};
 
 	/* UTILITY METHODS */
+
+	private getViewport = (): Rectangle => {
+		const canvasRect = getCanvasRect(this.context2d);
+
+		return {
+			topLeftCorner: this.toVirtualPoint(canvasRect.topLeftCorner),
+			width: canvasRect.width * this.scale,
+			height: canvasRect.height * this.scale,
+		};
+	};
 
 	private drawWithStyles = (styles: StyledShape, boundingRect: Rectangle): void => {
 		this.context2d.strokeStyle = styles.strokeColor;
@@ -192,8 +204,25 @@ export default class PainterAPI implements IPainterAPI {
 		return absolutePoint;
 	};
 
+	private toVirtualPoint = (point: Vector2D): Vector2D => {
+		const virtualPoint: Vector2D = {
+			x: point.x / this.scale,
+			y: point.y / this.scale,
+		};
+
+		const virtualPan: Vector2D = {
+			x: this.panOffset.x / this.scale,
+			y: this.panOffset.y / this.scale,
+		};
+
+		virtualPoint.x += virtualPan.x;
+		virtualPoint.y += virtualPan.y;
+
+		return virtualPoint;
+	};
+
 	private lineIntersectsCanvas = (line: Line): boolean => {
-		const canvasRect = getCanvasRect(this.context2d);
+		const canvasRect = this.getViewport();
 		return lineCollidesWithRect(line, canvasRect);
 	};
 
@@ -209,7 +238,7 @@ export default class PainterAPI implements IPainterAPI {
 			height: absHeight,
 		};
 
-		const canvasRect = getCanvasRect(this.context2d);
+		const canvasRect = this.getViewport();
 
 		if (rectCollidesWithRect(imageRect, canvasRect)) {
 			this.context2d.drawImage(image, x, y, absWidth, absHeight);
