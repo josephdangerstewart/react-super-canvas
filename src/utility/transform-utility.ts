@@ -40,6 +40,7 @@ export function scaleRectangle(rect: Rectangle, scale: Vector2D, node: ScalingNo
 	}
 
 	return {
+		...rect,
 		topLeftCorner: newTopLeft,
 		width: newWidth,
 		height: newHeight,
@@ -78,6 +79,7 @@ export function scaleCircle(circle: Circle, scale: Vector2D, node: ScalingNode):
 	}
 
 	return {
+		...circle,
 		center: newCenter,
 		radius: newRadius,
 	};
