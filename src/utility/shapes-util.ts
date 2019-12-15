@@ -356,3 +356,9 @@ export const cursorPreview = (pos: Vector2D): Circle => ({
 	radius: 2,
 	fillColor: 'rgba(0, 0, 0, 0.75)',
 });
+
+/**
+ * @description Returns the length of a line
+ * @param line The line to calculate the length of
+ */
+export const lengthOfLine = ({ point1, point2 }: Line): number => Math.sqrt(((point1.x - point2.x) ** 2) + ((point1.y - point2.y) ** 2));
