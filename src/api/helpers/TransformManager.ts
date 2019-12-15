@@ -3,7 +3,12 @@ import IPainterAPI from '../../types/IPainterAPI';
 import ISelection from '../../types/ISelection';
 import Rectangle from '../../types/shapes/Rectangle';
 import StyledShape from '../../types/shapes/StyledShape';
-import { vector, pointInsideRect, pointInsideCircle } from '../../utility/shapes-util';
+import {
+	vector,
+	pointInsideRect,
+	pointInsideCircle,
+	lengthOfLine,
+} from '../../utility/shapes-util';
 import { ScalingNode } from '../../types/transform/ScalingNode';
 import Circle from '../../types/shapes/Circle';
 import Line from '../../types/shapes/Line';
@@ -163,7 +168,7 @@ export class TransformManager {
 	};
 
 	mouseDragged = (context: Context): void => {
-		if (!this.isMouseDown) {
+		if (!this.isMouseDown || !this.selectionManager.selectedItem) {
 			return;
 		}
 
@@ -227,7 +232,32 @@ export class TransformManager {
 
 			this.transformOperation.scale.value = vector((width + delta.x) / width, (height + delta.y) / height);
 		} else if (action === TransformKind.Rotate) {
-			console.log('Rotating');
+			const [ handle ] = this.getRotateHandle(this.selectedItemBoundingRect);
+
+			const pointA = vector(left - width / 2, top - height / 2);
+			const pointB = context.mousePosition;
+			const pointC = handle.center;
+
+			const lineAC: Line = { point1: pointA, point2: pointC };
+			const lineCB: Line = { point1: pointC, point2: pointB };
+			const lineBA: Line = { point1: pointB, point2: pointA };
+
+			const S1 = lengthOfLine(lineAC);
+			const S2 = lengthOfLine(lineCB);
+			const S3 = lengthOfLine(lineBA);
+
+			let angle = Math.acos((S1 ** 2 + S3 ** 2 - S2 ** 2) / (2 * S1 * S2));
+
+			if (pointB.x < pointC.x) {
+				angle = (Math.PI * 2) - angle;
+			}
+
+			this.previewRect = {
+				topLeftCorner: vector(left, top),
+				width,
+				height,
+				rotation: angle,
+			};
 		} else if (action === TransformKind.Move) {
 			this.previewRect = {
 				topLeftCorner: vector(curX - (prevX - left), curY - (prevY - top)),

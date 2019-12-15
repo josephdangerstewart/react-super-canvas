@@ -16,6 +16,11 @@ export default interface Rectangle extends StyledShape {
 	 * @description The height of the rectangle in pixels
 	 */
 	height: number;
+
+	/**
+	 * @description The rotation of the rectangle in radians
+	 */
+	rotation?: number;
 }
 
 export const RectangleDefaults: object = StyledShapeDefaults;

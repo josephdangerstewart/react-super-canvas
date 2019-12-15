@@ -2,7 +2,7 @@ import ICanvasItem from '../../types/ICanvasItem';
 import Circle from '../../types/shapes/Circle';
 import IPainterAPI from '../../types/IPainterAPI';
 import Vector2D from '../../types/utility/Vector2D';
-import { vector } from '../../utility/shapes-util';
+import { boundingRectOfCircle } from '../../utility/shapes-util';
 import StyleContext from '../../types/context/StyleContext';
 import Rectangle from '../../types/shapes/Rectangle';
 import { TransformOperation } from '../../types/transform/TransformOperation';
@@ -25,16 +25,7 @@ export default class CircleCanvasItem implements ICanvasItem {
 		painter.drawCircle(this.circle);
 	};
 
-	getBoundingRect = (): Rectangle => {
-		const { radius } = this.circle;
-		const { x, y } = this.circle.center;
-
-		return {
-			topLeftCorner: vector(x - radius, y - radius),
-			width: radius * 2,
-			height: radius * 2,
-		};
-	};
+	getBoundingRect = (): Rectangle => boundingRectOfCircle(this.circle);
 
 	applyTransform = (operation: TransformOperation): void => {
 		if (operation.action === TransformKind.Scale) {

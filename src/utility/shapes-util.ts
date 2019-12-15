@@ -291,7 +291,7 @@ export function polygonCollidesWithRect(polygon: Polygon, rect: Rectangle): bool
 export function boundingRectOfCircle(circle: Circle): Rectangle {
 	const { center: { x, y }, radius } = circle;
 	return {
-		topLeftCorner: vector(x - radius, y + radius),
+		topLeftCorner: vector(x - radius, y - radius),
 		width: radius * 2,
 		height: radius * 2,
 	};
