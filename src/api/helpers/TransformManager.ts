@@ -5,19 +5,14 @@ import StyledShape from '../../types/shapes/StyledShape';
 import {
 	vector,
 	pointInsideRect,
-	pointInsideCircle,
-	lengthOfLine,
 } from '../../utility/shapes-util';
 import { ScalingNode } from '../../types/transform/ScalingNode';
-import Circle from '../../types/shapes/Circle';
-import Line from '../../types/shapes/Line';
 import { TransformKind } from '../../types/transform/TransformKind';
 import { TransformOperation } from '../../types/transform/TransformOperation';
 import Vector2D from '../../types/utility/Vector2D';
 import { BrushContext } from '../../types/context/BrushContext';
 
 const HANDLE_DIAMETER = 12;
-const ROTATE_HANDLE_HEIGHT = 20;
 
 const boundingRectangleStyles: StyledShape = {
 	fillColor: null,
@@ -65,28 +60,15 @@ export class TransformManager {
 		}
 
 		const boundingRect = this.previewRect || canvasItem.getBoundingRect();
-		const [ rotateHandle, rotateHandleLine ] = this.getRotateHandle(boundingRect, context);
-		const { canRotate, canMove, canScale } = this.selectionManager;
-
-		if (canRotate) {
-			painter.drawLine({
-				...rotateHandleLine,
-				...boundingRectangleStyles,
-			});
-		}
+		const { canMove, canScale } = this.selectionManager;
 
 		painter.drawRect({
 			...boundingRect,
 			...boundingRectangleStyles,
 		});
 
-		if (canRotate) {
-			painter.drawCircle(rotateHandle);
-		}
 
-		if (canRotate && pointInsideCircle(snappedMousePosition, rotateHandle)) {
-			painter.setCursor('crosshair');
-		} else if (canMove && pointInsideRect(snappedMousePosition, boundingRect)) {
+		if (canMove && pointInsideRect(snappedMousePosition, boundingRect)) {
 			painter.setCursor('move');
 		}
 
@@ -139,7 +121,7 @@ export class TransformManager {
 			return;
 		}
 
-		const { canScale, canMove, canRotate } = this.selectionManager;
+		const { canScale, canMove } = this.selectionManager;
 
 		const boundingRect = canvasItem.getBoundingRect();
 		this.selectedItemBoundingRect = boundingRect;
@@ -153,16 +135,6 @@ export class TransformManager {
 					value: vector(1, 1),
 					node: scaleNode.type,
 				},
-			};
-
-			return;
-		}
-
-		const [ rotateHandle ] = this.getRotateHandle(boundingRect);
-		if (canRotate && pointInsideCircle(mousePosition, rotateHandle)) {
-			this.transformOperation = {
-				action: TransformKind.Rotate,
-				rotation: 0,
 			};
 
 			return;
@@ -240,33 +212,6 @@ export class TransformManager {
 			};
 
 			this.transformOperation.scale.value = vector((width + delta.x) / width, (height + delta.y) / height);
-		} else if (action === TransformKind.Rotate) {
-			const [ handle ] = this.getRotateHandle(this.selectedItemBoundingRect);
-
-			const pointA = vector(left - width / 2, top - height / 2);
-			const pointB = context.snappedMousePosition;
-			const pointC = handle.center;
-
-			const lineAC: Line = { point1: pointA, point2: pointC };
-			const lineCB: Line = { point1: pointC, point2: pointB };
-			const lineBA: Line = { point1: pointB, point2: pointA };
-
-			const S1 = lengthOfLine(lineAC);
-			const S2 = lengthOfLine(lineCB);
-			const S3 = lengthOfLine(lineBA);
-
-			let angle = Math.acos((S1 ** 2 + S3 ** 2 - S2 ** 2) / (2 * S1 * S2));
-
-			if (pointB.x < pointC.x) {
-				angle = (Math.PI * 2) - angle;
-			}
-
-			this.previewRect = {
-				topLeftCorner: vector(left, top),
-				width,
-				height,
-				rotation: angle,
-			};
 		} else if (action === TransformKind.Move) {
 			this.previewRect = {
 				topLeftCorner: vector(curX - (prevX - left), curY - (prevY - top)),
@@ -291,8 +236,6 @@ export class TransformManager {
 						this.selectionManager.selectedItem.applyScale(this.transformOperation.scale.value, this.transformOperation.scale.node);
 					}
 					break;
-				case TransformKind.Rotate:
-					break;
 				default:
 					break;
 			}
@@ -301,28 +244,6 @@ export class TransformManager {
 		this.isMouseDown = false;
 		this.transformOperation = null;
 		this.previewRect = null;
-	};
-
-	private getRotateHandle = (rect: Rectangle, context?: BrushContext): [Circle, Line] => {
-		const { x, y } = rect.topLeftCorner;
-		const { width } = rect;
-		const { snappedMousePosition } = context || { snappedMousePosition: null };
-		const halfWidth = Math.floor(width / 2);
-
-		const point1 = vector(x + halfWidth, y);
-		const point2 = vector(x + halfWidth, y - ROTATE_HANDLE_HEIGHT);
-
-		const circle: Circle = {
-			center: vector(x + halfWidth, y - ROTATE_HANDLE_HEIGHT - HANDLE_DIAMETER / 2),
-			radius: HANDLE_DIAMETER / 2,
-		};
-
-		const styles = snappedMousePosition && pointInsideCircle(snappedMousePosition, circle) ? handleStylesHovered : handleStyles;
-
-		return [
-			{ ...circle, ...styles },
-			{ point1, point2 },
-		];
 	};
 
 	private getScaleNodes = (rect: Rectangle, context?: BrushContext): { type: ScalingNode; node: Rectangle }[] => {

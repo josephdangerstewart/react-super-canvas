@@ -40,12 +40,4 @@ export default interface ICanvasItem {
 	 * `applyMove({ x, y })`
 	 */
 	applyMove?: (move: Vector2D) => void;
-
-	/**
-	 * @description Applies a rotation to the canvas item. Rotations
-	 * should be invertable so that `applyRotation(-angle)` undos
-	 * `applyRotation(angle)`. Note that all angles should be in
-	 * radians
-	 */
-	applyRotation?: (angle: number) => void;
 }

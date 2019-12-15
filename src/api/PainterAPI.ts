@@ -106,13 +106,6 @@ export default class PainterAPI implements IPainterAPI {
 		if (rectCollidesWithRect(rect, canvasRect)) {
 			this.context2d.beginPath();
 
-			const center = vector(Math.floor(x - width / 2), Math.floor(y - height / 2));
-			if (rect.rotation) {
-				this.context2d.translate(center.x, center.y);
-				this.context2d.rotate(rect.rotation);
-				this.context2d.translate(-center.x, -center.y);
-			}
-
 			this.context2d.rect(x, y, width * this.scale, height * this.scale);
 			this.context2d.closePath();
 

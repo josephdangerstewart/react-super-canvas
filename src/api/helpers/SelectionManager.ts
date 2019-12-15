@@ -38,10 +38,6 @@ export default class SelectionManager implements ISelection {
 		return this._selectedItems.length && this._selectedItems.every((item) => item.applyMove);
 	}
 
-	get canRotate(): boolean {
-		return this._selectedItems.length && this._selectedItems.every((item) => item.applyRotation);
-	}
-
 	get canScale(): boolean {
 		return this._selectedItems.length && this._selectedItems.every((item) => item.applyScale);
 	}

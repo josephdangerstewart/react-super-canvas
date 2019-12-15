@@ -27,9 +27,4 @@ export default interface ISelection {
 	 * @description Whether or not the move operation can be performed on this selection
 	 */
 	canMove: boolean;
-
-	/**
-	 * @description Whether or not the rotation operation can be performed on this selection
-	 */
-	canRotate: boolean;
 }
