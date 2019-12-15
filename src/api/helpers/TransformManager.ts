@@ -49,6 +49,7 @@ export class TransformManager {
 
 	render = (painter: IPainterAPI, context: Context): void => {
 		const canvasItem = this.selectionManager.selectedItem;
+		const { mousePosition } = context;
 
 		if (!canvasItem || !canvasItem.applyTransform) {
 			return;
@@ -67,9 +68,48 @@ export class TransformManager {
 			...boundingRectangleStyles,
 		});
 
-		this.getScaleNodes(boundingRect, context).map(({ node }) => node).forEach(painter.drawRect);
-
 		painter.drawCircle(rotateHandle);
+
+		if (pointInsideCircle(mousePosition, rotateHandle)) {
+			painter.setCursor('crosshair');
+		} else if (pointInsideRect(mousePosition, boundingRect)) {
+			painter.setCursor('move');
+		}
+
+		this.getScaleNodes(boundingRect, context).forEach((node) => {
+			painter.drawRect(node.node);
+
+			if (pointInsideRect(mousePosition, node.node)) {
+				switch (node.type) {
+					case ScalingNode.TopLeft:
+						painter.setCursor('nw-resize');
+						break;
+					case ScalingNode.TopMiddle:
+						painter.setCursor('n-resize');
+						break;
+					case ScalingNode.TopRight:
+						painter.setCursor('ne-resize');
+						break;
+					case ScalingNode.MiddleLeft:
+						painter.setCursor('w-resize');
+						break;
+					case ScalingNode.MiddleRight:
+						painter.setCursor('e-resize');
+						break;
+					case ScalingNode.BottomLeft:
+						painter.setCursor('sw-resize');
+						break;
+					case ScalingNode.BottomMiddle:
+						painter.setCursor('s-resize');
+						break;
+					case ScalingNode.BottomRight:
+						painter.setCursor('se-resize');
+						break;
+					default:
+						break;
+				}
+			}
+		});
 	};
 
 	mouseDown = (context: Context): void => {

@@ -24,12 +24,14 @@ export default class PainterAPI implements IPainterAPI {
 	private scale: number;
 	private context2d: CanvasRenderingContext2D;
 	private imageCache: Record<string, CachedImage>;
+	private cursor: string;
 
 	constructor(context2d: CanvasRenderingContext2D, panOffset: Vector2D, scale: number) {
 		this.context2d = context2d;
 		this.panOffset = panOffset;
 		this.scale = scale;
 		this.imageCache = {};
+		this.cursor = null;
 	}
 
 	/* INTERFACE METHODS */
@@ -128,6 +130,20 @@ export default class PainterAPI implements IPainterAPI {
 
 	/* PUBLIC METHODS */
 
+	beginCursorState = (): void => {
+		this.cursor = null;
+	};
+
+	endCursorState = (): void => {
+		if (this.cursor) {
+			this.context2d.canvas.style.cursor = this.cursor;
+		} else {
+			this.context2d.canvas.style.cursor = 'default';
+		}
+
+		this.cursor = null;
+	};
+
 	setPan = (pan: Vector2D): void => {
 		this.panOffset = pan;
 	};
@@ -143,6 +159,10 @@ export default class PainterAPI implements IPainterAPI {
 	setContext2D = (context: CanvasRenderingContext2D): void => {
 		this.context2d = context;
 		context.translate(0.5, 0.5);
+	};
+
+	setCursor = (cursor: string): void => {
+		this.cursor = cursor;
 	};
 
 	/* UTILITY METHODS */

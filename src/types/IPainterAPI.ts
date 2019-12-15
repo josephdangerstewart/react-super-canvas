@@ -35,4 +35,10 @@ export default interface IPainterAPI {
 	 * @description Draws a polygon in the virtual space
 	 */
 	drawPolygon: (polygon: Polygon) => void;
+
+	/**
+	 * @description Sets the user's cursor, the most recent cursor in the stack takes precedent
+	 * So the top most item on the render stack has priority.
+	 */
+	setCursor: (cursor: string) => void;
 }

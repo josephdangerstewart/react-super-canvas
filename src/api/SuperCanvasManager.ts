@@ -149,6 +149,7 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 		// This must be the first thing called
 		this.interactionManager.update();
 		this.painter.clearCanvas();
+		this.painter.beginCursorState();
 
 		this.painter.setPan(this.interactionManager.panOffset);
 		this.painter.setScale(this.interactionManager.scale);
@@ -168,6 +169,7 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 			this.activeBrush.renderPreview(this.painter, this.generateBrushContext());
 		}
 
+		this.painter.endCursorState();
 		if (this.isActive) {
 			requestAnimationFrame(this.update);
 		}
