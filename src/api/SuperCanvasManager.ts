@@ -159,7 +159,7 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 		}
 
 		this.canvasItems.forEach((item) => {
-			const context = this.generateCanvasContextForItem();
+			const context = this.generateCanvasContextForItem(item);
 			item.render(this.painter, context);
 		});
 
@@ -182,9 +182,9 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 		styleContext: { ...this.styleContext },
 	});
 
-	private generateCanvasContextForItem = (): CanvasItemContext => ({
+	private generateCanvasContextForItem = (item: ICanvasItem): CanvasItemContext => ({
 		...this.generateContext(),
-		isSelected: false,
+		isSelected: this.selectionManager.selectedItems.includes(item),
 	});
 
 	private generateBackgroundElementContext = (): BackgroundElementContext => ({
