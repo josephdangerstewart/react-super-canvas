@@ -36,7 +36,7 @@ export default interface ICanvasItem {
 
 	/**
 	 * @description Applies a move transformation to the canvas item.
-	 * Moves should be invertable so that `applyMove({ -x, -y })` undos
+	 * Moves should be invertible so that `applyMove({ -x, -y })` undos
 	 * `applyMove({ x, y })`
 	 */
 	applyMove?: (move: Vector2D) => void;
