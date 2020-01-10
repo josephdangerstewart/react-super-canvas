@@ -4,6 +4,7 @@ import {
 	isValidHex,
 	isValidHexa,
 	stringToRgb,
+	stringToRgba,
 } from '../../src/utility/color-utility';
 
 describe('color-utility', () => {
@@ -174,6 +175,93 @@ describe('color-utility', () => {
 
 		cases.forEach(([ input, expectedOutput ]) => {
 			it(`can parse ${input}`, () => expect(stringToRgb(input as string)).toEqual(expectedOutput));
+		});
+	});
+
+	describe('stringToRGBA', () => {
+		const cases = [
+			[
+				'#FFFFFF',
+				{
+					r: 255,
+					g: 255,
+					b: 255,
+					a: 1,
+				},
+			],
+			[
+				'#FFFFFF33',
+				{
+					r: 255,
+					g: 255,
+					b: 255,
+					a: 0.2,
+				},
+			],
+			[
+				'#BA3C4CFF',
+				{
+					r: 186,
+					g: 60,
+					b: 76,
+					a: 1,
+				},
+			],
+			[
+				'#FFF',
+				{
+					r: 255,
+					g: 255,
+					b: 255,
+					a: 1,
+				},
+			],
+			[
+				'',
+				null,
+			],
+			[
+				'#FFFF',
+				null,
+			],
+			[
+				'#FF',
+				null,
+			],
+			[
+				'FFF',
+				null,
+			],
+			[
+				'#123456LL',
+				null,
+			],
+			[
+				'rgba(255,255,255, 0.5 )',
+				{
+					r: 255,
+					g: 255,
+					b: 255,
+					a: 0.5,
+				},
+			],
+			[
+				'rgba( 255 , 255 , 255, 0.5 )',
+				{
+					r: 255,
+					g: 255,
+					b: 255,
+					a: 0.5,
+				},
+			],
+			[
+				'rgba(260, 260, 260, 0.5)',
+				null,
+			],
+		];
+
+		cases.forEach(([ input, expectedOutput ]) => {
+			it(`properly parses ${input}`, () => expect(stringToRgba(input as string)).toEqual(expectedOutput));
 		});
 	});
 });

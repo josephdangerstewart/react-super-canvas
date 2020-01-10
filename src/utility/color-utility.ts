@@ -116,7 +116,7 @@ export function stringToRgba(color: string): RGBA {
 		return hexaToRgba(color);
 	}
 
-	const pieces = normalizedColor.match(/^rgba\((\d+),(\d+),(\d+),(\d+)\)$/);
+	const pieces = normalizedColor.match(/^rgba\((\d+),(\d+),(\d+),((\d+|\.)+)\)$/);
 
 	if (!pieces) {
 		return null;
