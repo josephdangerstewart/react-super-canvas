@@ -5,6 +5,9 @@ import {
 	isValidHexa,
 	stringToRgb,
 	stringToRgba,
+	rgbToString,
+	rgbaToString,
+	withOpacity,
 } from '../../src/utility/color-utility';
 
 describe('color-utility', () => {
@@ -262,6 +265,45 @@ describe('color-utility', () => {
 
 		cases.forEach(([ input, expectedOutput ]) => {
 			it(`properly parses ${input}`, () => expect(stringToRgba(input as string)).toEqual(expectedOutput));
+		});
+	});
+
+	describe('rgbToString', () => {
+		it('parses rgb(255,255,255)', () => {
+			const result = rgbToString({ r: 255, g: 255, b: 255 });
+			expect(result).toEqual('rgb(255,255,255)');
+		});
+	});
+
+	describe('rgbaToString', () => {
+		it('parses rgba(255,255,255,0.5)', () => {
+			const result = rgbaToString({
+				r: 255,
+				g: 255,
+				b: 255,
+				a: 0.5,
+			});
+
+			expect(result).toEqual('rgba(255,255,255,0.5)');
+		});
+	});
+
+	describe('withOpacity', () => {
+		const cases = [
+			[ '#FFFFFF', 0.5, 'rgba(255,255,255,0.5)' ],
+			[ '#FFFFFF', 2, null ],
+			[ '#ABCDEF', 1, 'rgba(171,205,239,1)' ],
+			[ '#FFFFF', 1, null ],
+			[ '#FFF', 0, 'rgba(255,255,255,0)' ],
+			[ '#fff', 1, 'rgba(255,255,255,1)' ],
+		];
+
+		cases.forEach(([ color, opacity, expectedOutput ]) => {
+			it(`${expectedOutput ? 'adds' : 'does not add'} an opacity of ${opacity} to ${color}`, () => {
+				const result = withOpacity(color as string, opacity as number);
+
+				expect(result).toEqual(expectedOutput);
+			});
 		});
 	});
 });

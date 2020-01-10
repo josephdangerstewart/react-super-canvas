@@ -193,9 +193,15 @@ export function getContrast(color: string): ColorContrast {
 }
 
 export function withOpacity(color: string, alpha: number): string {
-	if (!color) {
+	if (!color || alpha < 0 || alpha > 1) {
 		return null;
 	}
 
-	return rgbaToString({ ...stringToRgb(color), a: alpha });
+	const rgb = stringToRgb(color);
+
+	if (!rgb) {
+		return null;
+	}
+
+	return rgbaToString({ ...rgb, a: alpha });
 }
