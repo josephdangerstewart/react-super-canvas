@@ -5,8 +5,9 @@ import {
 	vector,
 	rectToPoints,
 	rectToLines,
+	lineCollidesWithLine,
 } from '../../src/utility/shapes-util';
-import { line } from '../test-utils/shapes';
+import { line, lineToString } from '../test-utils/shapes';
 import Rectangle from '../../src/types/shapes/Rectangle';
 import Vector2D from '../../src/types/utility/Vector2D';
 
@@ -81,6 +82,24 @@ describe('shapes-util', () => {
 			const result = rectToLines(rect);
 
 			expect(result).toEqual(expectedLines);
+		});
+	});
+
+	describe('lineCollidesWithLine', () => {
+		const cases = [
+			[ line(0, 0, 0, 5), line(1, 0, 1, 5), false ],
+			[ line(0, 0, 0, 5), line(-1, -0.001, 4, -0.001), false ],
+			[ line(0, 0, 0, 5), line(-3, 3, 6, 12), false ],
+			[ line(0, 0, 0, 5), line(0, 0, 5, 0), true ],
+			[ line(0, 0, 0, 5), line(-1, 0, 2, 5), true ],
+			[ line(0, 0, 0, 5), line(-1, 0, 4, 0), true ],
+		];
+
+		cases.forEach(([ line1, line2, expectedOutput ]) => {
+			it(`${expectedOutput ? 'does' : 'does not'} collide for ${lineToString(line1 as Line)} and ${lineToString(line2 as Line)}`, () => {
+				const result = lineCollidesWithLine(line1 as Line, line2 as Line);
+				expect(result).toEqual(expectedOutput);
+			});
 		});
 	});
 });
