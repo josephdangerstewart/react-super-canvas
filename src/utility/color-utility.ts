@@ -26,7 +26,7 @@ export function isValidHexa(color: string): boolean {
 		return false;
 	}
 
-	return /^#[A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9]$/.test(color);
+	return isValidHex(color) || /^#[A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9]$/.test(color);
 }
 
 export function hexToRgb(hex: string): RGB {
