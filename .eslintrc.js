@@ -1,7 +1,7 @@
 module.exports = {
 	extends: ['airbnb', 'plugin:@typescript-eslint/recommended'],
 	parser: '@typescript-eslint/parser',
-	plugins: ['@typescript-eslint', 'prettier'],
+	plugins: ['@typescript-eslint', 'prettier', 'jest'],
 	settings: {
 		'import/parsers': {
 			'@typescript-eslint/parser': ['.ts', '.tsx'],
@@ -13,6 +13,7 @@ module.exports = {
 	env: {
 		node: true,
 		browser: true,
+		'jest/globals': true,
 	},
 	rules: {
 		'react/jsx-filename-extension': [2, { extensions: ['.js', '.jsx', '.ts', '.tsx'] }],

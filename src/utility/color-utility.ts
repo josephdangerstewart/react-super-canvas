@@ -13,6 +13,22 @@ export interface RGBA extends RGB {
 	a: number;
 }
 
+export function isValidHex(color: string): boolean {
+	if (!color) {
+		return false;
+	}
+
+	return /^(#[A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9]|#[A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9])$/.test(color);
+}
+
+export function isValidHexa(color: string): boolean {
+	if (!color) {
+		return false;
+	}
+
+	return /^#[A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9]$/.test(color);
+}
+
 export function hexToRgb(hex: string): RGB {
 	if (!hex) {
 		return null;
@@ -36,6 +52,17 @@ export function hexaToRgba(hex: string): RGBA {
 		return null;
 	}
 
+	if (isValidHex(hex)) {
+		const hexObj = hexToRgb(hex);
+		if (!hexObj) {
+			return null;
+		}
+		return {
+			...hexObj,
+			a: 1,
+		};
+	}
+
 	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
 	return result && {
 		r: parseInt(result[1], 16),
@@ -43,22 +70,6 @@ export function hexaToRgba(hex: string): RGBA {
 		b: parseInt(result[3], 16),
 		a: parseInt(result[4], 16) / 255,
 	};
-}
-
-export function isValidHex(color: string): boolean {
-	if (!color) {
-		return false;
-	}
-
-	return /^(#[A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9]|#[A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9])$/.test(color);
-}
-
-export function isValidHexa(color: string): boolean {
-	if (!color) {
-		return false;
-	}
-
-	return /^#[A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9]$/.test(color);
 }
 
 export function stringToRgb(color: string): RGB {
