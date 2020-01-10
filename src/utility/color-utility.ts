@@ -97,6 +97,11 @@ export function stringToRgb(color: string): RGB {
 	pieces.shift();
 
 	const [ r, g, b ] = pieces.map((num): number => Number(num));
+
+	if (r > 255 || g > 255 || b > 255 || r < 0 || g < 0 || b < 0) {
+		return null;
+	}
+
 	return { r, g, b };
 }
 
@@ -120,6 +125,11 @@ export function stringToRgba(color: string): RGBA {
 	pieces.shift();
 
 	const [ r, g, b, a ] = pieces.map((num): number => Number(num));
+
+	if (r > 255 || g > 255 || b > 255 || a > 1 || r < 0 || g < 0 || b < 0 || a < 0) {
+		return null;
+	}
+
 	return {
 		r,
 		g,

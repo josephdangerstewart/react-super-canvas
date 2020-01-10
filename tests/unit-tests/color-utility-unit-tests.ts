@@ -3,28 +3,33 @@ import {
 	hexaToRgba,
 	isValidHex,
 	isValidHexa,
+	stringToRgb,
 } from '../../src/utility/color-utility';
 
 describe('color-utility', () => {
-	it('can convert hex to rgb', () => {
+	describe('hexToRgb', () => {
 		const cases = [
-			[ hexToRgb('#FFFFFF'), { r: 255, g: 255, b: 255 } ],
-			[ hexToRgb('#123456'), { r: 18, g: 52, b: 86 } ],
-			[ hexToRgb('#FFF'), { r: 255, g: 255, b: 255 } ],
-			[ hexToRgb('#BA3C4C'), { r: 186, g: 60, b: 76 } ],
-			[ hexToRgb(''), null ],
-			[ hexToRgb('#FF'), null ],
-			[ hexToRgb('#AAAA'), null ],
-			[ hexToRgb('#123L45'), null ],
+			[ '#FFFFFF', { r: 255, g: 255, b: 255 } ],
+			[ '#ffffff', { r: 255, g: 255, b: 255 } ],
+			[ '#123456', { r: 18, g: 52, b: 86 } ],
+			[ '#FFF', { r: 255, g: 255, b: 255 } ],
+			[ '#fff', { r: 255, g: 255, b: 255 } ],
+			[ '#BA3C4C', { r: 186, g: 60, b: 76 } ],
+			[ '', null ],
+			[ '#FF', null ],
+			[ '#AAAA', null ],
+			[ '#123L45', null ],
 		];
 
-		cases.forEach(([ actual, expected ]) => expect(actual).toEqual(expected));
+		cases.forEach(([ input, expectedOutput ]) => {
+			it(`correctly parses ${input}`, () => expect(hexToRgb(input as string)).toEqual(expectedOutput));
+		});
 	});
 
-	it('can convert hexa to rgba', () => {
+	describe('hexaToRgba', () => {
 		const cases = [
 			[
-				hexaToRgba('#FFFFFF'),
+				'#FFFFFF',
 				{
 					r: 255,
 					g: 255,
@@ -33,7 +38,7 @@ describe('color-utility', () => {
 				},
 			],
 			[
-				hexaToRgba('#FFFFFF33'),
+				'#FFFFFF33',
 				{
 					r: 255,
 					g: 255,
@@ -42,7 +47,7 @@ describe('color-utility', () => {
 				},
 			],
 			[
-				hexaToRgba('#BA3C4CFF'),
+				'#BA3C4CFF',
 				{
 					r: 186,
 					g: 60,
@@ -51,7 +56,7 @@ describe('color-utility', () => {
 				},
 			],
 			[
-				hexaToRgba('#FFF'),
+				'#FFF',
 				{
 					r: 255,
 					g: 255,
@@ -60,75 +65,115 @@ describe('color-utility', () => {
 				},
 			],
 			[
-				hexaToRgba(''),
+				'',
 				null,
 			],
 			[
-				hexaToRgba('#FFFF'),
+				'#FFFF',
 				null,
 			],
 			[
-				hexaToRgba('#FF'),
+				'#FF',
 				null,
 			],
 			[
-				hexaToRgba('FFF'),
+				'FFF',
 				null,
 			],
 			[
-				hexaToRgba('#123456LL'),
+				'#123456LL',
 				null,
 			],
 		];
 
-		cases.forEach(([ actual, expected ]) => expect(actual).toEqual(expected));
+		cases.forEach(([ input, expectedOutput ]) => {
+			it(`correctly parses ${input}`, () => expect(hexaToRgba(input as string)).toEqual(expectedOutput));
+		});
 	});
 
-	it('can determine valid hex', () => {
+	describe('isValidHex', () => {
 		const validCases = [
-			isValidHex('#FFF'),
-			isValidHex('#123ABC'),
-			isValidHex('#123'),
-			isValidHex('#A2C'),
-			isValidHex('#1A2B3C'),
+			'#FFF',
+			'#123ABC',
+			'#123',
+			'#A2C',
+			'#1A2B3C',
+			'#aaa',
+			'#ffffff',
 		];
 
 		const invalidCases = [
-			isValidHex('FFF'),
-			isValidHex('FFFFFF'),
-			isValidHex('#FF'),
-			isValidHex('#FFFF'),
-			isValidHex('#12345G'),
-			isValidHex('#FFFFFFF'),
+			'FFF',
+			'FFFFFF',
+			'#FF',
+			'#FFFF',
+			'#12345G',
+			'#FFFFFFF',
+			'#ff',
 		];
 
-		validCases.forEach((actual) => expect(actual).toEqual(true));
-		invalidCases.forEach((actual) => expect(actual).toEqual(false));
+		validCases.forEach((input) => {
+			it(`returns true for ${input}`, () => expect(isValidHex(input)).toEqual(true));
+		});
+
+		invalidCases.forEach((input) => {
+			it(`returns false for ${input}`, () => expect(isValidHex(input)).toEqual(false));
+		});
 	});
 
-	it('can determine valid hexa', () => {
+	describe('isValidHexa', () => {
 		const validCases = [
-			isValidHexa('#FFF'),
-			isValidHexa('#123ABC'),
-			isValidHexa('#123'),
-			isValidHexa('#A2C'),
-			isValidHexa('#1A2B3C'),
-			isValidHexa('#FFFFFFFF'),
-			isValidHexa('#ABCD128B'),
-			isValidHexa('#12345678'),
+			'#FFF',
+			'#123ABC',
+			'#123',
+			'#A2C',
+			'#1A2B3C',
+			'#FFFFFFFF',
+			'#ABCD128B',
+			'#12345678',
+			'#fff',
+			'#ffffff',
 		];
 
 		const invalidCases = [
-			isValidHexa('FFF'),
-			isValidHexa('FFFFFF'),
-			isValidHexa('#FF'),
-			isValidHexa('#FFFF'),
-			isValidHexa('#12345G'),
-			isValidHexa('#1234567'),
-			isValidHexa('#123456789'),
+			'FFF',
+			'FFFFFF',
+			'#FF',
+			'#FFFF',
+			'#12345G',
+			'#1234567',
+			'#123456789',
 		];
 
-		validCases.forEach((actual) => expect(actual).toEqual(true));
-		invalidCases.forEach((actual) => expect(actual).toEqual(false));
+		validCases.forEach((input) => {
+			it(`returns true for ${input}`, () => expect(isValidHexa(input)).toEqual(true));
+		});
+
+		invalidCases.forEach((input) => {
+			it(`returns false for ${input}`, () => expect(isValidHexa(input)).toEqual(false));
+		});
+	});
+
+	describe('stringToRGB', () => {
+		const cases = [
+			[ 'rgb(255,255,255)', { r: 255, g: 255, b: 255 } ],
+			[ 'rgb( 150, 150, 150)', { r: 150, g: 150, b: 150 } ],
+			[ 'rgb( 100 , 100, 100 )', { r: 100, g: 100, b: 100 } ],
+			[ 'rgb(0, 0, 0)', { r: 0, g: 0, b: 0 } ],
+			[ '#FFFFFF', { r: 255, g: 255, b: 255 } ],
+			[ '#123456', { r: 18, g: 52, b: 86 } ],
+			[ '#FFF', { r: 255, g: 255, b: 255 } ],
+			[ '#BA3C4C', { r: 186, g: 60, b: 76 } ],
+			[ '#fff', { r: 255, g: 255, b: 255 } ],
+			[ '#ffffff', { r: 255, g: 255, b: 255 } ],
+			[ '', null ],
+			[ 'invalid', null ],
+			[ 'rgb( 0, 0, 0', null ],
+			[ 'rgb(260, 260, 260)', null ],
+		];
+
+		cases.forEach(([ input, expectedOutput ]) => {
+			it(`can parse ${input}`, () => expect(stringToRgb(input as string)).toEqual(expectedOutput));
+		});
 	});
 });
