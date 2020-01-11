@@ -7,6 +7,7 @@ import {
 	rectToLines,
 	lineCollidesWithLine,
 	pointInsideRect,
+	lineCollidesWithRect,
 } from '../../src/utility/shapes-util';
 import { line, lineToString, vectorToString } from '../test-utils/shapes';
 import Rectangle from '../../src/types/shapes/Rectangle';
@@ -121,6 +122,28 @@ describe('shapes-util', () => {
 			it(`returns ${expectedOutput} for ${vectorToString(input as Vector2D)}`, () => {
 				const result = pointInsideRect(input as Vector2D, rect);
 
+				expect(result).toEqual(expectedOutput);
+			});
+		});
+	});
+
+	describe('lineCollidesWithRect', () => {
+		const cases = [
+			[ line(-1, 2, 3, -1), true ],
+			[ line(2, 2, 3, 2), true ],
+			[ line(0, 0, 5, 0), true ],
+			[ line(0, 0, 5, 5), true ],
+			[ line(5, 0, 5, 5), true ],
+			[ line(2, 7, 9, 3), false ],
+			[ line(9, 3, 2, 7), false ],
+			[ line(0, -1, 5, -1), false ],
+			[ line(0, 6, 5, 6), false ],
+			[ line(-5, 1, -4, 2), false ],
+		];
+
+		cases.forEach(([ input, expectedOutput ]) => {
+			it(`returns ${expectedOutput} for ${lineToString(input as Line)}`, () => {
+				const result = lineCollidesWithRect(input as Line, rect);
 				expect(result).toEqual(expectedOutput);
 			});
 		});
