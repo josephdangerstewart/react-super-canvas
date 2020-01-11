@@ -6,8 +6,9 @@ import {
 	rectToPoints,
 	rectToLines,
 	lineCollidesWithLine,
+	pointInsideRect,
 } from '../../src/utility/shapes-util';
-import { line, lineToString } from '../test-utils/shapes';
+import { line, lineToString, vectorToString } from '../test-utils/shapes';
 import Rectangle from '../../src/types/shapes/Rectangle';
 import Vector2D from '../../src/types/utility/Vector2D';
 
@@ -98,6 +99,28 @@ describe('shapes-util', () => {
 		cases.forEach(([ line1, line2, expectedOutput ]) => {
 			it(`${expectedOutput ? 'does' : 'does not'} collide for ${lineToString(line1 as Line)} and ${lineToString(line2 as Line)}`, () => {
 				const result = lineCollidesWithLine(line1 as Line, line2 as Line);
+				expect(result).toEqual(expectedOutput);
+			});
+		});
+	});
+
+	describe('pointInsideRect', () => {
+		const cases = [
+			[ vector(0, 0), true ],
+			[ vector(1, 1), true ],
+			[ vector(-1, -1), false ],
+			[ vector(6, 5), false ],
+			[ vector(5, 5), true ],
+			[ vector(3.5, 3.5), true ],
+			[ vector(2, -1), false ],
+			[ vector(2, 6), false ],
+			[ vector(-1, 2), false ],
+		];
+
+		cases.forEach(([ input, expectedOutput ]) => {
+			it(`returns ${expectedOutput} for ${vectorToString(input as Vector2D)}`, () => {
+				const result = pointInsideRect(input as Vector2D, rect);
+
 				expect(result).toEqual(expectedOutput);
 			});
 		});
