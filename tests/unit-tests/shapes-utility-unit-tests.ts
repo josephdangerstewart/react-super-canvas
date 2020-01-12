@@ -9,6 +9,7 @@ import {
 	pointInsideRect,
 	lineCollidesWithRect,
 	pointInsidePolygon,
+	pointOnLine,
 } from '../../src/utility/shapes-util';
 import { line, lineToString, vectorToString } from '../test-utils/shapes';
 import Rectangle from '../../src/types/shapes/Rectangle';
@@ -153,6 +154,26 @@ describe('shapes-util', () => {
 		cases.forEach(([ input, expectedOutput ]) => {
 			it(`returns ${expectedOutput} for ${lineToString(input as Line)}`, () => {
 				const result = lineCollidesWithRect(input as Line, rect);
+				expect(result).toEqual(expectedOutput);
+			});
+		});
+	});
+
+	describe('pointOnLine', () => {
+		const lineToTest = line(0, 0, 4, 2);
+
+		const cases = [
+			[ vector(0, 0), true ],
+			[ vector(4, 2), true ],
+			[ vector(2, 1), true ],
+			[ vector(6, 3), false ],
+			[ vector(1, 1), false ],
+		];
+
+		cases.forEach(([ input, expectedOutput ]) => {
+			it(`evaluates that ${vectorToString(input as Vector2D)} is${expectedOutput ? '' : ' not'} on ${lineToString(lineToTest)}`, () => {
+				const result = pointOnLine(input as Vector2D, lineToTest);
+
 				expect(result).toEqual(expectedOutput);
 			});
 		});

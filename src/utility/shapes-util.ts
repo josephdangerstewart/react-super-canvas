@@ -162,6 +162,15 @@ export function vectorEquals(v1: Vector2D, v2: Vector2D): boolean {
 export function pointOnLine(point: Vector2D, line: Line): boolean {
 	const { point1, point2 } = line;
 
+	const maxX = Math.max(point1.x, point2.x);
+	const minX = Math.min(point1.x, point2.x);
+	const maxY = Math.max(point1.y, point2.y);
+	const minY = Math.min(point1.y, point2.y);
+
+	if (point.x > maxX || point.x < minX || point.y > maxY || point.y < minY) {
+		return false;
+	}
+
 	const m = (point2.y - point1.y) / (point2.x - point1.x);
 	const b = -(m * point1.x) + point1.y;
 
