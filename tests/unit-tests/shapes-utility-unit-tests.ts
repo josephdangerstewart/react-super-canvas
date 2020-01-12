@@ -10,8 +10,14 @@ import {
 	lineCollidesWithRect,
 	pointInsidePolygon,
 	pointOnLine,
+	rectCollidesWithRect,
 } from '../../src/utility/shapes-util';
-import { line, lineToString, vectorToString } from '../test-utils/shapes';
+import {
+	line,
+	lineToString,
+	vectorToString,
+	rectToString,
+} from '../test-utils/shapes';
 import Rectangle from '../../src/types/shapes/Rectangle';
 import Vector2D from '../../src/types/utility/Vector2D';
 
@@ -202,6 +208,63 @@ describe('shapes-util', () => {
 		cases.forEach(([ input, expectedOutput ]) => {
 			it(`returns ${expectedOutput} for ${vectorToString(input as Vector2D)}`, () => {
 				const result = pointInsidePolygon(input as Vector2D, poly);
+				expect(result).toEqual(expectedOutput);
+			});
+		});
+	});
+
+	describe('rectCollidesWithRect', () => {
+		const cases = [
+			[
+				{ topLeftCorner: vector(3, 1), width: 3, height: 2 },
+				true,
+			],
+			[
+				{ topLeftCorner: vector(3, 1), width: 1, height: 2 },
+				true,
+			],
+			[
+				{ topLeftCorner: vector(0, 0), width: 4, height: 4 },
+				true,
+			],
+			[
+				{ topLeftCorner: vector(-1, -1), width: 7, height: 7 },
+				true,
+			],
+			[
+				{ topLeftCorner: vector(-1, 0), width: 4, height: 4 },
+				true,
+			],
+			[
+				{ topLeftCorner: vector(-1, 0), width: 10, height: 10 },
+				true,
+			],
+			[
+				{ topLeftCorner: vector(-1, 0), width: 1, height: 5 },
+				true,
+			],
+			[
+				{ topLeftCorner: vector(-2, 0), width: 1, height: 5 },
+				false,
+			],
+			[
+				{ topLeftCorner: vector(2, -2), width: 2, height: 1 },
+				false,
+			],
+			[
+				{ topLeftCorner: vector(6, 3), width: 1, height: 1 },
+				false,
+			],
+			[
+				{ topLeftCorner: vector(2, 6), width: 1, height: 1 },
+				false,
+			],
+		];
+
+		cases.forEach(([ input, expectedOutput ]) => {
+			it(`returns ${expectedOutput} for ${rectToString(input as Rectangle)}`, () => {
+				const result = rectCollidesWithRect(rect, input as Rectangle);
+
 				expect(result).toEqual(expectedOutput);
 			});
 		});

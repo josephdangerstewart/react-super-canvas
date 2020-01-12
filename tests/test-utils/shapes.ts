@@ -1,6 +1,7 @@
 import Line from '../../src/types/shapes/Line';
 import { vector } from '../../src/utility/shapes-util';
 import Vector2D from '../../src/types/utility/Vector2D';
+import Rectangle from '../../src/types/shapes/Rectangle';
 
 export function line(x1: number, y1: number, x2: number, y2: number): Line {
 	return {
@@ -15,4 +16,8 @@ export function vectorToString({ x, y }: Vector2D): string {
 
 export function lineToString({ point1, point2 }: Line): string {
 	return `${vectorToString(point1)}-${vectorToString(point2)}`;
+}
+
+export function rectToString(rect: Rectangle): string {
+	return `[topLeft: ${vectorToString(rect.topLeftCorner)}, w: ${rect.width}, h: ${rect.height}]`;
 }
