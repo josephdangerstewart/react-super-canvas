@@ -32,7 +32,6 @@ function getTypescriptFilesFromDirectory(directory) {
 
 const filesToScan = [
 	...getTypescriptFilesFromDirectory(path.resolve('./src/types')),
-	...getTypescriptFilesFromDirectory(path.resolve('./src/components')),
 ];
 
 const docs = app.convert(filesToScan);
@@ -88,7 +87,7 @@ const buildProperties = (reflection) => {
 			type = 'callback';
 			const parameters = {};
 			const returnTypes = []
-			for (const signature of reflection.type.declaration.signatures) {
+			for (const signature of reflection.type.declaration.signatures || []) {
 				if (signature.kindString === 'Call signature') {
 					returnTypes.push(signature.type.name);
 					for (const parameter of signature.parameters || []) {
