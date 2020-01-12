@@ -12,6 +12,7 @@ import {
 	pointOnLine,
 	rectCollidesWithRect,
 	pointInsideCircle,
+	circleCollidesWithLine,
 } from '../../src/utility/shapes-util';
 import {
 	line,
@@ -292,6 +293,33 @@ describe('shapes-util', () => {
 		cases.forEach(([ input, expectedOutput ]) => {
 			it(`returns ${expectedOutput} for ${vectorToString(input as Vector2D)}`, () => {
 				const result = pointInsideCircle(input as Vector2D, circle);
+				expect(result).toEqual(expectedOutput);
+			});
+		});
+	});
+
+	describe('circleCollidesWithLine', () => {
+		const circle: Circle = {
+			center: vector(0, 0),
+			radius: 3,
+		};
+
+		const cases = [
+			[ line(0, 0, 2, 0), true ],
+			[ line(0, 0, 6, 0), true ],
+			[ line(-4, 0, 0, 0), true ],
+			[ line(-4, 0, 4, 0), true ],
+			[ line(0, 4, 0, -4), true ],
+			[ line(-3, 3, 3, 3), true ], // ???
+			[ line(6, 4, 2, -4), false ],
+			[ line(6, 4, -4, 2), true ],
+			[ line(0, 4, -4, 2), false ],
+		];
+
+		cases.forEach(([ input, expectedOutput ]) => {
+			it(`returns ${expectedOutput} for ${lineToString(input as Line)}`, () => {
+				const result = circleCollidesWithLine(circle, input as Line);
+
 				expect(result).toEqual(expectedOutput);
 			});
 		});
