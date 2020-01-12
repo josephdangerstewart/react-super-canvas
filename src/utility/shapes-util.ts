@@ -146,6 +146,29 @@ export function vector(x: number, y: number): Vector2D {
 }
 
 /**
+ * @description Shorthand way of checking equality of two vectors
+ * @param v1 The right hand vector
+ * @param v2 The left hand vector
+ */
+export function vectorEquals(v1: Vector2D, v2: Vector2D): boolean {
+	return v1?.x === v2?.x && v1?.y === v2?.y;
+}
+
+/**
+ * @description Determines if a point is on a given line
+ * @param point The point to check
+ * @param line The line to check
+ */
+export function pointOnLine(point: Vector2D, line: Line): boolean {
+	const { point1, point2 } = line;
+
+	const m = (point2.y - point1.y) / (point2.x - point1.x);
+	const b = -(m * point1.x) + point1.y;
+
+	return point.y === (m * point.x) + b;
+}
+
+/**
  * @description Tests whether a point is inside of a polygon
  * @param point
  * @param polygon
@@ -156,12 +179,29 @@ export function pointInsidePolygon(point: Vector2D, polygon: Polygon): boolean {
 		point2: point,
 	};
 
+	if (polygon.points.some((v) => vectorEquals(v, point))) {
+		return true;
+	}
+
 	const polyLines = polygonToLines(polygon);
 	let intersections = 0;
 
+	if (polyLines.some((line) => pointOnLine(point, line))) {
+		return true;
+	}
+
 	for (let i = 0; i < polyLines.length; i++) {
+		// A ray passing through a single vertex will "collide" with the two lines that connect
+		// to that vertex. To fix this, only count a collision if the second point in the side
+		// is above the point we are testing
+		//
+		// https://en.wikipedia.org/wiki/Point_in_polygon (altered for canvas coordinate system)
 		if (lineCollidesWithLine(polyLines[i], ray)) {
-			intersections++;
+			const pointIsVertex = pointOnLine(polyLines[i].point1, ray) || pointOnLine(polyLines[i].point2, ray);
+
+			if ((pointIsVertex && polyLines[i].point2.y < point.y) || !pointIsVertex) {
+				intersections++;
+			}
 		}
 	}
 

@@ -38,5 +38,6 @@ module.exports = {
 		'react/button-has-type': 'off',
 		'react/prop-types': 'off',
 		'react/jsx-one-expression-per-line': 'off',
+		'prettier/prettier': 'off',
 	},
 };

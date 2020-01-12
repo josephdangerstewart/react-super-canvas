@@ -8,6 +8,7 @@ import {
 	lineCollidesWithLine,
 	pointInsideRect,
 	lineCollidesWithRect,
+	pointInsidePolygon,
 } from '../../src/utility/shapes-util';
 import { line, lineToString, vectorToString } from '../test-utils/shapes';
 import Rectangle from '../../src/types/shapes/Rectangle';
@@ -25,17 +26,21 @@ describe('shapes-util', () => {
 		const polygon: Polygon = Object.freeze({
 			points: [
 				vector(0, 0),
-				vector(5, 5),
-				vector(0, 5),
-				vector(5, 5),
+				vector(4, 1),
+				vector(2, 5),
+				vector(-3, 4),
+				vector(-4, 3),
+				vector(-3, 2),
 			],
 		});
 
 		it('can convert a polygon to lines without completeness', () => {
 			const expectedLines: Line[] = [
-				line(0, 0, 5, 5),
-				line(5, 5, 0, 5),
-				line(0, 5, 5, 5),
+				line(0, 0, 4, 1),
+				line(4, 1, 2, 5),
+				line(2, 5, -3, 4),
+				line(-3, 4, -4, 3),
+				line(-4, 3, -3, 2),
 			];
 
 			const lines = polygonToLines(polygon, false);
@@ -45,10 +50,12 @@ describe('shapes-util', () => {
 
 		it('can convert a polygon to lines with completeness', () => {
 			const expectedLines: Line[] = [
-				line(0, 0, 5, 5),
-				line(5, 5, 0, 5),
-				line(0, 5, 5, 5),
-				line(5, 5, 0, 0),
+				line(0, 0, 4, 1),
+				line(4, 1, 2, 5),
+				line(2, 5, -3, 4),
+				line(-3, 4, -4, 3),
+				line(-4, 3, -3, 2),
+				line(-3, 2, 0, 0),
 			];
 
 			const lines = polygonToLines(polygon, true);
@@ -95,6 +102,8 @@ describe('shapes-util', () => {
 			[ line(0, 0, 0, 5), line(0, 0, 5, 0), true ],
 			[ line(0, 0, 0, 5), line(-1, 0, 2, 5), true ],
 			[ line(0, 0, 0, 5), line(-1, 0, 4, 0), true ],
+			[ line(-5, 2, 4, 2), line(4, 1, 2, 5), true ],
+			[ line(-5, 2, 4, 2), line(-3, 2, -4, 3), true ],
 		];
 
 		cases.forEach(([ line1, line2, expectedOutput ]) => {
@@ -144,6 +153,34 @@ describe('shapes-util', () => {
 		cases.forEach(([ input, expectedOutput ]) => {
 			it(`returns ${expectedOutput} for ${lineToString(input as Line)}`, () => {
 				const result = lineCollidesWithRect(input as Line, rect);
+				expect(result).toEqual(expectedOutput);
+			});
+		});
+	});
+
+	describe('pointInsidePolygon', () => {
+		const poly: Polygon = {
+			points: [
+				vector(0, 0),
+				vector(4, 1),
+				vector(2, 5),
+				vector(-3, 4),
+				vector(-4, 3),
+				vector(-3, 2),
+			],
+		};
+
+		const cases = [
+			[ vector(0, 0), true ],
+			[ vector(1, 0), false ],
+			[ vector(0, 2), true ],
+			[ vector(4, 2), false ],
+			[ vector(4, 1), true ],
+		];
+
+		cases.forEach(([ input, expectedOutput ]) => {
+			it(`returns ${expectedOutput} for ${vectorToString(input as Vector2D)}`, () => {
+				const result = pointInsidePolygon(input as Vector2D, poly);
 				expect(result).toEqual(expectedOutput);
 			});
 		});
