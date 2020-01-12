@@ -8,7 +8,8 @@
 		"docz:dev": "docz dev",
 		"docz:build": "docz build",
 		"lint": "eslint . --ext .js,.jsx,.ts,.tsx",
-		"meta": "node tools/parse-jsdocs"
+		"meta": "node tools/parse-jsdocs",
+		"dev": "yarn meta && yarn docz:dev"
 	},
 	"keywords": [
 		"canvas",
