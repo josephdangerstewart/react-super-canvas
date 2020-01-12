@@ -260,7 +260,7 @@ export function pointInsideCircle(point: Vector2D, circle: Circle): boolean {
 	const { radius: r } = circle;
 
 	const d = (x1 - x2) ** 2 + (y1 - y2) ** 2;
-	return d ** 2 <= r ** 2;
+	return d <= r ** 2;
 }
 
 /**

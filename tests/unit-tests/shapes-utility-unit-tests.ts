@@ -11,6 +11,7 @@ import {
 	pointInsidePolygon,
 	pointOnLine,
 	rectCollidesWithRect,
+	pointInsideCircle,
 } from '../../src/utility/shapes-util';
 import {
 	line,
@@ -20,6 +21,7 @@ import {
 } from '../test-utils/shapes';
 import Rectangle from '../../src/types/shapes/Rectangle';
 import Vector2D from '../../src/types/utility/Vector2D';
+import Circle from '../../src/types/shapes/Circle';
 
 // Prepare a 5x5 rectangle with top left corner of (0,0)
 const rect: Rectangle = Object.freeze({
@@ -265,6 +267,31 @@ describe('shapes-util', () => {
 			it(`returns ${expectedOutput} for ${rectToString(input as Rectangle)}`, () => {
 				const result = rectCollidesWithRect(rect, input as Rectangle);
 
+				expect(result).toEqual(expectedOutput);
+			});
+		});
+	});
+
+	describe('pointInsideCircle', () => {
+		const circle: Circle = {
+			center: vector(0, 0),
+			radius: 3,
+		};
+
+		const cases = [
+			[ vector(0, 0), true ],
+			[ vector(1, 1), true ],
+			[ vector(2, 2), true ],
+			[ vector(0, 3), true ],
+			[ vector(1, 3), false ],
+			[ vector(-1, 1), true ],
+			[ vector(-2, 2), true ],
+			[ vector(-1, 3), false ],
+		];
+
+		cases.forEach(([ input, expectedOutput ]) => {
+			it(`returns ${expectedOutput} for ${vectorToString(input as Vector2D)}`, () => {
+				const result = pointInsideCircle(input as Vector2D, circle);
 				expect(result).toEqual(expectedOutput);
 			});
 		});
