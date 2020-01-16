@@ -3,6 +3,84 @@ import Rectangle from '../types/shapes/Rectangle';
 import Vector2D from '../types/utility/Vector2D';
 import Circle from '../types/shapes/Circle';
 import Polygon from '../types/shapes/Polygon';
+import { solveQuadraticEquation } from './math-utility';
+
+/**
+ * @description Shorthand way to create Vector2D objects
+ * @param x
+ * @param y
+ */
+export function vector(x: number, y: number): Vector2D {
+	return { x, y };
+}
+
+/**
+ * @description Shorthand way of checking equality of two vectors
+ * @param v1 The right hand vector
+ * @param v2 The left hand vector
+ */
+export function vectorEquals(v1: Vector2D, v2: Vector2D): boolean {
+	return v1?.x === v2?.x && v1?.y === v2?.y;
+}
+
+/**
+ * @description Returns the distance between two points in a cartesean plane
+ * @param point1
+ * @param point2
+ */
+export function distanceBetweenTwoPoints(point1: Vector2D, point2: Vector2D): number {
+	return Math.sqrt((point1.x - point2.x) ** 2 + (point1.y - point2.y) ** 2);
+}
+
+/**
+ * @description Returns the bounding rectangle of a circle
+ * @param circle
+ */
+export function boundingRectOfCircle(circle: Circle): Rectangle {
+	const { center: { x, y }, radius } = circle;
+	return {
+		topLeftCorner: vector(x - radius, y - radius),
+		width: radius * 2,
+		height: radius * 2,
+	};
+}
+
+/**
+ * @description Returns the bounding rectangle of a line
+ */
+export function boundingRectOfLine(line: Line): Rectangle {
+	const { point1, point2 } = line;
+	const topLeftX = Math.min(point1.x, point2.x);
+	const topLeftY = Math.max(point1.y, point2.y);
+	const bottomRightX = Math.max(point1.x, point2.x);
+	const bottomRightY = Math.min(point1.y, point2.y);
+	return {
+		topLeftCorner: vector(topLeftX, topLeftY),
+		height: topLeftY - bottomRightY,
+		width: bottomRightX - topLeftX,
+	};
+}
+
+/**
+ * @description Returns the bounding rectangle of a polygon
+ */
+export function boundingRectOfPolygon(polygon: Polygon): Rectangle {
+	const { points } = polygon;
+	const xValues = points.map((point) => point.x);
+	const yValues = points.map((point) => point.y);
+
+	const minX = Math.min(...xValues);
+	const minY = Math.min(...yValues);
+
+	const maxX = Math.max(...xValues);
+	const maxY = Math.max(...yValues);
+
+	return {
+		topLeftCorner: vector(minX, minY),
+		width: maxX - minX,
+		height: maxY - minY,
+	};
+}
 
 /**
  * @description Converts a polygon into a series of lines
@@ -137,24 +215,6 @@ export function lineCollidesWithRect(line: Line, rect: Rectangle): boolean {
 }
 
 /**
- * @description Shorthand way to create Vector2D objects
- * @param x
- * @param y
- */
-export function vector(x: number, y: number): Vector2D {
-	return { x, y };
-}
-
-/**
- * @description Shorthand way of checking equality of two vectors
- * @param v1 The right hand vector
- * @param v2 The left hand vector
- */
-export function vectorEquals(v1: Vector2D, v2: Vector2D): boolean {
-	return v1?.x === v2?.x && v1?.y === v2?.y;
-}
-
-/**
  * @description Determines if a point is on a given line
  * @param point The point to check
  * @param line The line to check
@@ -166,6 +226,12 @@ export function pointOnLine(point: Vector2D, line: Line): boolean {
 	const minX = Math.min(point1.x, point2.x);
 	const maxY = Math.max(point1.y, point2.y);
 	const minY = Math.min(point1.y, point2.y);
+
+	// Handle the special case when the slope
+	// is undefined
+	if (point1.x === point2.x) {
+		return point1.x === point.x && point.y <= maxY && point.y >= minY;
+	}
 
 	if (point.x > maxX || point.x < minX || point.y > maxY || point.y < minY) {
 		return false;
@@ -267,22 +333,60 @@ export function pointInsideCircle(point: Vector2D, circle: Circle): boolean {
  * @description Returns true if a lines intersects a circle or if the line is completely inside the circle
  * @param circle
  * @param line
+ * @source https://photos.app.goo.gl/g6Y2KXWpj4odXu9x6
  */
 export function circleCollidesWithLine(circle: Circle, line: Line): boolean {
 	if (lineToPoints(line).some((point) => pointInsideCircle(point, circle))) {
 		return true;
 	}
 
-	const { x: x1, y: y1 } = line.point1;
-	const { x: x2, y: y2 } = line.point2;
-	const { radius: r } = circle;
+	const { point1, point2 } = line;
+	const { center: { x: c1, y: c2 }, radius: r } = circle;
 
-	const dx = x2 - x1;
-	const dy = y2 - y1;
-	const dr = Math.sqrt(dx ** 2 + dy ** 2);
-	const D = x1 * y2 - x2 * y1;
+	// If the difference between our lines x values is 0 then
+	// our slope is undefined and our line is in the form x = c
+	if (point2.x === point1.x) {
+		// Put the line in form x = n
+		const n = point1.x;
 
-	return ((r ** 2) * (dr ** 2) - (D ** 2)) >= 0;
+		const A = 1;
+		const B = -2 * c2;
+		const C = n ** 2 - 2 * n * c1 + c1 ** 2 + c2 ** 2 - r ** 2;
+
+		const [ y1, y2 ] = solveQuadraticEquation(A, B, C);
+
+		if (Number.isNaN(y1) && Number.isNaN(y2)) {
+			return false;
+		}
+
+		return pointOnLine({ x: n, y: y1 }, line) || pointOnLine({ x: n, y: y2 }, line);
+	}
+
+	// Put the line in form y = mx + b
+	const m = (point2.y - point1.y) / (point2.x - point1.x);
+	const b = -(m * point1.x) + point1.y;
+
+	// The form of the circle is (x - c1)^2 + (y - c2)^2 = r^2
+	// When you substitute y = mx + b in for y and factor it out
+	// to the form Ax^2 + Bx + C, these are the relative values
+	// for A, B, and C
+	const A = (1 + m ** 2);
+	const B = 2 * (m * b - c2 * m - c1);
+	const C = c2 ** 2 + b ** 2 - 2 * c2 * b + c1 ** 2 - r ** 2;
+
+	// Solve for two points using the quadratic formula
+	const [ x1, x2 ] = solveQuadraticEquation(A, B, C);
+
+	if (Number.isNaN(x1) && Number.isNaN(x2)) {
+		return false;
+	}
+
+	// Then substitute x1 and x2 back into the original line function y = mx + b
+	// to get the two points of collision
+	const y1 = m * x1 + b;
+	const y2 = m * x2 + b;
+
+	return pointOnLine({ x: x1, y: y1 }, line) || pointOnLine({ x: x2, y: y2 }, line);
 }
 
 /**
@@ -292,21 +396,16 @@ export function circleCollidesWithLine(circle: Circle, line: Line): boolean {
  */
 export function circleCollidesWithRect(circle: Circle, rect: Rectangle): boolean {
 	const circleInsideRectangle = pointInsideRect(circle.center, rect);
-
 	if (circleInsideRectangle) {
 		return true;
 	}
 
-	return rectToLines(rect).some((line) => circleCollidesWithLine(circle, line)) || rectToPoints(rect).every((point) => pointInsideCircle(point, circle));
-}
+	const rectangleInsideCircle = rectToPoints(rect).some((point) => pointInsideCircle(point, circle));
+	if (rectangleInsideCircle) {
+		return true;
+	}
 
-/**
- * @description Returns the distance between two points in a cartesean plane
- * @param point1
- * @param point2
- */
-export function distanceBetweenTwoPoints(point1: Vector2D, point2: Vector2D): number {
-	return Math.sqrt((point1.x - point2.x) ** 2 + (point1.y - point2.y) ** 2);
+	return rectToLines(rect).some((line) => circleCollidesWithLine(circle, line));
 }
 
 /**
@@ -331,56 +430,6 @@ export function polygonCollidesWithRect(polygon: Polygon, rect: Rectangle): bool
 	}
 
 	return false;
-}
-
-/**
- * @description Returns the bounding rectangle of a circle
- * @param circle
- */
-export function boundingRectOfCircle(circle: Circle): Rectangle {
-	const { center: { x, y }, radius } = circle;
-	return {
-		topLeftCorner: vector(x - radius, y - radius),
-		width: radius * 2,
-		height: radius * 2,
-	};
-}
-
-/**
- * @description Returns the bounding rectangle of a line
- */
-export function boundingRectOfLine(line: Line): Rectangle {
-	const { point1, point2 } = line;
-	const topLeftX = Math.min(point1.x, point2.x);
-	const topLeftY = Math.max(point1.y, point2.y);
-	const bottomRightX = Math.max(point1.x, point2.x);
-	const bottomRightY = Math.min(point1.y, point2.y);
-	return {
-		topLeftCorner: vector(topLeftX, topLeftY),
-		height: topLeftY - bottomRightY,
-		width: bottomRightX - topLeftX,
-	};
-}
-
-/**
- * @description Returns the bounding rectangle of a polygon
- */
-export function boundingRectOfPolygon(polygon: Polygon): Rectangle {
-	const { points } = polygon;
-	const xValues = points.map((point) => point.x);
-	const yValues = points.map((point) => point.y);
-
-	const minX = Math.min(...xValues);
-	const minY = Math.min(...yValues);
-
-	const maxX = Math.max(...xValues);
-	const maxY = Math.max(...yValues);
-
-	return {
-		topLeftCorner: vector(minX, minY),
-		width: maxX - minX,
-		height: maxY - minY,
-	};
 }
 
 /**

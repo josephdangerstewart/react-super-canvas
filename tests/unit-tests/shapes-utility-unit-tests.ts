@@ -13,12 +13,14 @@ import {
 	rectCollidesWithRect,
 	pointInsideCircle,
 	circleCollidesWithLine,
+	circleCollidesWithRect,
 } from '../../src/utility/shapes-util';
 import {
 	line,
 	lineToString,
 	vectorToString,
 	rectToString,
+	circleToString,
 } from '../test-utils/shapes';
 import Rectangle from '../../src/types/shapes/Rectangle';
 import Vector2D from '../../src/types/utility/Vector2D';
@@ -169,19 +171,18 @@ describe('shapes-util', () => {
 	});
 
 	describe('pointOnLine', () => {
-		const lineToTest = line(0, 0, 4, 2);
-
 		const cases = [
-			[ vector(0, 0), true ],
-			[ vector(4, 2), true ],
-			[ vector(2, 1), true ],
-			[ vector(6, 3), false ],
-			[ vector(1, 1), false ],
+			[ vector(0, 0), line(0, 0, 4, 2), true ],
+			[ vector(4, 2), line(0, 0, 4, 2), true ],
+			[ vector(2, 1), line(0, 0, 4, 2), true ],
+			[ vector(0, 0), line(0, 4, 0, -4), true ],
+			[ vector(6, 3), line(0, 0, 4, 2), false ],
+			[ vector(1, 1), line(0, 0, 4, 2), false ],
 		];
 
-		cases.forEach(([ input, expectedOutput ]) => {
-			it(`evaluates that ${vectorToString(input as Vector2D)} is${expectedOutput ? '' : ' not'} on ${lineToString(lineToTest)}`, () => {
-				const result = pointOnLine(input as Vector2D, lineToTest);
+		cases.forEach(([ point, testLine, expectedOutput ]) => {
+			it(`evaluates that ${vectorToString(point as Vector2D)} is${expectedOutput ? '' : ' not'} on ${lineToString(testLine as Line)}`, () => {
+				const result = pointOnLine(point as Vector2D, testLine as Line);
 
 				expect(result).toEqual(expectedOutput);
 			});
@@ -310,15 +311,37 @@ describe('shapes-util', () => {
 			[ line(-4, 0, 0, 0), true ],
 			[ line(-4, 0, 4, 0), true ],
 			[ line(0, 4, 0, -4), true ],
-			[ line(-3, 3, 3, 3), true ], // ???
-			[ line(6, 4, 2, -4), false ],
+			[ line(-3, 3, 3, 3), true ],
 			[ line(6, 4, -4, 2), true ],
+			[ line(2.5, -4, 2.5, 4), true ],
+			[ line(6, 4, 2, -4), false ],
 			[ line(0, 4, -4, 2), false ],
+			[ line(6, 0, 12, 0), false ],
 		];
 
 		cases.forEach(([ input, expectedOutput ]) => {
 			it(`returns ${expectedOutput} for ${lineToString(input as Line)}`, () => {
 				const result = circleCollidesWithLine(circle, input as Line);
+
+				expect(result).toEqual(expectedOutput);
+			});
+		});
+	});
+
+	describe('circleCollidesWithRect', () => {
+		const cases = [
+			[ { center: vector(0, 0), radius: 2 }, true ],
+			[ { center: vector(-3, 0), radius: 3 }, true ],
+			[ { center: vector(-3, 0), radius: 2 }, false ],
+			[ { center: vector(8, 2), radius: 2 }, false ],
+			[ { center: vector(8, 2), radius: 3.2 }, true ],
+			[ { center: vector(2.5, 2.5), radius: 10 }, true ],
+			[ { center: vector(2.5, 2.5), radius: 1 }, true ],
+		];
+
+		cases.forEach(([ input, expectedOutput ]) => {
+			it(`returns ${expectedOutput} for ${circleToString(input as Circle)}`, () => {
+				const result = circleCollidesWithRect(input as Circle, rect);
 
 				expect(result).toEqual(expectedOutput);
 			});
