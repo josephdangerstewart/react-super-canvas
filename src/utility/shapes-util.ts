@@ -445,5 +445,6 @@ export const cursorPreview = (pos: Vector2D): Circle => ({
 /**
  * @description Returns the length of a line
  * @param line The line to calculate the length of
+ * @note Is essentially an alias for distanceBetweenTwoPoints
  */
 export const lengthOfLine = ({ point1, point2 }: Line): number => distanceBetweenTwoPoints(point1, point2);
