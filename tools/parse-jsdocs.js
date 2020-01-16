@@ -32,6 +32,8 @@ function getTypescriptFilesFromDirectory(directory) {
 
 const filesToScan = [
 	...getTypescriptFilesFromDirectory(path.resolve('./src/types')),
+	...getTypescriptFilesFromDirectory(path.resolve('./src/components')),
+	...getTypescriptFilesFromDirectory(path.resolve('./src/utility')),
 ];
 
 const docs = app.convert(filesToScan);
@@ -50,14 +52,32 @@ const callbacks = reflections
 	.map(reflection => reflection.signatures)
 	.reduce((all, signatures) => [...all, ...signatures], [])
 	.reduce((map, signature) => {
-		const [,fileName] = /\/(\w*).tsx?/.exec(signature.sources[0] && signature.sources[0].fileName) || [];
+		const [,fileName] = /\/(.*)\.tsx?/.exec(signature.sources[0] && signature.sources[0].fileName) || [];
 		if (fileName) {
 			map[fileName] = signature;
 		}
 		return map;
 	}, {});
 
-const buildProperties = (reflection) => {
+const utilityMethodsByUtility = reflections
+	.filter(reflection =>
+		reflection &&
+		reflection.sources.find(source => /src\/utility\//.test(source.file.fullFileName)) &&
+		reflection.kind === TypeDoc.ReflectionKind.Function
+	)
+	.reduce((all, reflection) => {
+		const [,fileName] = /(.*)\.tsx?/.exec(reflection.sources[0].file.name);
+
+		if (!all[fileName]) {
+			all[fileName] = [];
+		}
+
+		all[fileName].push(reflection);
+
+		return all;
+	}, {});
+
+const buildMetaForProperty = (reflection) => {
 	const commentTags = (reflection.comment && reflection.comment.tags) || [];
 	const inheritedFrom =
 		reflection.inheritedFrom &&
@@ -76,7 +96,7 @@ const buildProperties = (reflection) => {
 			const returnType = signature.type.name;
 			const parameters = {};
 			for (const parameter of signature.parameters || []) {
-				parameters[parameter.name] = buildProperties(parameter);
+				parameters[parameter.name] = buildMetaForProperty(parameter);
 			}
 			typeFlags.parameters = parameters;
 			typeFlags.returnType = returnType;
@@ -86,12 +106,12 @@ const buildProperties = (reflection) => {
 		} else if (reflection.type.type === 'reflection' && reflection.type.declaration) {
 			type = 'callback';
 			const parameters = {};
-			const returnTypes = []
+			const returnTypes = [];
 			for (const signature of reflection.type.declaration.signatures || []) {
 				if (signature.kindString === 'Call signature') {
 					returnTypes.push(signature.type.name);
 					for (const parameter of signature.parameters || []) {
-						parameters[parameter.name] = buildProperties(parameter);
+						parameters[parameter.name] = buildMetaForProperty(parameter);
 					}
 				}
 			}
@@ -111,11 +131,30 @@ const buildProperties = (reflection) => {
 	}
 }
 
+function buildMetaForFunction(reflection) {
+	const commentTags = ((reflection.comment || reflection.signatures[0].comment || {}).tags || [])
+		.reduce((total, current) => ({ ...total, [current.tagName]: current.text }), {});
+
+	const parameters = {};
+	for (const parameter of reflection.signatures[0].parameters || []) {
+		parameters[parameter.name] = buildMetaForProperty(parameter);
+		parameters[parameter.name].description = parameter.comment && parameter.comment.text;
+	}
+
+	return {
+		name: reflection.name,
+		description: commentTags.description,
+		isTested: Boolean(commentTags.tested),
+		untestedReason: commentTags.untested,
+		parameters,
+	};
+}
+
 for (const reflection of interfaces) {
 	const properties = {};
 	reflection.traverse(reflection => {
 		if (reflection.kindString === 'Property') {
-			properties[reflection.name] = buildProperties(reflection);
+			properties[reflection.name] = buildMetaForProperty(reflection);
 		}
 	});
 
@@ -126,4 +165,14 @@ for (const reflection of interfaces) {
 
 		fs.writeFileSync(path.resolve(`./meta/interfaces/${reflection.name}.json`), JSON.stringify(properties));
 	}
+}
+
+for (const utilityFile in utilityMethodsByUtility) {
+	const utilityMeta = utilityMethodsByUtility[utilityFile].map(buildMetaForFunction);
+
+	if (!fs.existsSync(path.resolve('./meta/utility'))) {
+		fs.mkdirSync(path.resolve('./meta/utility'));
+	}
+
+	fs.writeFileSync(path.resolve(`./meta/utility/${utilityFile}.json`), JSON.stringify(utilityMeta));
 }
