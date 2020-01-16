@@ -4,15 +4,36 @@ export enum ColorContrast {
 }
 
 export interface RGB {
+	/**
+	 * @description The red scale
+	 */
 	r: number;
+
+	/**
+	 * @description The green scale
+	 */
 	g: number;
+
+	/**
+	 * @description The blue scale
+	 */
 	b: number;
 }
 
 export interface RGBA extends RGB {
+	/**
+	 * @description The alpha scale representing opacity.
+	 * Must be between 0 and 1 inclusive
+	 */
 	a: number;
 }
 
+/**
+ * @description Returns true if the given color is a
+ * valid hex color
+ * @param color A string containing a valid hex color
+ * @tested
+ */
 export function isValidHex(color: string): boolean {
 	if (!color) {
 		return false;
@@ -21,6 +42,13 @@ export function isValidHex(color: string): boolean {
 	return /^(#[A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9]|#[A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9])$/.test(color);
 }
 
+/**
+ * @description Returns true if the given color is a
+ * valid hex color with opacity
+ * @param color A string containing a valid hex with
+ * opacity color
+ * @tested
+ */
 export function isValidHexa(color: string): boolean {
 	if (!color) {
 		return false;
@@ -29,8 +57,13 @@ export function isValidHexa(color: string): boolean {
 	return isValidHex(color) || /^#[A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9][A-Fa-f0-9]$/.test(color);
 }
 
+/**
+ * @description Converts a hex string to an RGB object
+ * @param hex A string containing a valid hex color
+ * @tested
+ */
 export function hexToRgb(hex: string): RGB {
-	if (!hex) {
+	if (!hex || !isValidHex(hex)) {
 		return null;
 	}
 
@@ -47,8 +80,15 @@ export function hexToRgb(hex: string): RGB {
 	};
 }
 
+/**
+ * @description Converts a hex with opacity string to
+ * an RGBA object
+ * @param hex A string containing a valid hex color
+ * with opacity
+ * @tested
+ */
 export function hexaToRgba(hex: string): RGBA {
-	if (!hex) {
+	if (!hex || !isValidHexa(hex)) {
 		return null;
 	}
 
@@ -72,6 +112,12 @@ export function hexaToRgba(hex: string): RGBA {
 	};
 }
 
+/**
+ * @description Converts a string into an RGB object
+ * @param color A string containing a color in hex format
+ * or in rgba(r, g, b) format
+ * @tested
+ */
 export function stringToRgb(color: string): RGB {
 	if (!color) {
 		return null;
@@ -105,6 +151,13 @@ export function stringToRgb(color: string): RGB {
 	return { r, g, b };
 }
 
+/**
+ * @description Converts a string representing a color
+ * into an RGBA object
+ * @param color A string containing a color in hexa
+ * or rgba(r, g, b, a) format
+ * @tested
+ */
 export function stringToRgba(color: string): RGBA {
 	if (!color) {
 		return null;
@@ -138,10 +191,20 @@ export function stringToRgba(color: string): RGBA {
 	};
 }
 
+/**
+ * @description Stringifies an RGB object into valid CSS
+ * @param color The RGB object
+ * @tested
+ */
 export function rgbToString({ r, g, b }: RGB): string {
 	return `rgb(${r},${g},${b})`;
 }
 
+/**
+ * @description Stringifies an RGBA object into valid css
+ * @param color The RGBA object
+ * @tested
+ */
 export function rgbaToString({
 	r,
 	g,
@@ -151,7 +214,14 @@ export function rgbaToString({
 	return `rgba(${r},${g},${b},${a})`;
 }
 
-// Copied from https://awik.io/determine-color-bright-dark-using-javascript/
+/**
+ * @description A hueristic for evaluating whether a given
+ * color is dark or light
+ * @param color A string representing a valid hex or
+ * rgba(r, g, b) color
+ * @source  https://awik.io/determine-color-bright-dark-using-javascript/
+ * @untested This is not my code, also not a critical function
+ */
 export function getContrast(color: string): ColorContrast {
 	let r: number;
 	let g: number;
@@ -192,6 +262,15 @@ export function getContrast(color: string): ColorContrast {
 	return ColorContrast.Dark;
 }
 
+/**
+ * @description Injects an opacity into a color
+ * string and returns a string in rgba(r, g, b, a) format
+ * @param color A string containing a valid hex or
+ * rgb(r, g, b) color
+ * @param alpha The alpha value to inject into the color
+ * alpha must be between 0 and 1 inclusive
+ * @tested
+ */
 export function withOpacity(color: string, alpha: number): string {
 	if (!color || alpha < 0 || alpha > 1) {
 		return null;

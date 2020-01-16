@@ -27,6 +27,7 @@ export function vectorEquals(v1: Vector2D, v2: Vector2D): boolean {
  * @description Returns the distance between two points in a cartesean plane
  * @param point1
  * @param point2
+ * @tested
  */
 export function distanceBetweenTwoPoints(point1: Vector2D, point2: Vector2D): number {
 	return Math.sqrt((point1.x - point2.x) ** 2 + (point1.y - point2.y) ** 2);
@@ -85,6 +86,7 @@ export function boundingRectOfPolygon(polygon: Polygon): Rectangle {
 /**
  * @description Converts a polygon into a series of lines
  * @param polygon
+ * @tested
  */
 export function polygonToLines(polygon: Polygon, enforceCompleteness = true): Line[] {
 	if (polygon.points.length < 2) {
@@ -114,6 +116,7 @@ export function polygonToLines(polygon: Polygon, enforceCompleteness = true): Li
 /**
  * @description Converts a rectangle to a series of points (topLeft, topRight, bottomLeft, bottomRight)
  * @param rect The rectangle to convert
+ * @tested
  */
 export function rectToPoints(rect: Rectangle): Vector2D[] {
 	const { x, y } = rect.topLeftCorner;
@@ -150,6 +153,7 @@ export function rectToPoints(rect: Rectangle): Vector2D[] {
 /**
  * @description Converts a line into an array of it's two points
  * @param line
+ * @untested This is simple enough to not need a test
  */
 export function lineToPoints(line: Line): Vector2D[] {
 	return [
@@ -161,6 +165,7 @@ export function lineToPoints(line: Line): Vector2D[] {
 /**
  * @description Converts a rectangle to a series of lines (top, right, bottom, left)
  * @param rect The rectangle to convert
+ * @tested
  */
 export function rectToLines(rect: Rectangle): Line[] {
 	const [ topLeft, topRight, bottomLeft, bottomRight ] = rectToPoints(rect);
@@ -177,6 +182,7 @@ export function rectToLines(rect: Rectangle): Line[] {
  * @description Returns true if there is an intersection between two lines
  * @param line1 The first line
  * @param line2 The second line
+ * @tested
  */
 export function lineCollidesWithLine(line1: Line, line2: Line): boolean {
 	const { x: x1, y: y1 } = line1.point1;
@@ -194,6 +200,7 @@ export function lineCollidesWithLine(line1: Line, line2: Line): boolean {
  * @description Returns true if a given point lies within a given rectangle
  * @param point The point
  * @param rect The rectangle
+ * @tested
  */
 export function pointInsideRect(point: Vector2D, rect: Rectangle): boolean {
 	const { x, y } = point;
@@ -207,6 +214,7 @@ export function pointInsideRect(point: Vector2D, rect: Rectangle): boolean {
  * @description Returns true if a line intersects a rectangle or if the line is completely inside the rectangle
  * @param line The line
  * @param rect The rectangle
+ * @tested
  */
 export function lineCollidesWithRect(line: Line, rect: Rectangle): boolean {
 	return rectToLines(rect).some((rectLine) => lineCollidesWithLine(rectLine, line)) || (
@@ -218,6 +226,7 @@ export function lineCollidesWithRect(line: Line, rect: Rectangle): boolean {
  * @description Determines if a point is on a given line
  * @param point The point to check
  * @param line The line to check
+ * @tested
  */
 export function pointOnLine(point: Vector2D, line: Line): boolean {
 	const { point1, point2 } = line;
@@ -247,6 +256,7 @@ export function pointOnLine(point: Vector2D, line: Line): boolean {
  * @description Tests whether a point is inside of a polygon
  * @param point
  * @param polygon
+ * @tested
  */
 export function pointInsidePolygon(point: Vector2D, polygon: Polygon): boolean {
 	const ray: Line = {
@@ -286,6 +296,7 @@ export function pointInsidePolygon(point: Vector2D, polygon: Polygon): boolean {
 /**
  * @description Returns a rectangle representing the size of the given canvas element
  * @param context2d
+ * @untested Simple enough to not need a test
  */
 export function getCanvasRect(context2d: CanvasRenderingContext2D): Rectangle {
 	return {
@@ -300,6 +311,7 @@ export function getCanvasRect(context2d: CanvasRenderingContext2D): Rectangle {
  * is inside the other
  * @param rect1 The first rectangle
  * @param rect2 The second rectangle
+ * @tested
  */
 export function rectCollidesWithRect(rect1: Rectangle, rect2: Rectangle): boolean {
 	const linesRect1 = rectToLines(rect1);
@@ -319,6 +331,7 @@ export function rectCollidesWithRect(rect1: Rectangle, rect2: Rectangle): boolea
  * @description Returns true if a point is inside a circle
  * @param point
  * @param circle
+ * @tested
  */
 export function pointInsideCircle(point: Vector2D, circle: Circle): boolean {
 	const { x: x1, y: y1 } = point;
@@ -334,6 +347,7 @@ export function pointInsideCircle(point: Vector2D, circle: Circle): boolean {
  * @param circle
  * @param line
  * @source https://photos.app.goo.gl/g6Y2KXWpj4odXu9x6
+ * @tested
  */
 export function circleCollidesWithLine(circle: Circle, line: Line): boolean {
 	if (lineToPoints(line).some((point) => pointInsideCircle(point, circle))) {
@@ -393,6 +407,7 @@ export function circleCollidesWithLine(circle: Circle, line: Line): boolean {
  * @description Returns true if a circle intersects a rectangle or if one is completely inside the other
  * @param circle
  * @param rect
+ * @tested
  */
 export function circleCollidesWithRect(circle: Circle, rect: Rectangle): boolean {
 	const circleInsideRectangle = pointInsideRect(circle.center, rect);
