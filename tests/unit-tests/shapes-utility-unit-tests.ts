@@ -14,6 +14,7 @@ import {
 	pointInsideCircle,
 	circleCollidesWithLine,
 	circleCollidesWithRect,
+	distanceBetweenTwoPoints,
 } from '../../src/utility/shapes-util';
 import {
 	line,
@@ -343,6 +344,21 @@ describe('shapes-util', () => {
 			it(`returns ${expectedOutput} for ${circleToString(input as Circle)}`, () => {
 				const result = circleCollidesWithRect(input as Circle, rect);
 
+				expect(result).toEqual(expectedOutput);
+			});
+		});
+	});
+
+	describe('distanceBetweenTwoPoints', () => {
+		const cases = [
+			[ vector(0, 6), vector(8, 0), 10 ],
+			[ vector(8, 6), vector(8, 0), 6 ],
+			[ vector(3, 4), vector(6, 0), 5 ],
+		];
+
+		cases.forEach(([ point1, point2, expectedOutput ]) => {
+			it(`returns the distance between ${vectorToString(point1 as Vector2D)} and ${vectorToString(point2 as Vector2D)} as ${expectedOutput}`, () => {
+				const result = distanceBetweenTwoPoints(point1 as Vector2D, point2 as Vector2D);
 				expect(result).toEqual(expectedOutput);
 			});
 		});
