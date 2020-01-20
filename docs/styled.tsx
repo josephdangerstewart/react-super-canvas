@@ -30,6 +30,16 @@ export const PropertyName = styled.span<{ isMethod: boolean }>`
 	color: ${({ isMethod }): string => isMethod ? '#DCDCAA' : '#9CDCFE'};
 `;
 
+export const PropertyNameLink = styled.a<{ isMethod: boolean }>`
+	color: ${({ isMethod }): string => isMethod ? '#DCDCAA' : '#9CDCFE'};
+	text-decoration: unset;
+
+	&:hover {
+		background-color: ${({ isMethod }): string => isMethod ? '#DCDCAA' : '#9CDCFE'};
+		color: #1E1E1E;
+	}
+`;
+
 export const PropertyDescription = styled.div`
 	font-size: 14px;
 	margin: 0 0 0 12px;
