@@ -19,6 +19,7 @@ export const CodeSnippet = styled.div`
 	color: #D4D4D4;
 	font-size: 16px;
 	border-radius: 6px;
+	flex-grow: 1;
 `;
 
 export const Property = styled.div`
