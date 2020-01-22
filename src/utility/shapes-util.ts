@@ -9,6 +9,7 @@ import { solveQuadraticEquation } from './math-utility';
  * @description Shorthand way to create Vector2D objects
  * @param x
  * @param y
+ * @untested An uncomplicated convinience method for creating vector objects in a readable way
  */
 export function vector(x: number, y: number): Vector2D {
 	return { x, y };
@@ -450,6 +451,7 @@ export function polygonCollidesWithRect(polygon: Polygon, rect: Rectangle): bool
 /**
  * @description A convinience method to get the shape for the mouse cursor
  * @param pos The position of the cursor
+ * @untested A convinience method for accessing a shared cursor preview
  */
 export const cursorPreview = (pos: Vector2D): Circle => ({
 	center: pos,
