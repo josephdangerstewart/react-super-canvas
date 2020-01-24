@@ -64,6 +64,35 @@ export function boundingRectOfLine(line: Line): Rectangle {
 }
 
 /**
+ * @description Returns the total bounding rect of an array of rectangles
+ * @param rects The rects to get the bounding rect of
+ * @tested
+ */
+export function boundingRectOfRects(rects: Rectangle[]): Rectangle {
+	const leftXs = rects.map(({ topLeftCorner }) => topLeftCorner.x);
+	const rightXs = rects.map(({ topLeftCorner, width }) => topLeftCorner.x + width);
+
+	const topYs = rects.map(({ topLeftCorner }) => topLeftCorner.y);
+	const bottomYs = rects.map(({ topLeftCorner, height }) => topLeftCorner.y + height);
+
+	const maxX = Math.max(...rightXs, ...leftXs);
+	const minX = Math.min(...rightXs, ...leftXs);
+
+	const maxY = Math.max(...topYs, ...bottomYs);
+	const minY = Math.min(...topYs, ...bottomYs);
+
+	const width = maxX - minX;
+	const height = maxY - minY;
+	const topLeftCorner = vector(minX, minY);
+
+	return {
+		width,
+		height,
+		topLeftCorner,
+	};
+}
+
+/**
  * @description Returns the bounding rectangle of a polygon
  */
 export function boundingRectOfPolygon(polygon: Polygon): Rectangle {

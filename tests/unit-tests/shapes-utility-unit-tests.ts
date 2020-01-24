@@ -15,6 +15,7 @@ import {
 	circleCollidesWithLine,
 	circleCollidesWithRect,
 	distanceBetweenTwoPoints,
+	boundingRectOfRects,
 } from '../../src/utility/shapes-util';
 import {
 	line,
@@ -361,6 +362,43 @@ describe('shapes-util', () => {
 				const result = distanceBetweenTwoPoints(point1 as Vector2D, point2 as Vector2D);
 				expect(result).toEqual(expectedOutput);
 			});
+		});
+	});
+
+	describe('boundingRectOfRects', () => {
+		it('can calculate the bounding rectangle of an array of rectangles', () => {
+			const rects: Rectangle[] = [
+				{
+					topLeftCorner: vector(-2, -3),
+					width: 1,
+					height: 1,
+				},
+				{
+					topLeftCorner: vector(0, 0),
+					width: 2,
+					height: 2,
+				},
+				{
+					topLeftCorner: vector(-1, 6),
+					width: 2,
+					height: 1,
+				},
+				{
+					topLeftCorner: vector(5, 4),
+					width: 2,
+					height: 2,
+				},
+			];
+
+			const expectedResult: Rectangle = {
+				topLeftCorner: vector(-2, -3),
+				width: 9,
+				height: 10,
+			};
+
+			const actualResult = boundingRectOfRects(rects);
+
+			expect(actualResult).toEqual(expectedResult);
 		});
 	});
 });
