@@ -174,8 +174,8 @@ export default class PainterAPI implements IPainterAPI {
 
 		return {
 			topLeftCorner: this.toVirtualPoint(canvasRect.topLeftCorner),
-			width: canvasRect.width * this.scale,
-			height: canvasRect.height * this.scale,
+			width: canvasRect.width / this.scale,
+			height: canvasRect.height / this.scale,
 		};
 	};
 
@@ -232,8 +232,8 @@ export default class PainterAPI implements IPainterAPI {
 		};
 
 		const virtualPan: Vector2D = {
-			x: this.panOffset.x / this.scale,
-			y: this.panOffset.y / this.scale,
+			x: this.panOffset.x,
+			y: this.panOffset.y,
 		};
 
 		virtualPoint.x += virtualPan.x;
