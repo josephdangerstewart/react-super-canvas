@@ -63,7 +63,7 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 	init = (canvas: HTMLCanvasElement): void => {
 		// This must be the first thing called because it attaches event listeners
 		this.interactionManager = new CanvasInteractionManager(canvas);
-		this.selectionManager = new SelectionManager();
+		this.selectionManager = new SelectionManager(this.interactionManager);
 		this.transformManager = new TransformManager(this.selectionManager);
 		this.context2d = canvas.getContext('2d');
 		this.painter = new PainterAPI(this.context2d, this.interactionManager.panOffset, this.interactionManager.scale);

@@ -5,12 +5,14 @@ import StyledShape from '../../types/shapes/StyledShape';
 import {
 	vector,
 	pointInsideRect,
+	boundingRectOfRects,
 } from '../../utility/shapes-util';
 import { ScalingNode } from '../../types/transform/ScalingNode';
 import { TransformKind } from '../../types/transform/TransformKind';
 import { TransformOperation } from '../../types/transform/TransformOperation';
 import Vector2D from '../../types/utility/Vector2D';
 import { BrushContext } from '../../types/context/BrushContext';
+import { applyMultiScale } from '../../utility/transform-utility';
 
 const HANDLE_DIAMETER = 12;
 
@@ -52,14 +54,14 @@ export class TransformManager {
 	}
 
 	render = (painter: IPainterAPI, context: BrushContext): void => {
-		const canvasItem = this.selectionManager.selectedItem;
+		const canvasItems = this.selectionManager.selectedItems;
 		const { snappedMousePosition } = context;
 
-		if (!canvasItem) {
+		if (!canvasItems?.length) {
 			return;
 		}
 
-		const boundingRect = this.previewRect || canvasItem.getBoundingRect();
+		const boundingRect = this.previewRect || boundingRectOfRects(canvasItems.map((item) => item.getBoundingRect()));
 		const { canMove, canScale } = this.selectionManager;
 
 		painter.drawRect({
@@ -112,18 +114,18 @@ export class TransformManager {
 
 	mouseDown = (context: BrushContext): void => {
 		this.isMouseDown = true;
-		const canvasItem = this.selectionManager.selectedItem;
+		const canvasItems = this.selectionManager.selectedItems;
 		const { snappedMousePosition, mousePosition } = context;
 
 		this.mouseDownAt = { ...snappedMousePosition };
 
-		if (!canvasItem) {
+		if (!canvasItems?.length) {
 			return;
 		}
 
 		const { canScale, canMove } = this.selectionManager;
 
-		const boundingRect = canvasItem.getBoundingRect();
+		const boundingRect = boundingRectOfRects(canvasItems.map((item) => item.getBoundingRect()));
 		this.selectedItemBoundingRect = boundingRect;
 		this.previewRect = boundingRect;
 		const scaleNode = canScale && this.getScaleNodes(boundingRect).find(({ node }) => pointInsideRect(mousePosition, node));
@@ -224,15 +226,17 @@ export class TransformManager {
 	};
 
 	mouseUp = (): void => {
-		if (this.transformOperation && this.selectionManager.selectedItem && this.selectionManager.selectedItem) {
+		if (this.transformOperation && this.selectionManager.selectedItem) {
 			switch (this.transformOperation.action) {
 				case TransformKind.Move:
 					if (this.selectionManager.selectedItem.applyMove) {
-						this.selectionManager.selectedItem.applyMove(this.transformOperation.move);
+						this.selectionManager.selectedItems.forEach((item) => item.applyMove(this.transformOperation.move));
 					}
 					break;
 				case TransformKind.Scale:
-					if (this.selectionManager.selectedItem.applyScale) {
+					if (this.selectionManager.selectedItemCount > 1 && this.selectionManager.selectedItems.every((item) => item.applyMove && item.applyScale)) {
+						applyMultiScale(this.selectionManager.selectedItems, this.transformOperation.scale.value, this.transformOperation.scale.node);
+					} else if (this.selectionManager.selectedItem.applyScale) {
 						this.selectionManager.selectedItem.applyScale(this.transformOperation.scale.value, this.transformOperation.scale.node);
 					}
 					break;

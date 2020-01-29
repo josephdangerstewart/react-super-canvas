@@ -1,9 +1,15 @@
 import Vector2D from '../types/utility/Vector2D';
 import { ScalingNode } from '../types/transform/ScalingNode';
 import Rectangle from '../types/shapes/Rectangle';
-import { vector, boundingRectOfCircle, boundingRectOfPolygon } from './shapes-util';
+import {
+	vector,
+	boundingRectOfCircle,
+	boundingRectOfPolygon,
+	boundingRectOfRects,
+} from './shapes-util';
 import Circle from '../types/shapes/Circle';
 import Polygon from '../types/shapes/Polygon';
+import ICanvasItem from '../types/ICanvasItem';
 
 /**
  * @description Scales a rectangle by a scale vector
@@ -137,4 +143,38 @@ export function movePolygon(polygon: Polygon, diff: Vector2D): Polygon {
 			y: y + diff.y,
 		})),
 	};
+}
+
+/**
+ * @description Applies a scale vector to an array of canvas items
+ * @param items The canvas items to apply the scale to
+ * @param scale The scale vector to apply
+ * @param scaleNode The node that was dragged by the user
+ */
+export function applyMultiScale(items: ICanvasItem[], scale: Vector2D, scaleNode: ScalingNode): void {
+	const itemsWithBoundingRects = items.map((item) => ({
+		item,
+		rect: item.getBoundingRect(),
+	}));
+
+	const boundingRect = boundingRectOfRects(itemsWithBoundingRects.map(({ rect }) => rect));
+	const { x: left, y: top } = boundingRect.topLeftCorner;
+
+	const scaledBoundingRect = scaleRectangle(boundingRect, scale, scaleNode);
+	const { x: scaledLeft, y: scaledTop } = scaledBoundingRect.topLeftCorner;
+
+	itemsWithBoundingRects.forEach(({ item, rect }) => {
+		const point: Vector2D = {
+			x: ((rect.topLeftCorner.x - left) * scale.x) + scaledLeft,
+			y: ((rect.topLeftCorner.y - top) * scale.y) + scaledTop,
+		};
+
+		const diff = vector(point.x - rect.topLeftCorner.x, point.y - rect.topLeftCorner.y);
+
+		item.applyMove(diff);
+
+		if (item.applyScale) {
+			item.applyScale(scale, scaleNode);
+		}
+	});
 }

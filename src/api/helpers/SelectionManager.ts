@@ -2,6 +2,7 @@ import ISelection from '../../types/ISelection';
 import ICanvasItem from '../../types/ICanvasItem';
 import Context from '../../types/context/Context';
 import { pointInsideRect } from '../../utility/shapes-util';
+import CanvasInteractionManager from './CanvasInteractionManager';
 
 type OnSelectionChangeCallback = () => void;
 
@@ -13,11 +14,13 @@ export default class SelectionManager implements ISelection {
 	private onSelectionChangeHandlers: OnSelectionChangeCallback[];
 	private _selectedItems: ICanvasItem[];
 	private _mouseDragged: boolean;
+	private interactionManager: CanvasInteractionManager;
 
-	constructor() {
+	constructor(interactionManager: CanvasInteractionManager) {
 		this._selectedItems = [];
 		this._mouseDragged = false;
 		this.onSelectionChangeHandlers = [];
+		this.interactionManager = interactionManager;
 	}
 
 	/* INTERFACE METHODS */
@@ -88,6 +91,8 @@ export default class SelectionManager implements ISelection {
 		if (selectedIndex === hits.length - 1) {
 			// The user is already selecting the bottom item in the stack so deselect
 			this.deselectItems();
+		} else if (this.interactionManager.keysDown.Control) {
+			this.addSelectedItem(hits[selectedIndex + 1]);
 		} else {
 			// Select the next item in the hit stack
 			this.setSelectedItem(hits[selectedIndex + 1]);
