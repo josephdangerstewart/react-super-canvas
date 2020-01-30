@@ -7,6 +7,7 @@ import SuperCanvas from '../../src/components/SuperCanvas';
 import GridBackground from '../../src/api/background-elements/GridBackground';
 import CircleBrush from '../../src/api/brushes/CircleBrush';
 import PolygonBrush from '../../src/api/brushes/PolygonBrush';
+import ImageBrush from '../../src/api/brushes/ImageBrush';
 import SuperCanvasProps from '../../meta/interfaces/SuperCanvasProps.json';
 import { InterfaceDocumentation } from '../InterfaceDocumentation';
 import { Playground } from 'docz';
@@ -27,6 +28,7 @@ The super canvas is super easy to use! Use it just like this:
 		availableBrushes={[
 			new CircleBrush(),
 			new PolygonBrush(),
+			new ImageBrush('https://knowpathology.com.au/app/uploads/2018/07/Happy-Test-Screen-01-825x510.png'),
 		]}
 	/>
 </Playground>

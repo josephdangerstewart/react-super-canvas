@@ -175,6 +175,7 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 			this.activeBrush.renderPreview(this.painter, this.generateBrushContext());
 		}
 
+		this.imageCache.clearCache(5000);
 		this.painter.endCursorState();
 		if (this.isActive) {
 			requestAnimationFrame(this.update);

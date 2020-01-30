@@ -238,10 +238,12 @@ export default class PainterAPI implements IPainterAPI {
 	};
 
 	private doDrawImage = (topLeftCorner: Vector2D, image: HTMLImageElement, scale?: Vector2D): void => {
+		const safeScale = scale || vector(1, 1);
+
 		const { x, y } = this.toAbsolutePoint(topLeftCorner);
 		const { width, height } = image;
-		const absWidth = width * this.scale * scale.x;
-		const absHeight = height * this.scale * scale.y;
+		const absWidth = width * this.scale * safeScale.x;
+		const absHeight = height * this.scale * safeScale.y;
 
 		const imageRect: Rectangle = {
 			topLeftCorner: vector(x, y),

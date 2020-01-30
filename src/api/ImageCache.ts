@@ -10,6 +10,7 @@ export default class ImageCache implements IImageCache {
 	constructor(context: CanvasRenderingContext2D) {
 		this.context2d = context;
 		this.returnImageAsyncCallbackStack = {};
+		this.imageCache = {};
 	}
 
 	getImageAsync = (src: string): Promise<HTMLImageElement> => new Promise((resolve) => {
@@ -97,7 +98,7 @@ export default class ImageCache implements IImageCache {
 
 		const callStack = this.returnImageAsyncCallbackStack[src];
 
-		if (!callStack) {
+		if (callStack) {
 			callStack.forEach((callback) => callback(cachedImage.image));
 		}
 
