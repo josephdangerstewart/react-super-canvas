@@ -14,24 +14,23 @@ import {
 	boundingRectOfCircle,
 	boundingRectOfPolygon,
 } from '../utility/shapes-util';
-import CachedImage from '../types/utility/CachedImage';
 import Polygon, { PolygonDefaults } from '../types/shapes/Polygon';
 import StyledShape from '../types/shapes/StyledShape';
-import { WithCachedImageCallback, OnImageUnprocessedCallback } from '../types/callbacks/WithCachedImageCallback';
+import { IImageCache } from '../types/IImageCache';
 
 export default class PainterAPI implements IPainterAPI {
 	private panOffset: Vector2D;
 	private scale: number;
 	private context2d: CanvasRenderingContext2D;
-	private imageCache: Record<string, CachedImage>;
+	private imageCache: IImageCache;
 	private cursor: string;
 
-	constructor(context2d: CanvasRenderingContext2D, panOffset: Vector2D, scale: number) {
+	constructor(context2d: CanvasRenderingContext2D, panOffset: Vector2D, scale: number, imageCache: IImageCache) {
 		this.context2d = context2d;
 		this.panOffset = panOffset;
 		this.scale = scale;
-		this.imageCache = {};
 		this.cursor = null;
+		this.imageCache = imageCache;
 	}
 
 	/* INTERFACE METHODS */
@@ -54,18 +53,9 @@ export default class PainterAPI implements IPainterAPI {
 		}
 	};
 
-	drawImage = (topLeftCorner: Vector2D, imageUrl: string): void => {
-		this.withCachedImage(imageUrl, (image) => {
-			this.doDrawImage(topLeftCorner, image);
-		});
-	};
-
-	cleanImageCache = (timeout: number): void => {
-		const now = new Date();
-		Object.keys(this.imageCache).forEach((key) => {
-			if (+now - +this.imageCache[key].lastAccessed > timeout) {
-				this.imageCache[key] = null;
-			}
+	drawImage = (topLeftCorner: Vector2D, imageUrl: string, scale?: Vector2D): void => {
+		this.imageCache.withCachedImage(imageUrl, (image) => {
+			this.doDrawImage(topLeftCorner, image, scale);
 		});
 	};
 
@@ -187,7 +177,7 @@ export default class PainterAPI implements IPainterAPI {
 			this.context2d.fillStyle = styles.fillColor;
 			this.context2d.fill();
 		} else if (styles.fillImageUrl) {
-			this.withCachedImage(styles.fillImageUrl, (image, repeating) => {
+			this.imageCache.withCachedImage(styles.fillImageUrl, (_, repeating) => {
 				if (!repeating) {
 					return;
 				}
@@ -247,11 +237,11 @@ export default class PainterAPI implements IPainterAPI {
 		return lineCollidesWithRect(line, canvasRect);
 	};
 
-	private doDrawImage = (topLeftCorner: Vector2D, image: HTMLImageElement): void => {
+	private doDrawImage = (topLeftCorner: Vector2D, image: HTMLImageElement, scale?: Vector2D): void => {
 		const { x, y } = this.toAbsolutePoint(topLeftCorner);
 		const { width, height } = image;
-		const absWidth = width * this.scale;
-		const absHeight = height * this.scale;
+		const absWidth = width * this.scale * scale.x;
+		const absHeight = height * this.scale * scale.y;
 
 		const imageRect: Rectangle = {
 			topLeftCorner: vector(x, y),
@@ -264,39 +254,5 @@ export default class PainterAPI implements IPainterAPI {
 		if (rectCollidesWithRect(imageRect, canvasRect)) {
 			this.context2d.drawImage(image, x, y, absWidth, absHeight);
 		}
-	};
-
-	private withCachedImage = (imageUrl: string, callback: WithCachedImageCallback, onImageUnprocessed?: OnImageUnprocessedCallback): boolean => {
-		const cachedImage = this.imageCache[imageUrl];
-		const image = cachedImage ? cachedImage.image : new Image();
-
-		if (!image.complete) {
-			// Do not handle context sensitive code asynchronously
-			// we don't want consumers drawing the canvas whenever their image happens to load
-			// So don't call the callback in onload
-			image.onload = (): void => {
-				cachedImage.repeating = this.context2d.createPattern(image, 'repeat');
-			};
-
-			if (onImageUnprocessed) {
-				onImageUnprocessed();
-			}
-		} else {
-			callback(image, cachedImage && cachedImage.repeating);
-		}
-
-		// Still cache the image though no matter what
-		if (!cachedImage) {
-			image.src = imageUrl;
-			this.imageCache[imageUrl] = {
-				image,
-				lastAccessed: new Date(),
-				repeating: null,
-			};
-		} else {
-			this.imageCache[imageUrl].lastAccessed = new Date();
-		}
-
-		return image.complete;
 	};
 }

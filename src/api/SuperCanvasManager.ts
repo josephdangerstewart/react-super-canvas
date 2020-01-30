@@ -15,6 +15,8 @@ import { StyleContextChangeCallback } from '../types/callbacks/StyleContextChang
 import SelectionManager from './helpers/SelectionManager';
 import { TransformManager } from './helpers/TransformManager';
 import CanvasItemInstance from '../types/utility/CanvasItemInstance';
+import { IImageCache } from '../types/IImageCache';
+import ImageCache from './ImageCache';
 
 export default class SuperCanvasManager implements ISuperCanvasManager {
 	/* PRIVATE MEMBERS */
@@ -52,6 +54,9 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 	// Allows users to set color/stroke settings
 	private styleContext: StyleContext;
 
+	// Caches images
+	private imageCache: IImageCache;
+
 	// The custom callback when the active brush changes
 	private _onActiveBrushChange: ActiveBrushChangeCallback;
 
@@ -63,10 +68,11 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 	init = (canvas: HTMLCanvasElement): void => {
 		// This must be the first thing called because it attaches event listeners
 		this.interactionManager = new CanvasInteractionManager(canvas);
+		this.context2d = canvas.getContext('2d');
 		this.selectionManager = new SelectionManager(this.interactionManager);
 		this.transformManager = new TransformManager(this.selectionManager);
-		this.context2d = canvas.getContext('2d');
-		this.painter = new PainterAPI(this.context2d, this.interactionManager.panOffset, this.interactionManager.scale);
+		this.imageCache = new ImageCache(this.context2d);
+		this.painter = new PainterAPI(this.context2d, this.interactionManager.panOffset, this.interactionManager.scale, this.imageCache);
 
 		this.canvasItems = [];
 		this.availableBrushes = [];
@@ -185,6 +191,7 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 	private generateCanvasContextForItem = (item: ICanvasItem): CanvasItemContext => ({
 		...this.generateContext(),
 		isSelected: this.selectionManager.selectedItems.includes(item),
+		imageCache: this.imageCache,
 	});
 
 	private generateBackgroundElementContext = (): BackgroundElementContext => ({
@@ -198,6 +205,7 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 		snappedMousePosition: this.activeBackgroundElement
 			? this.activeBackgroundElement.mapMouseCoordinates(this.interactionManager.mousePosition)
 			: this.interactionManager.mousePosition,
+		imageCache: this.imageCache,
 	});
 
 	private onMouseDown = (): void => {

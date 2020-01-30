@@ -6,11 +6,6 @@ import Polygon from './shapes/Polygon';
 
 export default interface IPainterAPI {
 	/**
-	 * @description Removes any image in the cache that haven't been used in *timeout* milliseconds
-	 */
-	cleanImageCache: (timeout: number) => void;
-
-	/**
 	 * @description Draws a line in the virtual space
 	 */
 	drawLine: (line: Line) => void;
@@ -19,7 +14,7 @@ export default interface IPainterAPI {
 	 * @description Draws an image in the virtual space
 	 * @remarks Images are cached
 	 */
-	drawImage: (topLeftCorner: Vector2D, imageUrl: string) => void;
+	drawImage: (topLeftCorner: Vector2D, imageUrl: string, scale?: Vector2D) => void;
 
 	/**
 	 * @description Draws a rectangle in the virtual space
