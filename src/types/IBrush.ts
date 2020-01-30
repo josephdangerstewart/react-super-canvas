@@ -6,6 +6,7 @@ export enum DefaultBrushKind {
 	CircleBrush = 'circle',
 	PolygonBrush = 'polygon',
 	Selection = 'selection',
+	ImageBrush = 'image',
 }
 
 export default interface IBrush {

@@ -205,8 +205,8 @@ export default class PainterAPI implements IPainterAPI {
 		};
 
 		const absolutePan: Vector2D = {
-			x: this.panOffset.x * this.scale,
-			y: this.panOffset.y * this.scale,
+			x: this.panOffset.x,
+			y: this.panOffset.y,
 		};
 
 		absolutePoint.x -= absolutePan.x;
@@ -246,15 +246,15 @@ export default class PainterAPI implements IPainterAPI {
 		const absHeight = height * this.scale * safeScale.y;
 
 		const imageRect: Rectangle = {
-			topLeftCorner: vector(x, y),
-			width: absWidth,
-			height: absHeight,
+			topLeftCorner,
+			width: width * safeScale.x,
+			height: height * safeScale.y,
 		};
 
 		const canvasRect = this.getViewport();
 
 		if (rectCollidesWithRect(imageRect, canvasRect)) {
-			this.context2d.drawImage(image, x, y, absWidth, absHeight);
+			this.context2d.drawImage(image, x * safeScale.x, y * safeScale.y, absWidth, absHeight);
 		}
 	};
 }

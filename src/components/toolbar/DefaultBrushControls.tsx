@@ -1,7 +1,12 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
-import { faDrawPolygon, faCircleNotch, faMousePointer } from '@fortawesome/free-solid-svg-icons';
+import {
+	faDrawPolygon,
+	faCircleNotch,
+	faMousePointer,
+	faImage,
+} from '@fortawesome/free-solid-svg-icons';
 import { SetActiveBrushCallback } from '../../types/callbacks/SetActiveBrushCallback';
 import IBrush, { DefaultBrushKind } from '../../types/IBrush';
 import { ToggleButton } from './StyledButton';
@@ -10,6 +15,7 @@ const ICONS: { [x: string]: IconDefinition } = {
 	[DefaultBrushKind.CircleBrush]: faCircleNotch,
 	[DefaultBrushKind.PolygonBrush]: faDrawPolygon,
 	[DefaultBrushKind.Selection]: faMousePointer,
+	[DefaultBrushKind.ImageBrush]: faImage,
 };
 
 export interface BrushControlsProps {

@@ -1,4 +1,4 @@
-import IBrush from '../../types/IBrush';
+import IBrush, { DefaultBrushKind } from '../../types/IBrush';
 import IPainterAPI from '../../types/IPainterAPI';
 import { BrushContext } from '../../types/context/BrushContext';
 import { AddCanvasItemCallback } from '../../types/callbacks/AddCanvasItemCallback';
@@ -7,7 +7,7 @@ import { vector } from '../../utility/shapes-util';
 import ImageCanvasItem from '../canvas-items/ImageCanvasItem';
 
 export default class ImageBrush implements IBrush {
-	brushName = 'imagebrush';
+	public brushName = DefaultBrushKind.ImageBrush;
 
 	private topLeftCorner: Vector2D;
 	private src: string;
