@@ -4,6 +4,8 @@ import { vector } from '../../utility/shapes-util';
 import Vector2D from '../../types/utility/Vector2D';
 import IPainterAPI from '../../types/IPainterAPI';
 import { IImageCache } from '../../types/IImageCache';
+import { ScalingNode } from '../../types/transform/ScalingNode';
+import { scaleRectangle } from '../../utility/transform-utility';
 
 export default class ImageCanvasItem implements ICanvasItem {
 	private src: string;
@@ -35,6 +37,13 @@ export default class ImageCanvasItem implements ICanvasItem {
 	applyMove = (move: Vector2D): void => {
 		this.topLeftCorner.x += move.x;
 		this.topLeftCorner.y += move.y;
+	};
+
+	applyScale = (scale: Vector2D, node: ScalingNode): void => {
+		const scaledRect = scaleRectangle(this.getBoundingRect(), scale, node);
+		this.topLeftCorner = scaledRect.topLeftCorner;
+		this.scale.x *= scale.x;
+		this.scale.y *= scale.y;
 	};
 
 	private generateSize = async (): Promise<void> => {
