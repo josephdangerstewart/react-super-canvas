@@ -7,6 +7,7 @@ import DefaultBrushControls, { BrushControlsProps } from './toolbar/DefaultBrush
 import DefaultStyleControls, { StyleControlsProps } from './toolbar/DefaultStyleControls';
 import DefaultClearButton, { ClearButtonProps } from './toolbar/DefaultClearButton';
 import SelectionBrush from '../api/brushes/SelectionBrush';
+import { OnCanvasItemChangeCallback } from '../types/callbacks/OnCanvasItemChangeCallback';
 
 export interface ToolbarComponents {
 	Toolbar?: React.ComponentType<ToolbarProps>;
@@ -40,6 +41,11 @@ export interface SuperCanvasProps {
 	 * @description Optional replaceable components for the toolbar
 	 */
 	toolbarComponents?: ToolbarComponents;
+
+	/**
+	 * @description Called when the items on the super canvas change
+	 */
+	onChange?: OnCanvasItemChangeCallback;
 }
 
 const SuperCanvas: React.FunctionComponent<SuperCanvasProps> = ({
@@ -48,6 +54,7 @@ const SuperCanvas: React.FunctionComponent<SuperCanvasProps> = ({
 	availableBrushes: providedBrushes,
 	activeBackgroundElement,
 	toolbarComponents,
+	onChange,
 }) => {
 	const availableBrushes = useMemo(() => {
 		if (!providedBrushes.find((brush) => brush.brushName === DefaultBrushKind.Selection)) {
@@ -62,7 +69,7 @@ const SuperCanvas: React.FunctionComponent<SuperCanvasProps> = ({
 		superCanvasManager,
 		activeBrushName,
 		styleContext,
-	} = useSuperCanvasManager(activeBackgroundElement, availableBrushes);
+	} = useSuperCanvasManager(activeBackgroundElement, availableBrushes, onChange);
 	const {
 		Toolbar: CustomToolbar,
 		BrushControls: CustomBrushControls,

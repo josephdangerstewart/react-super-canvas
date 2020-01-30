@@ -4,6 +4,7 @@ import IBrush from './IBrush';
 import StyleContext from './context/StyleContext';
 import { ActiveBrushChangeCallback } from './callbacks/ActiveBrushChangeCallback';
 import { StyleContextChangeCallback } from './callbacks/StyleContextChangeCallback';
+import { OnCanvasItemChangeCallback } from './callbacks/OnCanvasItemChangeCallback';
 
 export default interface ISuperCanvasManager {
 	/**
@@ -57,6 +58,11 @@ export default interface ISuperCanvasManager {
 	 * @description Calls the callback when the style context is changed
 	 */
 	onStyleContextChange: (onChange: StyleContextChangeCallback) => void;
+
+	/**
+	 * @description A callback for when the canvas items change
+	 */
+	onCanvasItemsChange: (onChange: OnCanvasItemChangeCallback) => void;
 
 	/**
 	 * @description Clears the super canvas

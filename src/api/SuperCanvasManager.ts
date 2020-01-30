@@ -17,6 +17,7 @@ import { TransformManager } from './helpers/TransformManager';
 import CanvasItemInstance from '../types/utility/CanvasItemInstance';
 import { IImageCache } from '../types/IImageCache';
 import ImageCache from './ImageCache';
+import { OnCanvasItemChangeCallback } from '../types/callbacks/OnCanvasItemChangeCallback';
 
 export default class SuperCanvasManager implements ISuperCanvasManager {
 	/* PRIVATE MEMBERS */
@@ -63,6 +64,9 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 	// The custom callback when the style context changes
 	private _onStyleContextChange: StyleContextChangeCallback;
 
+	// The custom callback when canvas items change
+	private _onCanvasItemChange: OnCanvasItemChangeCallback;
+
 	/* PUBLIC METHODS */
 
 	init = (canvas: HTMLCanvasElement): void => {
@@ -70,7 +74,7 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 		this.interactionManager = new CanvasInteractionManager(canvas);
 		this.context2d = canvas.getContext('2d');
 		this.selectionManager = new SelectionManager(this.interactionManager);
-		this.transformManager = new TransformManager(this.selectionManager);
+		this.transformManager = new TransformManager(this.selectionManager, this.handleCanvasItemsChange);
 		this.imageCache = new ImageCache(this.context2d);
 		this.painter = new PainterAPI(this.context2d, this.interactionManager.panOffset, this.interactionManager.scale, this.imageCache);
 
@@ -89,6 +93,10 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 
 	destroy = (): void => {
 		this.isActive = false;
+	};
+
+	onCanvasItemsChange = (onChange: OnCanvasItemChangeCallback): void => {
+		this._onCanvasItemChange = onChange;
 	};
 
 	setCanvasItems = (items: ICanvasItem[]): void => {
@@ -234,5 +242,12 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 
 	private addCanvasItem = (item: ICanvasItem): void => {
 		this.canvasItems.push({ ...item, $rotation: 0 });
+		this.handleCanvasItemsChange();
+	};
+
+	private handleCanvasItemsChange = (): void => {
+		if (this._onCanvasItemChange) {
+			this._onCanvasItemChange(this.getCanvasItems());
+		}
 	};
 }

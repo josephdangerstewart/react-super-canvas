@@ -4,6 +4,7 @@ import SuperCanvasManager from '../api/SuperCanvasManager';
 import IBackgroundElement from '../types/IBackgroundElement';
 import IBrush from '../types/IBrush';
 import StyleContext from '../types/context/StyleContext';
+import { OnCanvasItemChangeCallback } from '../types/callbacks/OnCanvasItemChangeCallback';
 
 export interface UseSuperCanvasManagerHook {
 	canvasRef: React.MutableRefObject<HTMLCanvasElement>;
@@ -15,7 +16,7 @@ export interface UseSuperCanvasManagerHook {
 /**
  * @description Initializes the super canvas manager
  */
-export const useSuperCanvasManager = (activeBackgroundElement: IBackgroundElement, availableBrushes: IBrush[]): UseSuperCanvasManagerHook => {
+export const useSuperCanvasManager = (activeBackgroundElement: IBackgroundElement, availableBrushes: IBrush[], onCanvasItemsChange?: OnCanvasItemChangeCallback): UseSuperCanvasManagerHook => {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const [ activeBrushName, setActiveBrushName ] = useState('');
 	const [ styleContext, setStyleContext ] = useState({});
@@ -35,6 +36,10 @@ export const useSuperCanvasManager = (activeBackgroundElement: IBackgroundElemen
 			});
 
 			setSuperCanvasManager(manager);
+
+			if (onCanvasItemsChange) {
+				manager.onCanvasItemsChange(onCanvasItemsChange);
+			}
 
 			return (): void => {
 				manager.destroy();

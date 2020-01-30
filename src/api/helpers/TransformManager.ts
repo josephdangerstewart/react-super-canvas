@@ -45,12 +45,14 @@ export class TransformManager {
 	private transformOperation: TransformOperation;
 	private selectedItemBoundingRect: Rectangle;
 	private previewRect: Rectangle;
+	private onCanvasItemChange: () => void;
 
 	private mouseDownAt: Vector2D;
 
-	constructor(selectionManager: ISelection) {
+	constructor(selectionManager: ISelection, onCanvasItemChange: () => void) {
 		this.selectionManager = selectionManager;
 		this.mouseDownAt = vector(0, 0);
+		this.onCanvasItemChange = onCanvasItemChange;
 	}
 
 	render = (painter: IPainterAPI, context: BrushContext): void => {
@@ -231,13 +233,16 @@ export class TransformManager {
 				case TransformKind.Move:
 					if (this.selectionManager.selectedItem.applyMove) {
 						this.selectionManager.selectedItems.forEach((item) => item.applyMove(this.transformOperation.move));
+						this.onCanvasItemChange();
 					}
 					break;
 				case TransformKind.Scale:
-					if (this.selectionManager.selectedItemCount > 1 && this.selectionManager.selectedItems.every((item) => item.applyMove && item.applyScale)) {
+					if (this.selectionManager.selectedItemCount > 1 && this.selectionManager.canScale) {
 						applyMultiScale(this.selectionManager.selectedItems, this.transformOperation.scale.value, this.transformOperation.scale.node);
-					} else if (this.selectionManager.selectedItem.applyScale) {
+						this.onCanvasItemChange();
+					} else if (this.selectionManager.canScale) {
 						this.selectionManager.selectedItem.applyScale(this.transformOperation.scale.value, this.transformOperation.scale.node);
+						this.onCanvasItemChange();
 					}
 					break;
 				default:
