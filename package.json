@@ -9,7 +9,8 @@
 		"docz:build": "docz build",
 		"lint": "eslint . --ext .js,.jsx,.ts,.tsx",
 		"meta": "node tools/parse-jsdocs",
-		"dev": "yarn meta && yarn docz:dev"
+		"dev": "yarn meta && yarn docz:dev",
+		"build": "webpack"
 	},
 	"keywords": [
 		"canvas",
@@ -18,6 +19,7 @@
 		"map",
 		"maker"
 	],
+	"types": "index.d.ts",
 	"author": "Joseph Stewart",
 	"license": "ISC",
 	"dependencies": {
@@ -66,6 +68,7 @@
 		"ts-loader": "^6.2.0",
 		"typedoc": "^0.15.1",
 		"typescript": "^3.7.4",
-		"webpack": "^4.41.2"
+		"webpack": "^4.41.2",
+		"webpack-cli": "^3.3.10"
 	}
 }

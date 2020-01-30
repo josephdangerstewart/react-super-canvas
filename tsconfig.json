@@ -7,5 +7,6 @@
 		"jsx": "react",
 		"rootDir": ".",
 		"esModuleInterop": true,
+		"declaration": true,
     }
 }
