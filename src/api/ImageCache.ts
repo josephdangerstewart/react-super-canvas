@@ -13,9 +13,14 @@ export default class ImageCache implements IImageCache {
 		this.imageCache = {};
 	}
 
-	getImageAsync = (src: string): Promise<HTMLImageElement> => new Promise((resolve) => {
+	getImageAsync = (src: string): Promise<HTMLImageElement> => new Promise((resolve, reject) => {
 		const cachedImage = this.imageCache[src];
 		const image = cachedImage ? cachedImage.image : new Image();
+
+		if (cachedImage && cachedImage.isBroken) {
+			reject(new Error('broken image'));
+			return;
+		}
 
 		if (!this.returnImageAsyncCallbackStack[src]) {
 			this.returnImageAsyncCallbackStack[src] = [];
@@ -26,6 +31,7 @@ export default class ImageCache implements IImageCache {
 				image,
 				lastAccessed: new Date(),
 				repeating: null,
+				isBroken: false,
 			};
 		} else {
 			this.imageCache[src].lastAccessed = new Date();
@@ -36,6 +42,10 @@ export default class ImageCache implements IImageCache {
 			image.onload = (): void => {
 				this.handleOnImageLoad(src);
 			};
+
+			image.onerror = (): void => {
+				reject(new Error('broken image'));
+			};
 		} else {
 			resolve(image);
 		}
@@ -44,6 +54,10 @@ export default class ImageCache implements IImageCache {
 	withCachedImage = (src: string, callback: WithCachedImageCallback, onImageUnprocessed?: OnImageUnprocessedCallback): boolean => {
 		const cachedImage = this.imageCache[src];
 		const image = cachedImage ? cachedImage.image : new Image();
+
+		if (cachedImage && cachedImage.isBroken) {
+			return false;
+		}
 
 		if (!cachedImage) {
 			image.src = src;
@@ -55,6 +69,10 @@ export default class ImageCache implements IImageCache {
 			// So don't call the callback in onload
 			image.onload = (): void => {
 				this.handleOnImageLoad(src);
+			};
+
+			image.onerror = (): void => {
+				this.handleOnImageError(src);
 			};
 
 			if (onImageUnprocessed) {
@@ -70,6 +88,7 @@ export default class ImageCache implements IImageCache {
 				image,
 				lastAccessed: new Date(),
 				repeating: null,
+				isBroken: false,
 			};
 		} else {
 			this.imageCache[src].lastAccessed = new Date();
@@ -85,6 +104,16 @@ export default class ImageCache implements IImageCache {
 				this.imageCache[key] = null;
 			}
 		});
+	};
+
+	private handleOnImageError = (src: string): void => {
+		const cachedImage = this.imageCache[src];
+
+		if (!cachedImage) {
+			return;
+		}
+
+		cachedImage.isBroken = true;
 	};
 
 	private handleOnImageLoad = (src: string): void => {

@@ -53,9 +53,9 @@ export default class PainterAPI implements IPainterAPI {
 		}
 	};
 
-	drawImage = (topLeftCorner: Vector2D, imageUrl: string, scale?: Vector2D): void => {
+	drawImage = (topLeftCorner: Vector2D, imageUrl: string, scale?: Vector2D, opacity?: number): void => {
 		this.imageCache.withCachedImage(imageUrl, (image) => {
-			this.doDrawImage(topLeftCorner, image, scale);
+			this.doDrawImage(topLeftCorner, image, scale, opacity);
 		});
 	};
 
@@ -237,7 +237,7 @@ export default class PainterAPI implements IPainterAPI {
 		return lineCollidesWithRect(line, canvasRect);
 	};
 
-	private doDrawImage = (topLeftCorner: Vector2D, image: HTMLImageElement, scale?: Vector2D): void => {
+	private doDrawImage = (topLeftCorner: Vector2D, image: HTMLImageElement, scale?: Vector2D, opacity?: number): void => {
 		const safeScale = scale || vector(1, 1);
 
 		const { x, y } = this.toAbsolutePoint(topLeftCorner);
@@ -254,7 +254,10 @@ export default class PainterAPI implements IPainterAPI {
 		const canvasRect = this.getViewport();
 
 		if (rectCollidesWithRect(imageRect, canvasRect)) {
+			const oldOpacity = this.context2d.globalAlpha;
+			this.context2d.globalAlpha = opacity || oldOpacity;
 			this.context2d.drawImage(image, x, y, absWidth, absHeight);
+			this.context2d.globalAlpha = oldOpacity;
 		}
 	};
 }

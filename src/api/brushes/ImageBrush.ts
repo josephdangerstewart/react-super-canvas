@@ -19,8 +19,7 @@ export default class ImageBrush implements IBrush {
 
 	renderPreview = (painter: IPainterAPI, context: BrushContext): void => {
 		this.topLeftCorner = context.snappedMousePosition;
-		console.log(this.topLeftCorner, this.src);
-		painter.drawImage(this.topLeftCorner, this.src);
+		painter.drawImage(this.topLeftCorner, this.src, null, 0.5);
 	};
 
 	mouseDown = (addCanvasItem: AddCanvasItemCallback, context: BrushContext): void => {
