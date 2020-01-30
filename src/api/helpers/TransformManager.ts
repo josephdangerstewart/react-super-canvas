@@ -57,7 +57,7 @@ export class TransformManager {
 
 	render = (painter: IPainterAPI, context: BrushContext): void => {
 		const canvasItems = this.selectionManager.selectedItems;
-		const { snappedMousePosition } = context;
+		const { mousePosition } = context;
 
 		if (!canvasItems?.length) {
 			return;
@@ -72,7 +72,7 @@ export class TransformManager {
 		});
 
 
-		if (canMove && pointInsideRect(snappedMousePosition, boundingRect)) {
+		if (canMove && pointInsideRect(mousePosition, boundingRect)) {
 			painter.setCursor('move');
 		}
 
@@ -80,7 +80,7 @@ export class TransformManager {
 			this.getScaleNodes(boundingRect, context).forEach((node) => {
 				painter.drawRect(node.node);
 
-				if (pointInsideRect(snappedMousePosition, node.node)) {
+				if (pointInsideRect(mousePosition, node.node)) {
 					switch (node.type) {
 						case ScalingNode.TopLeft:
 							painter.setCursor('nw-resize');
@@ -298,7 +298,7 @@ export class TransformManager {
 	};
 
 	private scaleHandle = (x: number, y: number, context?: BrushContext): Rectangle => {
-		const { snappedMousePosition } = context || { snappedMousePosition: null };
+		const { mousePosition } = context || {};
 		const rect = {
 			topLeftCorner: vector(x - HANDLE_DIAMETER / 2, y - HANDLE_DIAMETER / 2),
 			width: HANDLE_DIAMETER,
@@ -307,7 +307,7 @@ export class TransformManager {
 
 		let styles = handleStyles;
 
-		if (snappedMousePosition && pointInsideRect(snappedMousePosition, rect)) {
+		if (mousePosition && pointInsideRect(mousePosition, rect)) {
 			styles = handleStylesHovered;
 		}
 
