@@ -1,6 +1,8 @@
 # react-super-canvas
 An powerfully flexible canvas based graphical editor
 
+**This component is still in development, do not use it in production**
+
 # To build
 
 1. Clone the repo
