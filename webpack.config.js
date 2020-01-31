@@ -1,7 +1,15 @@
 /* eslint-disable */
+var path = require('path');
 
 module.exports = {
-	entry: './src/index.ts',
+	entry: {
+		index: './src/index.ts',
+		defaults: './src/defaults.ts',
+	},
+	output: {
+		path: path.resolve('./dist'),
+		filename: '[name].js',
+	},
 	mode: 'production',
 	module: {
 		rules: [
