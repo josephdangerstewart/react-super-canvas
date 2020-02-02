@@ -1,12 +1,27 @@
 {
-    "compilerOptions": {
-        "outDir": "./dist/",
-        "noImplicitAny": true,
-        "module": "commonjs",
-        "target": "es6",
+	"compilerOptions": {
+		"target": "es6",
+		"lib": [
+			"dom",
+			"es6"
+		],
+		"module": "commonjs",
+		"noImplicitReturns": true,
+		"outDir": "dist",
+		"sourceMap": true,
+		"typeRoots": [
+			"node_modules/@types"
+		],
 		"jsx": "react",
-		"rootDir": ".",
-		"esModuleInterop": true,
-		"declaration": true,
-    }
+	},
+	"compileOnSave": true,
+	"skipLibCheck": true,
+	"exclude": [
+		"node_modules",
+		"functions"
+	],
+	"include": [
+		"index.ts",
+		"defaults.ts"
+	]
 }
