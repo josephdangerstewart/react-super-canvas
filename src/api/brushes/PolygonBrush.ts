@@ -10,6 +10,10 @@ import { withOpacity } from '../../utility/color-utility';
 
 export default class PolygonBrush implements IBrush {
 	public brushName = DefaultBrushKind.PolygonBrush;
+	public supportedCanvasItems = [
+		PolygonCanvasItem,
+	];
+
 	private points: Vector2D[];
 
 	constructor() {

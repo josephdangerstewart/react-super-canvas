@@ -1,6 +1,8 @@
 import IPainterAPI from './IPainterAPI';
 import { BrushContext } from './context/BrushContext';
 import { AddCanvasItemCallback } from './callbacks/AddCanvasItemCallback';
+import Type from './utility/Type';
+import ICanvasItem from './ICanvasItem';
 
 export enum DefaultBrushKind {
 	CircleBrush = 'circle',
@@ -24,4 +26,10 @@ export default interface IBrush {
 	 * @description The unique id for the brush type
 	 */
 	brushName: string | DefaultBrushKind;
+
+	/**
+	 * @description An array of supported brushes that can be rendered
+	 * by this brush
+	 */
+	supportedCanvasItems: Type<ICanvasItem>[];
 }

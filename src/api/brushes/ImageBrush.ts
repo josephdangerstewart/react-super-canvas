@@ -8,6 +8,9 @@ import ImageCanvasItem from '../canvas-items/ImageCanvasItem';
 
 export default class ImageBrush implements IBrush {
 	public brushName = DefaultBrushKind.ImageBrush;
+	public supportedCanvasItems = [
+		ImageCanvasItem,
+	];
 
 	private topLeftCorner: Vector2D;
 	private src: string;

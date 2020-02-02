@@ -9,6 +9,9 @@ import { withOpacity } from '../../utility/color-utility';
 
 export default class CircleBrush implements IBrush {
 	public brushName = DefaultBrushKind.CircleBrush;
+	public supportedCanvasItems = [
+		CircleCanvasItem,
+	];
 
 	private cursorRadius: number;
 	private centerAt: Vector2D;
