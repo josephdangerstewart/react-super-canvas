@@ -29,7 +29,9 @@ export default interface IBrush {
 
 	/**
 	 * @description An array of supported brushes that can be rendered
-	 * by this brush
+	 * by this brush. This is needed in order to map initial static JSON
+	 * data to canvas items. The SuperCanvas needs an awareness of which
+	 * canvas items exist.
 	 */
 	supportedCanvasItems: Type<ICanvasItem>[];
 }
