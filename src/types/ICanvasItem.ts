@@ -2,6 +2,7 @@ import IPainterAPI from './IPainterAPI';
 import CanvasItemContext from './context/CanvasItemContext';
 import Rectangle from './shapes/Rectangle';
 import Vector2D from './utility/Vector2D';
+import JsonData from './utility/JsonData';
 import { ScalingNode } from './transform/ScalingNode';
 
 export default interface ICanvasItem {
@@ -18,6 +19,19 @@ export default interface ICanvasItem {
 	 * if a user has selected this canvas item and for rendering the selection box
 	 */
 	getBoundingRect: () => Rectangle;
+
+	/**
+	 * @description Returns a pure JSON object that captures the
+	 * current state of this canvas item and can be serialized to
+	 * store in a database
+	 */
+	toJson: () => JsonData;
+
+	/**
+	 * @description Initializes the canvas item from a saved json
+	 * state
+	 */
+	fromJson: (data: JsonData) => void;
 
 	/**
 	 * @description Optionally allows consumers to have more fine tuned control over
