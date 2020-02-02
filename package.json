@@ -72,6 +72,6 @@
 		"webpack-cli": "^3.3.10"
 	},
 	"files": [
-		"./dist/**"
+		"dist/*"
 	]
 }
