@@ -1,8 +1,9 @@
 {
 	"name": "react-super-canvas",
-	"version": "0.0.2",
+	"version": "0.0.3",
 	"description": "An API for creating powerful canvas based editors",
-	"main": "index.js",
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"docz:dev": "docz dev",
@@ -19,7 +20,6 @@
 		"map",
 		"maker"
 	],
-	"types": "index.d.ts",
 	"author": "Joseph Stewart",
 	"license": "ISC",
 	"dependencies": {
