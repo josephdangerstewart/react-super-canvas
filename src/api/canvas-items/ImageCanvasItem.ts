@@ -6,6 +6,7 @@ import IPainterAPI from '../../types/IPainterAPI';
 import { IImageCache } from '../../types/IImageCache';
 import { ScalingNode } from '../../types/transform/ScalingNode';
 import { scaleRectangle } from '../../utility/transform-utility';
+import JsonData from '../../types/utility/JsonData';
 
 export default class ImageCanvasItem implements ICanvasItem {
 	private src: string;
@@ -23,6 +24,38 @@ export default class ImageCanvasItem implements ICanvasItem {
 
 		this.generateSize();
 	}
+
+	toJson = (): JsonData => ({
+		src: this.src,
+		topLeftCorner: this.topLeftCorner,
+		scale: this.scale,
+		size: this.size,
+	});
+
+	fromJson = (data: JsonData): void => {
+		const {
+			src,
+			topLeftCorner,
+			scale,
+			size,
+		} = data;
+
+		if (src) {
+			this.src = src as string;
+		}
+
+		if (topLeftCorner) {
+			this.topLeftCorner = topLeftCorner as Vector2D;
+		}
+
+		if (scale) {
+			this.scale = scale as Vector2D;
+		}
+
+		if (size) {
+			this.size = size as Vector2D;
+		}
+	};
 
 	render = (painter: IPainterAPI): void => {
 		painter.drawImage(this.topLeftCorner, this.src, this.scale);

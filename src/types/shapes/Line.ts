@@ -4,8 +4,9 @@
  */
 
 import Vector2D from '../utility/Vector2D';
+import JsonData from '../utility/JsonData';
 
-export default interface Line {
+export default interface Line extends JsonData {
 	/**
 	 * @description The first point in the virtual space
 	 */

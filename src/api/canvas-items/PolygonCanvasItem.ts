@@ -7,6 +7,7 @@ import Rectangle from '../../types/shapes/Rectangle';
 import { pointInsidePolygon, boundingRectOfPolygon } from '../../utility/shapes-util';
 import { scalePolygon, movePolygon } from '../../utility/transform-utility';
 import { ScalingNode } from '../../types/transform/ScalingNode';
+import JsonData from '../../types/utility/JsonData';
 
 export default class PolygonCanvasItem implements ICanvasItem {
 	private polygon: Polygon;
@@ -18,6 +19,16 @@ export default class PolygonCanvasItem implements ICanvasItem {
 			strokeColor: styleContext.strokeColor,
 		};
 	}
+
+	toJson = (): JsonData => ({
+		polygon: this.polygon,
+	});
+
+	fromJson = (data: JsonData): void => {
+		if (data.polygon) {
+			this.polygon = data.polygon as Polygon;
+		}
+	};
 
 	render = (painter: IPainterAPI): void => {
 		painter.drawPolygon(this.polygon);

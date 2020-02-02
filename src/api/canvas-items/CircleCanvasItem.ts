@@ -9,6 +9,7 @@ import { TransformOperation } from '../../types/transform/TransformOperation';
 import { TransformKind } from '../../types/transform/TransformKind';
 import { scaleCircle, moveCircle } from '../../utility/transform-utility';
 import { ScalingNode } from '../../types/transform/ScalingNode';
+import JsonData from '../../types/utility/JsonData';
 
 export default class CircleCanvasItem implements ICanvasItem {
 	private circle: Circle;
@@ -21,6 +22,16 @@ export default class CircleCanvasItem implements ICanvasItem {
 			strokeColor: styleContext.strokeColor,
 		};
 	}
+
+	toJson = (): JsonData => ({
+		circle: this.circle,
+	});
+
+	fromJson = (data: JsonData): void => {
+		if (data.circle) {
+			this.circle = data.circle as Circle;
+		}
+	};
 
 	render = (painter: IPainterAPI): void => {
 		painter.drawCircle(this.circle);

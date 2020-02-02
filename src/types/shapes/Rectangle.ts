@@ -1,7 +1,8 @@
 import Vector2D from '../utility/Vector2D';
 import StyledShape, { StyledShapeDefaults } from './StyledShape';
+import JsonData from '../utility/JsonData';
 
-export default interface Rectangle extends StyledShape {
+export default interface Rectangle extends StyledShape, JsonData {
 	/**
 	 * @description The top left corner in the virtual space
 	 */

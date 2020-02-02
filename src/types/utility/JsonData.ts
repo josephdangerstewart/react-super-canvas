@@ -1,7 +1,15 @@
+export type PureData = (
+	number |
+	string |
+	boolean |
+	JsonData |
+	JsonArray
+);
+
 export default interface JsonData {
-	[key: string]: number | string | boolean | JsonData | JsonArray;
+	[key: string]: PureData;
 }
 
 export interface JsonArray {
-	[index: number]: number | string | boolean | JsonData | JsonArray;
+	[index: number]: PureData;
 }

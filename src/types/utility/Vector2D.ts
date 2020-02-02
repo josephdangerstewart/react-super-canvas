@@ -1,4 +1,6 @@
-export default interface Vector2D {
+import JsonData from './JsonData';
+
+export default interface Vector2D extends JsonData {
 	/**
 	 * @description The x coordinate
 	 */
