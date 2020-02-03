@@ -116,11 +116,15 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 			const className = item.__className;
 			const CanvasItemClass = uniqueClasses.find((c) => className === c.prototype.constructor.name);
 
+			if (!CanvasItemClass) {
+				return null;
+			}
+
 			const canvasItem = new CanvasItemClass();
 			canvasItem.fromJson(item);
 
 			return { ...canvasItem, $rotation: 0 };
-		});
+		}).filter(Boolean);
 	};
 
 	getCanvasItems = (): ICanvasItem[] => this.canvasItems;

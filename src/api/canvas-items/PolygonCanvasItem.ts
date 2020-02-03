@@ -12,7 +12,11 @@ import JsonData from '../../types/utility/JsonData';
 export default class PolygonCanvasItem implements ICanvasItem {
 	private polygon: Polygon;
 
-	constructor(points: Vector2D[], styleContext: StyleContext) {
+	constructor(points?: Vector2D[], styleContext?: StyleContext) {
+		if (!points && !styleContext) {
+			return null;
+		}
+
 		this.polygon = {
 			points,
 			fillColor: styleContext.fillColor,

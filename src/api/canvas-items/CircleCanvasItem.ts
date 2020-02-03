@@ -14,7 +14,11 @@ import JsonData from '../../types/utility/JsonData';
 export default class CircleCanvasItem implements ICanvasItem {
 	private circle: Circle;
 
-	constructor(center: Vector2D, radius: number, styleContext: StyleContext) {
+	constructor(center?: Vector2D, radius?: number, styleContext?: StyleContext) {
+		if (!center && !radius && !styleContext) {
+			return null;
+		}
+
 		this.circle = {
 			center,
 			radius,

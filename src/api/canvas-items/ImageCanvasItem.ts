@@ -15,7 +15,11 @@ export default class ImageCanvasItem implements ICanvasItem {
 	private size: Vector2D;
 	private imageCache: IImageCache;
 
-	constructor(src: string, topLeftCorner: Vector2D, imageCache: IImageCache) {
+	constructor(src?: string, topLeftCorner?: Vector2D, imageCache?: IImageCache) {
+		if (!src && !topLeftCorner && !imageCache) {
+			return;
+		}
+
 		this.src = src;
 		this.topLeftCorner = topLeftCorner;
 		this.scale = vector(1, 1);
