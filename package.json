@@ -8,7 +8,7 @@
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"docz:dev": "docz dev",
 		"docz:build": "docz build",
-		"docz:publish": "git checkout master && git checkout gh-pages && yarn docz:build && git add . && git commit -m \"Auto publish docs\" && git push origin gh-pages && git checkout master",
+		"docz:publish": "git checkout master && git checkout gh-pages && git rebase master && yarn meta && yarn docz:build && git add . && git commit -m \"Auto publish docs\" && git push origin gh-pages && git checkout master",
 		"lint": "eslint . --ext .js,.jsx,.ts,.tsx",
 		"meta": "node tools/parse-jsdocs",
 		"dev": "yarn meta && yarn docz:dev",
