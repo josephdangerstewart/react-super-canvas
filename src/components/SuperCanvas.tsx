@@ -1,20 +1,21 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useCallback } from 'react';
 import IBrush, { DefaultBrushKind } from '../types/IBrush';
 import IBackgroundElement from '../types/IBackgroundElement';
 import { useSuperCanvasManager } from '../hooks/use-super-canvas-manager';
 import DefaultToolbar, { ToolbarProps } from './toolbar/DefaultToolbar';
 import DefaultBrushControls, { BrushControlsProps } from './toolbar/DefaultBrushControls';
 import DefaultStyleControls, { StyleControlsProps } from './toolbar/DefaultStyleControls';
-import DefaultClearButton, { ClearButtonProps } from './toolbar/DefaultClearButton';
+import DefaultCanvasControls, { CanvasControlsProps } from './toolbar/DefaultCanvasControls';
 import SelectionBrush from '../api/brushes/SelectionBrush';
 import { OnCanvasItemChangeCallback } from '../types/callbacks/OnCanvasItemChangeCallback';
 import JsonData from '../types/utility/JsonData';
+import ISelection from '../types/ISelection';
 
 export interface ToolbarComponents {
 	Toolbar?: React.ComponentType<ToolbarProps>;
 	BrushControls?: React.ComponentType<BrushControlsProps>;
 	StyleControls?: React.ComponentType<StyleControlsProps>;
-	ClearButton?: React.ComponentType<ClearButtonProps>;
+	CanvasControls?: React.ComponentType<CanvasControlsProps>;
 }
 
 export interface SuperCanvasProps {
@@ -72,23 +73,33 @@ const SuperCanvas: React.FunctionComponent<SuperCanvasProps> = ({
 		return providedBrushes;
 	}, [ providedBrushes ]);
 
+	const [ selection, setSelection ] = useState(null);
+	const handleSelectionChange = useCallback((curSelection: ISelection): void => {
+		if (curSelection.selectedItem) {
+			setSelection(curSelection);
+		} else {
+			setSelection(null);
+		}
+	}, []);
+
 	const {
 		canvasRef,
 		superCanvasManager,
 		activeBrushName,
 		styleContext,
-	} = useSuperCanvasManager(activeBackgroundElement, availableBrushes, onChange, initialValue);
+	} = useSuperCanvasManager(activeBackgroundElement, availableBrushes, onChange, initialValue, handleSelectionChange);
+
 	const {
 		Toolbar: CustomToolbar,
 		BrushControls: CustomBrushControls,
 		StyleControls: CustomStyleControls,
-		ClearButton: CustomClearButton,
+		CanvasControls: CustomCanvasControls,
 	} = (toolbarComponents || {}) as ToolbarComponents;
 
 	const Toolbar = CustomToolbar || DefaultToolbar as React.ComponentType<ToolbarProps>;
 	const BrushControls = CustomBrushControls || DefaultBrushControls as React.ComponentType<BrushControlsProps>;
 	const StyleControls = CustomStyleControls || DefaultStyleControls as React.ComponentType<StyleControlsProps>;
-	const ClearButton = CustomClearButton || DefaultClearButton as React.ComponentType<ClearButtonProps>;
+	const CanvasControls = CustomCanvasControls || DefaultCanvasControls as React.ComponentType<CanvasControlsProps>;
 
 	return (
 		<div style={{ position: 'relative' }}>
@@ -112,9 +123,11 @@ const SuperCanvas: React.FunctionComponent<SuperCanvasProps> = ({
 							styleContext={styleContext}
 						/>
 					)}
-					clearButton={(
-						<ClearButton
+					canvasControls={(
+						<CanvasControls
 							clear={superCanvasManager && superCanvasManager.clear}
+							currentSelection={selection}
+							deleteSelectedCanvasItems={superCanvasManager && superCanvasManager.deleteSelectedCanvasItem}
 						/>
 					)}
 				/>

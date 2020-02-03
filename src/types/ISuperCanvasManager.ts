@@ -5,7 +5,9 @@ import StyleContext from './context/StyleContext';
 import { ActiveBrushChangeCallback } from './callbacks/ActiveBrushChangeCallback';
 import { StyleContextChangeCallback } from './callbacks/StyleContextChangeCallback';
 import { OnCanvasItemChangeCallback } from './callbacks/OnCanvasItemChangeCallback';
+import { OnSelectionChangeCallback } from './callbacks/OnSelectionChangeCallback';
 import JsonData from './utility/JsonData';
+import ISelection from './ISelection';
 
 export default interface ISuperCanvasManager {
 	/**
@@ -69,4 +71,20 @@ export default interface ISuperCanvasManager {
 	 * @description Clears the super canvas
 	 */
 	clear: () => void;
+
+	/**
+	 * @description Attatches a listener for when the selection changes
+	 */
+	onSelectionChange: (onChange: OnSelectionChangeCallback) => void;
+
+	/**
+	 * @description Deletes selected canvas item or does nothing if no
+	 * item is selected
+	 */
+	deleteSelectedCanvasItem: () => void;
+
+	/**
+	 * @description Gets the current selection
+	 */
+	getSelection: () => ISelection;
 }

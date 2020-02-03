@@ -34,12 +34,12 @@ export interface ToolbarProps {
 	styleControls: React.ReactNode;
 
 	/**
-	 * @description The clear button defined by the [clear button](#clearbutton)
+	 * @description The canvas controls defined by the [canvas controls](#canvascontrols)
 	 */
-	clearButton: React.ReactNode;
+	canvasControls: React.ReactNode;
 }
 
-const Toolbar: React.FunctionComponent<ToolbarProps> = ({ brushControls, styleControls, clearButton }) => (
+const Toolbar: React.FunctionComponent<ToolbarProps> = ({ brushControls, styleControls, canvasControls }) => (
 	<DefaultToolbarContainer>
 		<ToolbarSection>
 			{brushControls}
@@ -50,7 +50,7 @@ const Toolbar: React.FunctionComponent<ToolbarProps> = ({ brushControls, styleCo
 		</ToolbarSection>
 		<VerticalDivider />
 		<ToolbarSection>
-			{clearButton}
+			{canvasControls}
 		</ToolbarSection>
 	</DefaultToolbarContainer>
 );

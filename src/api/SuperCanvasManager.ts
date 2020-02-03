@@ -20,6 +20,8 @@ import ImageCache from './ImageCache';
 import { OnCanvasItemChangeCallback } from '../types/callbacks/OnCanvasItemChangeCallback';
 import JsonData from '../types/utility/JsonData';
 import Type from '../types/utility/Type';
+import ISelection from '../types/ISelection';
+import { OnSelectionChangeCallback } from '../types/callbacks/OnSelectionChangeCallback';
 
 export default class SuperCanvasManager implements ISuperCanvasManager {
 	/* PRIVATE MEMBERS */
@@ -179,6 +181,20 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 		this.handleCanvasItemsChange();
 	};
 
+	deleteSelectedCanvasItem = (): void => {
+		const items = this.selectionManager.selectedItems;
+		this.canvasItems = this.canvasItems.filter((item) => !items.includes(item));
+		this.handleCanvasItemsChange();
+	};
+
+	getSelection = (): ISelection => this.selectionManager;
+
+	onSelectionChange = (onChange: OnSelectionChangeCallback): void => {
+		this.selectionManager.onSelectionChange(() => {
+			onChange(this.selectionManager);
+		});
+	};
+
 	/* PRIVATE METHODS */
 
 	private update = (): void => {
@@ -276,6 +292,10 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 				}));
 
 			this._onCanvasItemChange(data);
+		}
+
+		if (!this.getCanvasItems().length) {
+			this.selectionManager.deselectItems();
 		}
 	};
 }

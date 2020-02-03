@@ -101,6 +101,7 @@ export default class SelectionManager implements ISelection {
 
 	deselectItems = (): void => {
 		this._selectedItems = [];
+		this.onSelectionChangeHandlers.forEach((handler): void => handler());
 	};
 
 	/* PRIVATE METHODS */
