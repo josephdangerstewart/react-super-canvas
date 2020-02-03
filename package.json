@@ -1,6 +1,6 @@
 {
 	"name": "react-super-canvas",
-	"version": "0.0.7",
+	"version": "0.0.8",
 	"description": "An API for creating powerful canvas based editors",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
@@ -11,7 +11,7 @@
 		"lint": "eslint . --ext .js,.jsx,.ts,.tsx",
 		"meta": "node tools/parse-jsdocs",
 		"dev": "yarn meta && yarn docz:dev",
-		"build": "tsc"
+		"build": "tsc --declaration --declarationMap --declarationDir ./dist"
 	},
 	"keywords": [
 		"canvas",
