@@ -8,6 +8,7 @@ import DefaultStyleControls, { StyleControlsProps } from './toolbar/DefaultStyle
 import DefaultClearButton, { ClearButtonProps } from './toolbar/DefaultClearButton';
 import SelectionBrush from '../api/brushes/SelectionBrush';
 import { OnCanvasItemChangeCallback } from '../types/callbacks/OnCanvasItemChangeCallback';
+import JsonData from '../types/utility/JsonData';
 
 export interface ToolbarComponents {
 	Toolbar?: React.ComponentType<ToolbarProps>;
@@ -46,6 +47,12 @@ export interface SuperCanvasProps {
 	 * @description Called when the items on the super canvas change
 	 */
 	onChange?: OnCanvasItemChangeCallback;
+
+	/**
+	 * @description The initial contents of the editor. Note that this
+	 * component cannot currently be controlled.
+	 */
+	initialValue?: JsonData[];
 }
 
 const SuperCanvas: React.FunctionComponent<SuperCanvasProps> = ({
@@ -55,6 +62,7 @@ const SuperCanvas: React.FunctionComponent<SuperCanvasProps> = ({
 	activeBackgroundElement,
 	toolbarComponents,
 	onChange,
+	initialValue,
 }) => {
 	const availableBrushes = useMemo(() => {
 		if (!providedBrushes.find((brush) => brush.brushName === DefaultBrushKind.Selection)) {
@@ -69,7 +77,7 @@ const SuperCanvas: React.FunctionComponent<SuperCanvasProps> = ({
 		superCanvasManager,
 		activeBrushName,
 		styleContext,
-	} = useSuperCanvasManager(activeBackgroundElement, availableBrushes, onChange);
+	} = useSuperCanvasManager(activeBackgroundElement, availableBrushes, onChange, initialValue);
 	const {
 		Toolbar: CustomToolbar,
 		BrushControls: CustomBrushControls,
