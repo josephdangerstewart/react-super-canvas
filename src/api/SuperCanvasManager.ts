@@ -18,6 +18,8 @@ import CanvasItemInstance from '../types/utility/CanvasItemInstance';
 import { IImageCache } from '../types/IImageCache';
 import ImageCache from './ImageCache';
 import { OnCanvasItemChangeCallback } from '../types/callbacks/OnCanvasItemChangeCallback';
+import JsonData from '../types/utility/JsonData';
+import Type from '../types/utility/Type';
 
 export default class SuperCanvasManager implements ISuperCanvasManager {
 	/* PRIVATE MEMBERS */
@@ -99,8 +101,26 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 		this._onCanvasItemChange = onChange;
 	};
 
-	setCanvasItems = (items: ICanvasItem[]): void => {
-		this.canvasItems = items.map((item) => ({ ...item, $rotation: 0 }));
+	setCanvasItems = (items: JsonData[]): void => {
+		const classes = this.availableBrushes.reduce(
+			(prev, cur) => {
+				prev.push(...cur.supportedCanvasItems);
+				return prev;
+			},
+			[],
+		);
+
+		const uniqueClasses = [ ...new Set(classes) ] as Type<ICanvasItem>[];
+
+		this.canvasItems = items.map((item) => {
+			const className = item.__className;
+			const CanvasItemClass = uniqueClasses.find((c) => className === c.prototype.constructor.name);
+
+			const canvasItem = new CanvasItemClass();
+			canvasItem.fromJson(item);
+
+			return { ...canvasItem, $rotation: 0 };
+		});
 	};
 
 	getCanvasItems = (): ICanvasItem[] => this.canvasItems;
@@ -247,7 +267,13 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 
 	private handleCanvasItemsChange = (): void => {
 		if (this._onCanvasItemChange) {
-			this._onCanvasItemChange(this.getCanvasItems());
+			const data = this.getCanvasItems()
+				.map((canvasItem) => ({
+					...canvasItem.toJson(),
+					__className: Object.getPrototypeOf(canvasItem).constructor.name,
+				}));
+
+			this._onCanvasItemChange(data);
 		}
 	};
 }

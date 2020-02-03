@@ -1,3 +1,3 @@
-import ICanvasItem from '../ICanvasItem';
+import JsonData from '../utility/JsonData';
 
-export type OnCanvasItemChangeCallback = (canvasItems: ICanvasItem[]) => void;
+export type OnCanvasItemChangeCallback = (canvasItems: JsonData[]) => void;

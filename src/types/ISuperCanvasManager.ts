@@ -5,6 +5,7 @@ import StyleContext from './context/StyleContext';
 import { ActiveBrushChangeCallback } from './callbacks/ActiveBrushChangeCallback';
 import { StyleContextChangeCallback } from './callbacks/StyleContextChangeCallback';
 import { OnCanvasItemChangeCallback } from './callbacks/OnCanvasItemChangeCallback';
+import JsonData from './utility/JsonData';
 
 export default interface ISuperCanvasManager {
 	/**
@@ -20,7 +21,7 @@ export default interface ISuperCanvasManager {
 	/**
 	 * @description Sets the active canvas items (useful for a controlled version of the editor)
 	 */
-	setCanvasItems: (items: ICanvasItem[]) => void;
+	setCanvasItems: (items: JsonData[]) => void;
 
 	/**
 	 * @description Gets all the active canvas items (useful for external saving)
