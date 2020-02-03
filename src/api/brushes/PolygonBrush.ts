@@ -7,12 +7,13 @@ import { AddCanvasItemCallback } from '../../types/callbacks/AddCanvasItemCallba
 import PolygonCanvasItem from '../canvas-items/PolygonCanvasItem';
 import Line from '../../types/shapes/Line';
 import { withOpacity } from '../../utility/color-utility';
+import { CanvasItemKind } from '../canvas-items/CanvasItemKind';
 
 export default class PolygonBrush implements IBrush {
 	public brushName = DefaultBrushKind.PolygonBrush;
-	public supportedCanvasItems = [
-		PolygonCanvasItem,
-	];
+	public supportedCanvasItems = {
+		[CanvasItemKind.PolygonCanvasItem]: PolygonCanvasItem,
+	};
 
 	private points: Vector2D[];
 

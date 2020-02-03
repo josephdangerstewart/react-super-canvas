@@ -7,8 +7,11 @@ import { IImageCache } from '../../types/IImageCache';
 import { ScalingNode } from '../../types/transform/ScalingNode';
 import { scaleRectangle } from '../../utility/transform-utility';
 import JsonData from '../../types/utility/JsonData';
+import { CanvasItemKind } from './CanvasItemKind';
 
 export default class ImageCanvasItem implements ICanvasItem {
+	public canvasItemName = CanvasItemKind.ImageCanvasItem;
+
 	private src: string;
 	private topLeftCorner: Vector2D;
 	private scale: Vector2D;

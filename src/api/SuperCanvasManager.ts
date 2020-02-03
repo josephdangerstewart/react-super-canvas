@@ -102,28 +102,25 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 	};
 
 	setCanvasItems = (items: JsonData[]): void => {
-		const classes = this.availableBrushes.reduce(
-			(prev, cur) => {
-				prev.push(...cur.supportedCanvasItems);
-				return prev;
-			},
-			[],
-		);
+		const availableCanvasItems = this.availableBrushes
+			.reduce(
+				(dictionary, brush) => ({
+					...dictionary,
+					...brush.supportedCanvasItems,
+				}),
+				{},
+			) as Record<string, Type<ICanvasItem>>;
 
-		const uniqueClasses = [ ...new Set(classes) ] as Type<ICanvasItem>[];
+		this.canvasItems = items.map((data = {}) => {
+			const { item, canvasItemName } = data;
+			const CanvasItemClass = availableCanvasItems[canvasItemName as string];
 
-		this.canvasItems = items.map((item) => {
-			const className = item.__className;
-			const CanvasItemClass = uniqueClasses.find((c) => className === c.prototype.constructor.name);
-
-			if (!CanvasItemClass) {
-				return null;
+			if (CanvasItemClass) {
+				const canvasItem = new CanvasItemClass();
+				canvasItem.fromJson(item as JsonData);
+				return { ...canvasItem, $rotation: 0 };
 			}
-
-			const canvasItem = new CanvasItemClass();
-			canvasItem.fromJson(item);
-
-			return { ...canvasItem, $rotation: 0 };
+			return null;
 		}).filter(Boolean);
 	};
 
@@ -273,8 +270,8 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 		if (this._onCanvasItemChange) {
 			const data = this.getCanvasItems()
 				.map((canvasItem) => ({
-					...canvasItem.toJson(),
-					__className: Object.getPrototypeOf(canvasItem).constructor.name,
+					item: canvasItem.toJson(),
+					canvasItemName: canvasItem.canvasItemName,
 				}));
 
 			this._onCanvasItemChange(data);

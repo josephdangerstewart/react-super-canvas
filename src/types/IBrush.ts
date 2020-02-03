@@ -33,5 +33,5 @@ export default interface IBrush {
 	 * data to canvas items. The SuperCanvas needs an awareness of which
 	 * canvas items exist.
 	 */
-	supportedCanvasItems: Type<ICanvasItem>[];
+	supportedCanvasItems: Record<string, Type<ICanvasItem>>;
 }

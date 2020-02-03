@@ -54,4 +54,10 @@ export default interface ICanvasItem {
 	 * `applyMove({ x, y })`
 	 */
 	applyMove?: (move: Vector2D) => void;
+
+	/**
+	 * @description The name of the canvas item so that the canvas can be
+	 * reconstructed from a saved pure JSON states
+	 */
+	canvasItemName: string;
 }

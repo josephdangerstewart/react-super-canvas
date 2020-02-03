@@ -6,12 +6,13 @@ import Vector2D from '../../types/utility/Vector2D';
 import { distanceBetweenTwoPoints, cursorPreview } from '../../utility/shapes-util';
 import CircleCanvasItem from '../canvas-items/CircleCanvasItem';
 import { withOpacity } from '../../utility/color-utility';
+import { CanvasItemKind } from '../canvas-items/CanvasItemKind';
 
 export default class CircleBrush implements IBrush {
 	public brushName = DefaultBrushKind.CircleBrush;
-	public supportedCanvasItems = [
-		CircleCanvasItem,
-	];
+	public supportedCanvasItems = {
+		[CanvasItemKind.CircleCanvasItem]: CircleCanvasItem,
+	};
 
 	private cursorRadius: number;
 	private centerAt: Vector2D;

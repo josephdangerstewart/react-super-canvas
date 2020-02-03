@@ -5,12 +5,13 @@ import { AddCanvasItemCallback } from '../../types/callbacks/AddCanvasItemCallba
 import Vector2D from '../../types/utility/Vector2D';
 import { vector } from '../../utility/shapes-util';
 import ImageCanvasItem from '../canvas-items/ImageCanvasItem';
+import { CanvasItemKind } from '../canvas-items/CanvasItemKind';
 
 export default class ImageBrush implements IBrush {
 	public brushName = DefaultBrushKind.ImageBrush;
-	public supportedCanvasItems = [
-		ImageCanvasItem,
-	];
+	public supportedCanvasItems = {
+		[CanvasItemKind.ImageCanvasItem]: ImageCanvasItem,
+	};
 
 	private topLeftCorner: Vector2D;
 	private src: string;

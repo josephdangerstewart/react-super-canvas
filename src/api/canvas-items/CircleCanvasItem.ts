@@ -10,8 +10,11 @@ import { TransformKind } from '../../types/transform/TransformKind';
 import { scaleCircle, moveCircle } from '../../utility/transform-utility';
 import { ScalingNode } from '../../types/transform/ScalingNode';
 import JsonData from '../../types/utility/JsonData';
+import { CanvasItemKind } from './CanvasItemKind';
 
 export default class CircleCanvasItem implements ICanvasItem {
+	public canvasItemName = CanvasItemKind.CircleCanvasItem;
+
 	private circle: Circle;
 
 	constructor(center?: Vector2D, radius?: number, styleContext?: StyleContext) {

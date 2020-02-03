@@ -9,7 +9,7 @@ const noop = (): void => {};
  */
 export default class SelectionBrush implements IBrush {
 	brushName = DefaultBrushKind.Selection;
-	supportedCanvasItems = [];
+	supportedCanvasItems = {};
 
 	renderPreview = noop;
 	mouseDown = noop;

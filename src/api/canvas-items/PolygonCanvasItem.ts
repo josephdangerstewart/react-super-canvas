@@ -8,8 +8,11 @@ import { pointInsidePolygon, boundingRectOfPolygon } from '../../utility/shapes-
 import { scalePolygon, movePolygon } from '../../utility/transform-utility';
 import { ScalingNode } from '../../types/transform/ScalingNode';
 import JsonData from '../../types/utility/JsonData';
+import { CanvasItemKind } from './CanvasItemKind';
 
 export default class PolygonCanvasItem implements ICanvasItem {
+	public canvasItemName = CanvasItemKind.PolygonCanvasItem;
+
 	private polygon: Polygon;
 
 	constructor(points?: Vector2D[], styleContext?: StyleContext) {
