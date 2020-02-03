@@ -176,6 +176,7 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 	clear = (): void => {
 		this.selectionManager.deselectItems();
 		this.canvasItems = [];
+		this.handleCanvasItemsChange();
 	};
 
 	/* PRIVATE METHODS */
