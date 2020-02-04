@@ -1,7 +1,12 @@
 # react-super-canvas
+
 An powerfully flexible canvas based graphical editor
 
 **This component is still in development, do not use it in production**
+
+# Checkout these sick [DOCS](https://reactsupercanvas.netlify.com/)
+
+(it was made with [docz](https://www.docz.site/))
 
 # To build
 
