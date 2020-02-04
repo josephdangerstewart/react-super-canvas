@@ -1,5 +1,9 @@
 # react-super-canvas
 
+| Build | Status |
+|-------|--------|
+| Documentation Site | [![Netlify Status](https://api.netlify.com/api/v1/badges/b3e8edaf-80e2-416b-aa2a-be2c5984c5aa/deploy-status)](https://app.netlify.com/sites/reactsupercanvas/deploys) |
+
 An powerfully flexible canvas based graphical editor
 
 **This component is still in development, do not use it in production**
