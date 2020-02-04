@@ -7,8 +7,7 @@
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"docz:dev": "docz dev",
-		"docz:build": "docz build",
-		"docz:publish": "yarn meta && yarn docz:build",
+		"docz:build": "yarn meta && docz build",
 		"lint": "eslint . --ext .js,.jsx,.ts,.tsx",
 		"meta": "node tools/parse-jsdocs",
 		"dev": "yarn meta && yarn docz:dev",
