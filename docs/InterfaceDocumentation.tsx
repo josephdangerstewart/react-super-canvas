@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import React from 'react';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import ReactMarkdown from 'react-markdown';
@@ -12,33 +13,21 @@ import {
 	PropertyType,
 } from './styled';
 
-interface InterfaceMetadata {
-	[propertyName: string]: {
-		description: string;
-		default?: string;
-		inheritedFrom?: string;
-		isArray?: boolean;
-		parameters?: InterfaceMetadata;
-		returnType?: string;
-		isOptional?: boolean;
-		type: string;
-	};
-}
+import { TypedProperty, PropertyList } from './types';
 
-interface TypeDocumentationProps {
-	type: string;
-	parameters?: InterfaceMetadata;
-	isArray?: boolean;
-	returnType?: string;
-}
+const intersperse = (arr: React.ReactNode[], separator: React.ReactNode): React.ReactNode[] => [].concat(
+	...arr.map((el) => [ separator, el ]),
+).splice(1);
 
-const TypeDocumentation: React.FunctionComponent<TypeDocumentationProps> = ({
+const TypeDocumentation: React.FunctionComponent<TypedProperty> = ({
 	type,
 	parameters,
 	isArray,
 	returnType,
+	typeArguments,
+	typeUnion,
 }) => {
-	if (type === 'callback' && parameters) {
+	if (type === 'callback') {
 		return (
 			<span>
 				({parameters && Object.entries(parameters).map(([ parameter, meta ]) => (
@@ -46,20 +35,44 @@ const TypeDocumentation: React.FunctionComponent<TypeDocumentationProps> = ({
 						<PropertyName isMethod={meta.type === 'callback'}>{parameter}</PropertyName>:{' '}
 						<PropertyType link={links[meta.type]}>{meta.type}</PropertyType>{meta.isArray && '[]'}
 					</span>
-				)).reduce((prev, cur) => ([ ...prev, ', ', cur ]), []).splice(1)}) <Keyword>=&gt;</Keyword> <PropertyType>{returnType}</PropertyType>
+				)).reduce((prev, cur) => ([ ...prev, ', ', cur ]), []).splice(1)}) <Keyword>=&gt;</Keyword>&nbsp;
+				<TypeDocumentation
+					{...returnType}
+				/>
+			</span>
+		);
+	}
+
+	if (typeUnion) {
+		return (
+			<span>
+				{intersperse(
+					typeUnion.map((uType) => <TypeDocumentation {...uType} />),
+					<span>&nbsp;|&nbsp;</span>,
+				)}
 			</span>
 		);
 	}
 
 	return (
 		<span>
-			<PropertyType link={links[type]}>{type}</PropertyType>{isArray && '[]'}
+			<PropertyType link={links[type]}>{type}</PropertyType>{isArray && '[]'}{
+				typeArguments && (
+					<span>
+						{'<'}
+						{intersperse(
+							typeArguments.map((typeArgument) => <TypeDocumentation {...typeArgument} />),
+							<span>,&nbsp;</span>,
+						)}{'>'}
+					</span>
+				)
+			}
 		</span>
 	);
 };
 
 export interface InterfaceDocumentationProps {
-	interfaceMetadata: InterfaceMetadata;
+	interfaceMetadata: PropertyList;
 	hideInheritedMembers?: boolean;
 }
 
@@ -81,6 +94,8 @@ export const InterfaceDocumentation: React.FunctionComponent<InterfaceDocumentat
 					parameters,
 					returnType,
 					isOptional,
+					typeUnion,
+					typeArguments,
 				} = interfaceMetadata[key];
 
 				const typeForDefault = [ 'null', 'undefined' ].includes((defaultValue || '').trim()) ? 'nullish' : type;
@@ -96,6 +111,8 @@ export const InterfaceDocumentation: React.FunctionComponent<InterfaceDocumentat
 							type={type}
 							parameters={parameters}
 							returnType={returnType}
+							typeUnion={typeUnion}
+							typeArguments={typeArguments}
 						/>
 						{defaultValue && (
 							<>

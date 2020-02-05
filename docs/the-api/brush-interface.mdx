@@ -1,0 +1,25 @@
+---
+name: IBrush
+menu: 3. API Reference
+route: /ibrush
+---
+
+import { InterfaceDocumentation } from '../InterfaceDocumentation';
+import IBrushMeta from '../../meta/interfaces/IBrush';
+
+# The `IBrush` interface
+
+All super canvas brushes implement this interface and can be made usable in the editor by passing in an instance as an item in the `availableBrushes` prop on the `SuperCanvas` component. For example, if you had a custom `LocationPinBrush`, you would make it available to use in the component like this.
+
+```jsx
+<SuperCanvas
+	...
+	availableBrushes={[
+		new LocationPinBrush(),
+	]}
+/>
+```
+
+## `interface IBrush`
+
+<InterfaceDocumentation interfaceMetadata={IBrushMeta} />

@@ -31,9 +31,10 @@ function getTypescriptFilesFromDirectory(directory) {
 }
 
 const filesToScan = [
-	...getTypescriptFilesFromDirectory(path.resolve('./src/types')),
+	/* ...getTypescriptFilesFromDirectory(path.resolve('./src/types')),
 	...getTypescriptFilesFromDirectory(path.resolve('./src/components')),
-	...getTypescriptFilesFromDirectory(path.resolve('./src/utility')),
+	...getTypescriptFilesFromDirectory(path.resolve('./src/utility')), */
+	path.resolve('./src/types/IBrush.ts'),
 ];
 
 const docs = app.convert(filesToScan);
@@ -77,6 +78,77 @@ const utilityMethodsByUtility = reflections
 		return all;
 	}, {});
 
+const getType = (type) => {
+	if (!type) {
+		return {};
+	}
+
+	let typeArgumentsObj = {};
+	if (type.typeArguments) {
+		typeArgumentsObj = {
+			typeArguments: type.typeArguments.map(getType),
+		}
+	}
+
+	if (type.type === 'union') {
+		return {
+			...typeArgumentsObj,
+			typeUnion: type.types.map(getType),
+		}
+	}
+
+	if (callbacks[type.name]) {
+		type = 'callback';
+		const signature = callbacks[reflection.type.name];
+		const returnType = getType(signature.type);
+		const parameters = {};
+		for (const parameter of signature.parameters || []) {
+			parameters[parameter.name] = buildMetaForProperty(parameter);
+		}
+		typeFlags.parameters = parameters;
+		typeFlags.returnType = returnType;
+		return {
+			...typeArgumentsObj,
+			type: 'callback',
+			parameters,
+			returnType,
+		}
+	}
+
+	if (type.type === 'array') {
+		return {
+			...typeArgumentsObj,
+			type: type.elementType.name,
+			isArray: true,
+		}
+	}
+
+	if (type.type === 'reflection' && type.declaration) {
+		const parameters = {};
+		const returnTypes = [];
+		for (const signature of type.declaration.signatures || []) {
+			if (signature.kindString === 'Call signature') {
+				returnTypes.push(getType(signature.type));
+				for (const parameter of signature.parameters || []) {
+					parameters[parameter.name] = buildMetaForProperty(parameter);
+				}
+			}
+		}
+
+		return {
+			...typeArgumentsObj,
+			parameters,
+			type: 'callback',
+			returnType: returnTypes[0],
+		}
+	}
+
+	return {
+		...typeArgumentsObj,
+		type: type.name,
+	}
+};
+
 const buildMetaForProperty = (reflection) => {
 	const commentTags = (reflection.comment && reflection.comment.tags) || [];
 	const inheritedFrom =
@@ -87,45 +159,14 @@ const buildMetaForProperty = (reflection) => {
 
 	const isOptional = reflection.flags && reflection.flags.isOptional;
 
-	let type;
-	let typeFlags = {};
+	let typeObj = {};
 	if (reflection.type) {
-		if (callbacks[reflection.type.name]) {
-			type = 'callback';
-			const signature = callbacks[reflection.type.name];
-			const returnType = signature.type.name;
-			const parameters = {};
-			for (const parameter of signature.parameters || []) {
-				parameters[parameter.name] = buildMetaForProperty(parameter);
-			}
-			typeFlags.parameters = parameters;
-			typeFlags.returnType = returnType;
-		} else if (reflection.type.type === 'array') {
-			type = reflection.type.elementType.name;
-			typeFlags.isArray = true;
-		} else if (reflection.type.type === 'reflection' && reflection.type.declaration) {
-			type = 'callback';
-			const parameters = {};
-			const returnTypes = [];
-			for (const signature of reflection.type.declaration.signatures || []) {
-				if (signature.kindString === 'Call signature') {
-					returnTypes.push(signature.type.name);
-					for (const parameter of signature.parameters || []) {
-						parameters[parameter.name] = buildMetaForProperty(parameter);
-					}
-				}
-			}
-			typeFlags.parameters = parameters;
-			typeFlags.returnType = returnTypes[0];
-		} else {
-			type = reflection.type.name;
-		}
+		typeObj = getType(reflection.type);
 	}
 	
 	return {
 		...commentTags.reduce((total, current) => ({ ...total, [current.tagName]: current.text }), {}),
-		...typeFlags,
-		type,
+		...typeObj,
 		inheritedFrom,
 		isOptional,
 	}
