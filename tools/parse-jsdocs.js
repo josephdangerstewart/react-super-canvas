@@ -31,9 +31,9 @@ function getTypescriptFilesFromDirectory(directory) {
 }
 
 const filesToScan = [
-	/* ...getTypescriptFilesFromDirectory(path.resolve('./src/types')),
+	...getTypescriptFilesFromDirectory(path.resolve('./src/types')),
 	...getTypescriptFilesFromDirectory(path.resolve('./src/components')),
-	...getTypescriptFilesFromDirectory(path.resolve('./src/utility')), */
+	...getTypescriptFilesFromDirectory(path.resolve('./src/utility')),
 	path.resolve('./src/types/IBrush.ts'),
 ];
 
@@ -47,13 +47,13 @@ const interfaces = reflections.filter(reflection => reflection && reflection.kin
 const callbacks = reflections
 	.filter(reflection =>
 		reflection &&
-		reflection.kindString === 'Type literal' &&
-		reflection.sources.find(source => /types\/callbacks\//.test(source.fileName))
+		reflection.signatures &&
+		reflection.sources.find(source => /types\/callbacks\//.test(source.file.fullFileName))
 	)
 	.map(reflection => reflection.signatures)
 	.reduce((all, signatures) => [...all, ...signatures], [])
 	.reduce((map, signature) => {
-		const [,fileName] = /\/(.*)\.tsx?/.exec(signature.sources[0] && signature.sources[0].fileName) || [];
+		const [,fileName] = /\/([^\/]*)\.tsx?/.exec(signature.sources[0] && signature.sources[0].fileName) || [];
 		if (fileName) {
 			map[fileName] = signature;
 		}
@@ -98,20 +98,17 @@ const getType = (type) => {
 	}
 
 	if (callbacks[type.name]) {
-		type = 'callback';
-		const signature = callbacks[reflection.type.name];
+		const signature = callbacks[type.name];
 		const returnType = getType(signature.type);
 		const parameters = {};
 		for (const parameter of signature.parameters || []) {
 			parameters[parameter.name] = buildMetaForProperty(parameter);
 		}
-		typeFlags.parameters = parameters;
-		typeFlags.returnType = returnType;
 		return {
 			...typeArgumentsObj,
-			type: 'callback',
 			parameters,
 			returnType,
+			type: 'callback',
 		}
 	}
 
@@ -138,8 +135,8 @@ const getType = (type) => {
 		return {
 			...typeArgumentsObj,
 			parameters,
-			type: 'callback',
 			returnType: returnTypes[0],
+			type: 'callback',
 		}
 	}
 

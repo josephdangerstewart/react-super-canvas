@@ -23,3 +23,46 @@ All super canvas brushes implement this interface and can be made usable in the 
 ## `interface IBrush`
 
 <InterfaceDocumentation interfaceMetadata={IBrushMeta} />
+
+## Default brushes
+
+The super canvas package exports a few default brush classes that can be plugged right into the `SuperCanvas` component.
+
+* `CircleBrush` - Draws circles (exposes `CircleCanvasItem`)
+* `PolygonBrush` - Draws a polygon (exposes `PolygonCanvasItem`)
+* `ImageBrush` - Stamps an image (exposes `ImageCanvasItem`)
+
+```tsx
+import {
+	CircleBrush,
+	PolygonBrush,
+	ImageBrush,
+} from 'react-super-canvas/defaults';
+import { SuperCanvas } from 'react-super-canvas';
+
+// ...
+
+<SuperCanvas
+	...
+	availableBrushes={[
+		new CircleBrush(),
+		new PolygonBrush(),
+		new ImageBrush('http://www.example.com/my-image.jpg'),
+	]}
+/>
+```
+
+## Remarks on `supportedCanvasItem`
+
+The usage of `supportedCanvasItems` might be a little bit confusing. Say you have a brush called `CharacterBrush` that can paint NPCs and PCs on a map. Say that NPCs and PCs are both rendered by the `NPCCanvasItem` class and `PCCanvasItem` class respectively. Your declaration for `CharacterBrush` might look a little bit like the following.
+
+```ts
+export default class CharacterBrush implements IBrush {
+	supportedCanvasItems = {
+		PCCanvasItem,
+		NPCCanvasItem,
+	}
+}
+```
+
+This is how the super canvas can map pure JSON output to the `ICanvasItem` class that it is supposed to be an instance of.

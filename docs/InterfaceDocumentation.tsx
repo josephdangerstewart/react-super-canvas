@@ -33,7 +33,7 @@ const TypeDocumentation: React.FunctionComponent<TypedProperty> = ({
 				({parameters && Object.entries(parameters).map(([ parameter, meta ]) => (
 					<span key={parameter}>
 						<PropertyName isMethod={meta.type === 'callback'}>{parameter}</PropertyName>:{' '}
-						<PropertyType link={links[meta.type]}>{meta.type}</PropertyType>{meta.isArray && '[]'}
+						<TypeDocumentation {...meta} />{meta.isArray && '[]'}
 					</span>
 				)).reduce((prev, cur) => ([ ...prev, ', ', cur ]), []).splice(1)}) <Keyword>=&gt;</Keyword>&nbsp;
 				<TypeDocumentation
