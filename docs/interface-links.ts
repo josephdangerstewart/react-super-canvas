@@ -7,6 +7,9 @@ const links: { [interfaceName: string]: string } = {
 	Vector2D: '/utility#interface-vector2d',
 	CanvasRenderingContext2D: 'https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D',
 	IPainterAPI: '/painterapi',
+	ICanvasItem: '/icanvasitem',
+	IBrush: '/ibrush',
+	IBackgroundElement: '/ibackgroundelement',
 };
 
 export default links;
