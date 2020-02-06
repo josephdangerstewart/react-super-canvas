@@ -10,6 +10,7 @@ const links: { [interfaceName: string]: string } = {
 	ICanvasItem: '/icanvasitem',
 	IBrush: '/ibrush',
 	IBackgroundElement: '/ibackgroundelement',
+	Type: '/utility/#interface-type',
 };
 
 export default links;
