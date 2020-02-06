@@ -6,6 +6,7 @@ const links: { [interfaceName: string]: string } = {
 	Polygon: '/shapes#interface-polygon',
 	Vector2D: '/utility#interface-vector2d',
 	CanvasRenderingContext2D: 'https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D',
+	IPainterAPI: '/painterapi',
 };
 
 export default links;
