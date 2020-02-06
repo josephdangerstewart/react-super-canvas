@@ -1,0 +1,36 @@
+---
+name: IBackgroundElement
+menu: API Reference
+route: ibackgroundelement
+---
+
+import { InterfaceDocumentation } from '../InterfaceDocumentation';
+import IBackgroundElementMeta from '../../meta/interfaces/IBackgroundElement';
+
+# The `IBackgroundElement` Interface
+
+The background element defines what is rendered as the background of the canvas but also is responsible for any coordinate mapping that takes place.
+
+## `interface IBackgroundElement`
+
+<InterfaceDocumentation interfaceMetadata={IBackgroundElementMeta} />
+
+## Defaults
+
+The `react-super-canvas` package exports a couple of default background elements that can be plugged in right away.
+
+* `GridBackground` - Draws a dotted grid and snaps coordinates to the nearest valid point
+* `DefaultBackgroundElement` - Renders nothing and does nothing to the coordinates. This is the default background element if none is provided via props
+
+```tsx
+import { GridBackground, DefaultBackgroundElement } from 'react-super-canvas/defaults';
+
+// ...
+
+<SuperCanvas
+	...
+	activeBackgroundElement={new GridBackground(20)}
+/>
+```
+
+

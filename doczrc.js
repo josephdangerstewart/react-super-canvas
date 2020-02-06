@@ -18,6 +18,7 @@ export default {
 				'IPainterAPI',
 				'IBrush',
 				'ICanvasItem',
+				'IBackgroundElement',
 				'Shape Types',
 				'Utility Types',
 			]
