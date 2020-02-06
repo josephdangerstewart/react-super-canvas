@@ -1,0 +1,40 @@
+---
+name: ICanvasItem
+menu: API Reference
+---
+
+import { InterfaceDocumentation } from '../InterfaceDocumentation';
+import ICanvasItemMeta from '../../meta/interfaces/ICanvasItem';
+
+# The `ICanvasItem` interface
+
+All canvas items implement the following interface and represent a single object drawn on the canvas. All canvas items must be able to convert from/to pure JSON data. When converting from pure JSON, the super canvas will create an instance of the canvas item and then call `fromJson(data)`. Therefore, all classes that implement `ICanvasItem` must define a default constructor with the signature `constructor() {}`. In this case, initializing any data should be delegated to `fromJson(data)`.
+
+## `interface ICanvasItem`
+
+<InterfaceDocumentation interfaceMetadata={ICanvasItemMeta} />
+
+## Defaults
+
+While canvas items aren't used directly in the `SuperCanvas` component, they can be used when extending `IBrush` to create custom brushes. For this reason, campaign buddy exports a few default brushes for public use.
+
+* `CircleCanvasItem`
+* `ImageCanvasItem`
+* `PolygonCanvasItem`
+
+```ts
+import {
+	CircleCanvasItem,
+	PolygonCanvasItem,
+	ImageCanvasItem,
+} from 'react-super-canvas/defaults';
+import { SuperCanvas } from 'react-super-canvas';
+
+// ...
+
+const circleCanvasItemInstance = new CircleCanvasItem(center?: Vector2D, radius?: number, styleContext?: StyleContext);
+
+const polygonCanvasItem = new PolygonCanvasItem(points?: Vector2D[], styleContext?: StyleContext);
+
+const imageCanvasItem = new ImageCanvasItem(src?: string, topLeftCorner?: Vector2D, imageCache?: IImageCache);
+```

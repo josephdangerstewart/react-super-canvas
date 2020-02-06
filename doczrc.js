@@ -17,6 +17,7 @@ export default {
 			menu: [
 				'IPainterAPI',
 				'IBrush',
+				'ICanvasItem',
 				'Shape Types',
 				'Utility Types',
 			]
