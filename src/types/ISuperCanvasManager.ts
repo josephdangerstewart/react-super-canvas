@@ -43,6 +43,11 @@ export default interface ISuperCanvasManager {
 	setAvailableBrushes: (brushes: IBrush[]) => void;
 
 	/**
+	 * @description Sets the brush that is currently being used
+	 */
+	setActiveBrushByName: (brushName: string) => void;
+
+	/**
 	 * @description Sets the brush that the user is currently using
 	 */
 	setActiveBrush: (brush: IBrush) => void;

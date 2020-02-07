@@ -1,4 +1,6 @@
-import React, { useMemo, useState, useCallback } from 'react';
+import React, {
+	useMemo, useState, useCallback, forwardRef, useImperativeHandle,
+} from 'react';
 import IBrush, { DefaultBrushKind } from '../types/IBrush';
 import IBackgroundElement from '../types/IBackgroundElement';
 import { useSuperCanvasManager } from '../hooks/use-super-canvas-manager';
@@ -56,84 +58,104 @@ export interface SuperCanvasProps {
 	initialValue?: JsonData[];
 }
 
-const SuperCanvas: React.FunctionComponent<SuperCanvasProps> = ({
-	height,
-	width,
-	availableBrushes: providedBrushes,
-	activeBackgroundElement,
-	toolbarComponents,
-	onChange,
-	initialValue,
-}) => {
-	const availableBrushes = useMemo(() => {
-		if (!providedBrushes.find((brush) => brush.brushName === DefaultBrushKind.Selection)) {
-			return [ new SelectionBrush(), ...providedBrushes ];
-		}
+export interface SuperCanvasImperativeHandle {
+	/**
+	 * @description Changes the brush that is currently brush
+	 */
+	setActiveBrush: (brushName: string) => void;
+}
 
-		return providedBrushes;
-	}, [ providedBrushes ]);
+const SuperCanvas: React.ForwardRefExoticComponent<SuperCanvasProps> = forwardRef<SuperCanvasImperativeHandle, SuperCanvasProps>(
+	(
+		{
+			height,
+			width,
+			availableBrushes: providedBrushes,
+			activeBackgroundElement,
+			toolbarComponents,
+			onChange,
+			initialValue,
+		},
+		ref,
+	) => {
+		const availableBrushes = useMemo(() => {
+			if (!providedBrushes.find((brush) => brush.brushName === DefaultBrushKind.Selection)) {
+				return [ new SelectionBrush(), ...providedBrushes ];
+			}
 
-	const [ selection, setSelection ] = useState(null);
-	const handleSelectionChange = useCallback((curSelection: ISelection): void => {
-		if (curSelection.selectedItem) {
-			setSelection(curSelection);
-		} else {
-			setSelection(null);
-		}
-	}, []);
+			return providedBrushes;
+		}, [ providedBrushes ]);
 
-	const {
-		canvasRef,
-		superCanvasManager,
-		activeBrushName,
-		styleContext,
-	} = useSuperCanvasManager(activeBackgroundElement, availableBrushes, onChange, initialValue, handleSelectionChange);
+		const [ selection, setSelection ] = useState(null);
+		const handleSelectionChange = useCallback((curSelection: ISelection): void => {
+			if (curSelection.selectedItem) {
+				setSelection(curSelection);
+			} else {
+				setSelection(null);
+			}
+		}, []);
 
-	const {
-		Toolbar: CustomToolbar,
-		BrushControls: CustomBrushControls,
-		StyleControls: CustomStyleControls,
-		CanvasControls: CustomCanvasControls,
-	} = (toolbarComponents || {}) as ToolbarComponents;
+		const {
+			canvasRef,
+			superCanvasManager,
+			activeBrushName,
+			styleContext,
+		} = useSuperCanvasManager(activeBackgroundElement, availableBrushes, onChange, initialValue, handleSelectionChange);
 
-	const Toolbar = CustomToolbar || DefaultToolbar as React.ComponentType<ToolbarProps>;
-	const BrushControls = CustomBrushControls || DefaultBrushControls as React.ComponentType<BrushControlsProps>;
-	const StyleControls = CustomStyleControls || DefaultStyleControls as React.ComponentType<StyleControlsProps>;
-	const CanvasControls = CustomCanvasControls || DefaultCanvasControls as React.ComponentType<CanvasControlsProps>;
+		useImperativeHandle(
+			ref,
+			() => superCanvasManager && ({
+				setActiveBrush: superCanvasManager && superCanvasManager.setActiveBrushByName,
+			}),
+			[ superCanvasManager ],
+		);
 
-	return (
-		<div style={{ position: 'relative' }}>
-			<canvas
-				height={height}
-				width={width}
-				ref={canvasRef}
-			/>
-			{superCanvasManager && (
-				<Toolbar
-					brushControls={(
-						<BrushControls
-							setActiveBrush={superCanvasManager.setActiveBrush}
-							brushes={availableBrushes}
-							activeBrushName={activeBrushName}
-						/>
-					)}
-					styleControls={(
-						<StyleControls
-							setStyleContext={superCanvasManager.setStyleContext}
-							styleContext={styleContext}
-						/>
-					)}
-					canvasControls={(
-						<CanvasControls
-							clear={superCanvasManager && superCanvasManager.clear}
-							currentSelection={selection}
-							deleteSelectedCanvasItems={superCanvasManager && superCanvasManager.deleteSelectedCanvasItem}
-						/>
-					)}
+		const {
+			Toolbar: CustomToolbar,
+			BrushControls: CustomBrushControls,
+			StyleControls: CustomStyleControls,
+			CanvasControls: CustomCanvasControls,
+		} = (toolbarComponents || {}) as ToolbarComponents;
+
+		const Toolbar = CustomToolbar || DefaultToolbar as React.ComponentType<ToolbarProps>;
+		const BrushControls = CustomBrushControls || DefaultBrushControls as React.ComponentType<BrushControlsProps>;
+		const StyleControls = CustomStyleControls || DefaultStyleControls as React.ComponentType<StyleControlsProps>;
+		const CanvasControls = CustomCanvasControls || DefaultCanvasControls as React.ComponentType<CanvasControlsProps>;
+
+		return (
+			<div style={{ position: 'relative' }}>
+				<canvas
+					height={height}
+					width={width}
+					ref={canvasRef}
 				/>
-			)}
-		</div>
-	);
-};
+				{superCanvasManager && (
+					<Toolbar
+						brushControls={(
+							<BrushControls
+								setActiveBrush={superCanvasManager.setActiveBrush}
+								brushes={availableBrushes}
+								activeBrushName={activeBrushName}
+							/>
+						)}
+						styleControls={(
+							<StyleControls
+								setStyleContext={superCanvasManager.setStyleContext}
+								styleContext={styleContext}
+							/>
+						)}
+						canvasControls={(
+							<CanvasControls
+								clear={superCanvasManager && superCanvasManager.clear}
+								currentSelection={selection}
+								deleteSelectedCanvasItems={superCanvasManager && superCanvasManager.deleteSelectedCanvasItem}
+							/>
+						)}
+					/>
+				)}
+			</div>
+		);
+	},
+);
 
 export default SuperCanvas;

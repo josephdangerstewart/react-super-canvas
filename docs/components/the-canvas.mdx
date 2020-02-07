@@ -4,12 +4,14 @@ menu: Components
 route: supercanvas
 ---
 
+import { useRef, useCallback } from 'react';
 import SuperCanvas from '../../src/components/SuperCanvas';
 import GridBackground from '../../src/api/background-elements/GridBackground';
 import CircleBrush from '../../src/api/brushes/CircleBrush';
 import PolygonBrush from '../../src/api/brushes/PolygonBrush';
 import ImageBrush from '../../src/api/brushes/ImageBrush';
 import SuperCanvasProps from '../../meta/interfaces/SuperCanvasProps.json';
+import SuperCanvasImperativeHandle from '../../meta/interfaces/SuperCanvasImperativeHandle.json';
 import { InterfaceDocumentation } from '../InterfaceDocumentation';
 import { Playground } from 'docz';
 
@@ -37,3 +39,36 @@ The super canvas is super easy to use! Use it just like this:
 ## Props
 
 <InterfaceDocumentation interfaceMetadata={SuperCanvasProps} />
+
+## Imperative Handle
+
+The `SuperCanvas` component defines an imperative API that extends the following interface. This allows consumers to imperatively manipulate the canvas (e.g. for setting up hotkeys). The imperative handle is accessed via a ref to the `SuperCanvas` component.
+
+<InterfaceDocumentation interfaceMetadata={SuperCanvasImperativeHandle} />
+
+<Playground>
+	{() => {
+		const ref = React.useRef(null);
+		const changeBrush = React.useCallback(() => {
+			if (ref.current) {
+				ref.current.setActiveBrush('selection');
+			}
+		});
+		return (
+			<>
+				<button onClick={changeBrush}>Change brush to selection</button>
+				<SuperCanvas
+					height={600}
+					width={600}
+					activeBackgroundElement={new GridBackground(20)}
+					availableBrushes={[
+						new CircleBrush(),
+						new PolygonBrush(),
+						new ImageBrush('https://knowpathology.com.au/app/uploads/2018/07/Happy-Test-Screen-01-825x510.png'),
+					]}
+					ref={ref}
+				/>
+			</>
+		);
+	}}
+</Playground>

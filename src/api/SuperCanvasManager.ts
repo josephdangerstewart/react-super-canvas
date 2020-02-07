@@ -195,6 +195,13 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 		});
 	};
 
+	setActiveBrushByName = (brushName: string): void => {
+		const brush = this.availableBrushes.find((b) => b.brushName === brushName);
+		if (brush) {
+			this.setActiveBrush(brush);
+		}
+	};
+
 	/* PRIVATE METHODS */
 
 	private update = (): void => {
