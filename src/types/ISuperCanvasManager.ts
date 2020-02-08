@@ -92,4 +92,14 @@ export default interface ISuperCanvasManager {
 	 * @description Gets the current selection
 	 */
 	getSelection: () => ISelection;
+
+	/**
+	 * @description Undos the last action
+	 */
+	undo: () => void;
+
+	/**
+	 * @description Redos the last action
+	 */
+	redo: () => void;
 }

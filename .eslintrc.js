@@ -39,5 +39,6 @@ module.exports = {
 		'react/prop-types': 'off',
 		'react/jsx-one-expression-per-line': 'off',
 		'prettier/prettier': 'off',
+		'no-case-declarations': 'off',
 	},
 };

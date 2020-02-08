@@ -63,6 +63,16 @@ export interface SuperCanvasImperativeHandle {
 	 * @description Changes the brush that is currently brush
 	 */
 	setActiveBrush: (brushName: string) => void;
+
+	/**
+	 * @description Undos the last action
+	 */
+	undo: () => void;
+
+	/**
+	 * @description Redos the last undone action
+	 */
+	redo: () => void;
 }
 
 const SuperCanvas: React.ForwardRefExoticComponent<SuperCanvasProps> = forwardRef<SuperCanvasImperativeHandle, SuperCanvasProps>(
@@ -106,6 +116,8 @@ const SuperCanvas: React.ForwardRefExoticComponent<SuperCanvasProps> = forwardRe
 			ref,
 			() => superCanvasManager && ({
 				setActiveBrush: superCanvasManager && superCanvasManager.setActiveBrushByName,
+				undo: superCanvasManager && superCanvasManager.undo,
+				redo: superCanvasManager && superCanvasManager.redo,
 			}),
 			[ superCanvasManager ],
 		);

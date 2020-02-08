@@ -14,7 +14,7 @@ import { ActiveBrushChangeCallback } from '../types/callbacks/ActiveBrushChangeC
 import { StyleContextChangeCallback } from '../types/callbacks/StyleContextChangeCallback';
 import SelectionManager from './helpers/SelectionManager';
 import { TransformManager } from './helpers/TransformManager';
-import CanvasItemInstance from '../types/utility/CanvasItemInstance';
+import ActionHistoryManager, { ActionType, TransformAction, ActionRecord } from './helpers/ActionHistoryManager';
 import { IImageCache } from '../types/IImageCache';
 import ImageCache from './ImageCache';
 import { OnCanvasItemChangeCallback } from '../types/callbacks/OnCanvasItemChangeCallback';
@@ -22,6 +22,7 @@ import JsonData from '../types/utility/JsonData';
 import Type from '../types/utility/Type';
 import ISelection from '../types/ISelection';
 import { OnSelectionChangeCallback } from '../types/callbacks/OnSelectionChangeCallback';
+import { createSelection } from '../utility/selection-utility';
 
 export default class SuperCanvasManager implements ISuperCanvasManager {
 	/* PRIVATE MEMBERS */
@@ -42,7 +43,7 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 	private transformManager: TransformManager;
 
 	// The active canvas items on the canvas
-	private canvasItems: CanvasItemInstance[];
+	private canvasItems: ICanvasItem[];
 
 	// The available bushes the user can paint with
 	private availableBrushes: IBrush[];
@@ -71,14 +72,18 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 	// The custom callback when canvas items change
 	private _onCanvasItemChange: OnCanvasItemChangeCallback;
 
+	// The action history manager for handling undo, redo management
+	private actionHistoryManager: ActionHistoryManager;
+
 	/* PUBLIC METHODS */
 
 	init = (canvas: HTMLCanvasElement): void => {
 		// This must be the first thing called because it attaches event listeners
 		this.interactionManager = new CanvasInteractionManager(canvas);
 		this.context2d = canvas.getContext('2d');
+		this.actionHistoryManager = new ActionHistoryManager();
 		this.selectionManager = new SelectionManager(this.interactionManager);
-		this.transformManager = new TransformManager(this.selectionManager, this.handleCanvasItemsChange);
+		this.transformManager = new TransformManager(this.selectionManager, this.handleCanvasItemsChange, this.actionHistoryManager);
 		this.imageCache = new ImageCache(this.context2d);
 		this.painter = new PainterAPI(this.context2d, this.interactionManager.panOffset, this.interactionManager.scale, this.imageCache);
 
@@ -177,12 +182,14 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 
 	clear = (): void => {
 		this.selectionManager.deselectItems();
+		this.actionHistoryManager.recordDeleteCanvasItems([ ...this.canvasItems ]);
 		this.canvasItems = [];
 		this.handleCanvasItemsChange();
 	};
 
 	deleteSelectedCanvasItem = (): void => {
 		const items = this.selectionManager.selectedItems;
+		this.actionHistoryManager.recordDeleteCanvasItems([ ...items ]);
 		this.canvasItems = this.canvasItems.filter((item) => !items.includes(item));
 		this.handleCanvasItemsChange();
 	};
@@ -202,7 +209,42 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 		}
 	};
 
+	undo = (): void => {
+		const action = this.actionHistoryManager.getNextUndoAction();
+		this.applyAction(action);
+	};
+
+	redo = (): void => {
+		const action = this.actionHistoryManager.getNextRedoAction();
+		this.applyAction(action);
+	};
+
 	/* PRIVATE METHODS */
+
+	private applyAction = (action: ActionRecord): void => {
+		if (!action) {
+			return;
+		}
+
+		switch (action.type) {
+			case ActionType.DeleteCanvasItems:
+				this.canvasItems = this.canvasItems.filter((item) => !action.data.canvasItems.includes(item));
+				break;
+			case ActionType.AddCanvasItems:
+				this.canvasItems.push(...action.data.canvasItems);
+				break;
+			case ActionType.TransformCanvasItems:
+				const data = (action.data as TransformAction);
+				this.transformManager.applyTransform(data.transformOperation, createSelection(data.canvasItems));
+				break;
+			default:
+				break;
+		}
+
+		if (this.selectionManager.selectedItems.some((item) => !this.canvasItems.includes(item))) {
+			this.selectionManager.deselectItems();
+		}
+	};
 
 	private update = (): void => {
 		// This must be the first thing called
@@ -286,7 +328,8 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 	};
 
 	private addCanvasItem = (item: ICanvasItem): void => {
-		this.canvasItems.push({ ...item, $rotation: 0 });
+		this.canvasItems.push(item);
+		this.actionHistoryManager.recordAddCanvasItems([ item ]);
 		this.handleCanvasItemsChange();
 	};
 

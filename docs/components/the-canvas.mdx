@@ -49,14 +49,19 @@ The `SuperCanvas` component defines an imperative API that extends the following
 <Playground>
 	{() => {
 		const ref = React.useRef(null);
-		const changeBrush = React.useCallback(() => {
+		const redo = React.useCallback(() => {
 			if (ref.current) {
-				ref.current.setActiveBrush('selection');
+				ref.current.redo();
 			}
 		});
+		const undo = React.useCallback(() => {
+			if (ref.current) {
+				ref.current.undo();
+			}
+		})
 		return (
 			<>
-				<button onClick={changeBrush}>Change brush to selection</button>
+				<button onClick={undo}>Undo</button><button onClick={redo}>Redo</button>
 				<SuperCanvas
 					height={600}
 					width={600}

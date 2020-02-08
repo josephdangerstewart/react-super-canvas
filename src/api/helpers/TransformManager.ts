@@ -13,6 +13,7 @@ import { TransformOperation } from '../../types/transform/TransformOperation';
 import Vector2D from '../../types/utility/Vector2D';
 import { BrushContext } from '../../types/context/BrushContext';
 import { applyMultiScale } from '../../utility/transform-utility';
+import ActionHistoryManager from './ActionHistoryManager';
 
 const HANDLE_DIAMETER = 12;
 
@@ -48,11 +49,13 @@ export class TransformManager {
 	private onCanvasItemChange: () => void;
 
 	private mouseDownAt: Vector2D;
+	private actionHistoryManager: ActionHistoryManager;
 
-	constructor(selectionManager: ISelection, onCanvasItemChange: () => void) {
+	constructor(selectionManager: ISelection, onCanvasItemChange: () => void, actionHistoryManager: ActionHistoryManager) {
 		this.selectionManager = selectionManager;
 		this.mouseDownAt = vector(0, 0);
 		this.onCanvasItemChange = onCanvasItemChange;
+		this.actionHistoryManager = actionHistoryManager;
 	}
 
 	render = (painter: IPainterAPI, context: BrushContext): void => {
@@ -229,30 +232,35 @@ export class TransformManager {
 
 	mouseUp = (): void => {
 		if (this.transformOperation && this.selectionManager.selectedItem) {
-			switch (this.transformOperation.action) {
-				case TransformKind.Move:
-					if (this.selectionManager.selectedItem.applyMove) {
-						this.selectionManager.selectedItems.forEach((item) => item.applyMove(this.transformOperation.move));
-						this.onCanvasItemChange();
-					}
-					break;
-				case TransformKind.Scale:
-					if (this.selectionManager.selectedItemCount > 1 && this.selectionManager.canScale) {
-						applyMultiScale(this.selectionManager.selectedItems, this.transformOperation.scale.value, this.transformOperation.scale.node);
-						this.onCanvasItemChange();
-					} else if (this.selectionManager.canScale) {
-						this.selectionManager.selectedItem.applyScale(this.transformOperation.scale.value, this.transformOperation.scale.node);
-						this.onCanvasItemChange();
-					}
-					break;
-				default:
-					break;
-			}
+			this.actionHistoryManager.recordTransform([ ...this.selectionManager.selectedItems ], { ...this.transformOperation });
+			this.applyTransform(this.transformOperation, this.selectionManager);
 		}
 
 		this.isMouseDown = false;
 		this.transformOperation = null;
 		this.previewRect = null;
+	};
+
+	applyTransform = (op: TransformOperation, selection: ISelection): void => {
+		switch (op.action) {
+			case TransformKind.Move:
+				if (selection.selectedItem.applyMove) {
+					selection.selectedItems.forEach((item) => item.applyMove(op.move));
+					this.onCanvasItemChange();
+				}
+				break;
+			case TransformKind.Scale:
+				if (selection.selectedItemCount > 1 && selection.canScale) {
+					applyMultiScale(selection.selectedItems, op.scale.value, op.scale.node);
+					this.onCanvasItemChange();
+				} else if (selection.canScale) {
+					selection.selectedItem.applyScale(op.scale.value, op.scale.node);
+					this.onCanvasItemChange();
+				}
+				break;
+			default:
+				break;
+		}
 	};
 
 	private getScaleNodes = (rect: Rectangle, context?: BrushContext): { type: ScalingNode; node: Rectangle }[] => {
