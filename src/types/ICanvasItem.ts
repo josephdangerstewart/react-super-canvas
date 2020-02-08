@@ -28,12 +28,6 @@ export default interface ICanvasItem {
 	toJson: () => JsonData;
 
 	/**
-	 * @description Initializes the canvas item from a saved json
-	 * state
-	 */
-	fromJson: (data: JsonData) => void;
-
-	/**
 	 * @description Optionally allows consumers to have more fine tuned control over
 	 * whether or not the user has selected this item
 	 *

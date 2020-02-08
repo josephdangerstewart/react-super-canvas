@@ -9,6 +9,16 @@ import { scaleRectangle } from '../../utility/transform-utility';
 import JsonData from '../../types/utility/JsonData';
 import { CanvasItemKind } from './CanvasItemKind';
 
+export interface ImageCanvasItemConstructor {
+	src: string;
+	topLeftCorner: Vector2D;
+	imageMeta?: {
+		size: Vector2D;
+		scale: Vector2D;
+	};
+	imageCache?: IImageCache;
+}
+
 export default class ImageCanvasItem implements ICanvasItem {
 	public canvasItemName = CanvasItemKind.ImageCanvasItem;
 
@@ -18,51 +28,34 @@ export default class ImageCanvasItem implements ICanvasItem {
 	private size: Vector2D;
 	private imageCache: IImageCache;
 
-	constructor(src?: string, topLeftCorner?: Vector2D, imageCache?: IImageCache) {
-		if (!src && !topLeftCorner && !imageCache) {
-			return;
-		}
-
+	constructor({
+		src,
+		topLeftCorner,
+		imageCache,
+		imageMeta,
+	}: ImageCanvasItemConstructor) {
 		this.src = src;
 		this.topLeftCorner = topLeftCorner;
 		this.scale = vector(1, 1);
 		this.size = vector(0, 0);
 		this.imageCache = imageCache;
 
-		this.generateSize();
+		if (imageCache) {
+			this.generateSize();
+		} else if (imageMeta) {
+			this.scale = imageMeta.scale;
+			this.size = imageMeta.size;
+		}
 	}
 
 	toJson = (): JsonData => ({
 		src: this.src,
 		topLeftCorner: this.topLeftCorner,
-		scale: this.scale,
-		size: this.size,
+		imageMeta: {
+			size: this.size,
+			scale: this.scale,
+		},
 	});
-
-	fromJson = (data: JsonData): void => {
-		const {
-			src,
-			topLeftCorner,
-			scale,
-			size,
-		} = data;
-
-		if (src) {
-			this.src = src as string;
-		}
-
-		if (topLeftCorner) {
-			this.topLeftCorner = topLeftCorner as Vector2D;
-		}
-
-		if (scale) {
-			this.scale = scale as Vector2D;
-		}
-
-		if (size) {
-			this.size = size as Vector2D;
-		}
-	};
 
 	render = (painter: IPainterAPI): void => {
 		painter.drawImage(this.topLeftCorner, this.src, this.scale);

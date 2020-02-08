@@ -3,7 +3,6 @@ import Circle from '../../types/shapes/Circle';
 import IPainterAPI from '../../types/IPainterAPI';
 import Vector2D from '../../types/utility/Vector2D';
 import { boundingRectOfCircle } from '../../utility/shapes-util';
-import StyleContext from '../../types/context/StyleContext';
 import Rectangle from '../../types/shapes/Rectangle';
 import { TransformOperation } from '../../types/transform/TransformOperation';
 import { TransformKind } from '../../types/transform/TransformKind';
@@ -11,17 +10,20 @@ import { scaleCircle, moveCircle } from '../../utility/transform-utility';
 import { ScalingNode } from '../../types/transform/ScalingNode';
 import JsonData from '../../types/utility/JsonData';
 import { CanvasItemKind } from './CanvasItemKind';
+import StyleContext from '../../types/context/StyleContext';
+
+export interface CircleCanvasItemConstructor {
+	center: Vector2D;
+	radius: number;
+	styleContext: StyleContext;
+}
 
 export default class CircleCanvasItem implements ICanvasItem {
 	public canvasItemName = CanvasItemKind.CircleCanvasItem;
 
 	private circle: Circle;
 
-	constructor(center?: Vector2D, radius?: number, styleContext?: StyleContext) {
-		if (!center && !radius && !styleContext) {
-			return null;
-		}
-
+	constructor({ center, radius, styleContext }: CircleCanvasItemConstructor) {
 		this.circle = {
 			center,
 			radius,
@@ -31,14 +33,10 @@ export default class CircleCanvasItem implements ICanvasItem {
 	}
 
 	toJson = (): JsonData => ({
-		circle: this.circle,
+		center: this.circle.center,
+		radius: this.circle.radius,
+		styleContext: { ...this.circle },
 	});
-
-	fromJson = (data: JsonData): void => {
-		if (data.circle) {
-			this.circle = data.circle as Circle;
-		}
-	};
 
 	render = (painter: IPainterAPI): void => {
 		painter.drawCircle(this.circle);

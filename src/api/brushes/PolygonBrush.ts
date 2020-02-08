@@ -61,7 +61,11 @@ export default class PolygonBrush implements IBrush {
 				return;
 			}
 
-			addCanvasItem(new PolygonCanvasItem(this.points, context.styleContext));
+			addCanvasItem(new PolygonCanvasItem({
+				points: this.points,
+				styleContext: context.styleContext,
+			}));
+
 			this.points = [];
 			return;
 		}

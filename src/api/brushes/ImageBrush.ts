@@ -27,6 +27,10 @@ export default class ImageBrush implements IBrush {
 	};
 
 	mouseDown = (addCanvasItem: AddCanvasItemCallback, context: BrushContext): void => {
-		addCanvasItem(new ImageCanvasItem(this.src, this.topLeftCorner, context.imageCache));
+		addCanvasItem(new ImageCanvasItem({
+			src: this.src,
+			topLeftCorner: this.topLeftCorner,
+			imageCache: context.imageCache,
+		}));
 	};
 }

@@ -123,9 +123,7 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 			const CanvasItemClass = availableCanvasItems[canvasItemName as string];
 
 			if (CanvasItemClass) {
-				const canvasItem = new CanvasItemClass();
-				canvasItem.fromJson(item as JsonData);
-				return { ...canvasItem, $rotation: 0 };
+				return new CanvasItemClass(item);
 			}
 			return null;
 		}).filter(Boolean);

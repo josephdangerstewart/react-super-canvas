@@ -2,24 +2,25 @@ import ICanvasItem from '../../types/ICanvasItem';
 import IPainterAPI from '../../types/IPainterAPI';
 import Polygon from '../../types/shapes/Polygon';
 import Vector2D from '../../types/utility/Vector2D';
-import StyleContext from '../../types/context/StyleContext';
 import Rectangle from '../../types/shapes/Rectangle';
 import { pointInsidePolygon, boundingRectOfPolygon } from '../../utility/shapes-util';
 import { scalePolygon, movePolygon } from '../../utility/transform-utility';
 import { ScalingNode } from '../../types/transform/ScalingNode';
 import JsonData from '../../types/utility/JsonData';
 import { CanvasItemKind } from './CanvasItemKind';
+import StyleContext from '../../types/context/StyleContext';
+
+export interface PolygonCanvasItemConstructor {
+	points: Vector2D[];
+	styleContext: StyleContext;
+}
 
 export default class PolygonCanvasItem implements ICanvasItem {
 	public canvasItemName = CanvasItemKind.PolygonCanvasItem;
 
 	private polygon: Polygon;
 
-	constructor(points?: Vector2D[], styleContext?: StyleContext) {
-		if (!points && !styleContext) {
-			return null;
-		}
-
+	constructor({ points, styleContext }: PolygonCanvasItemConstructor) {
 		this.polygon = {
 			points,
 			fillColor: styleContext.fillColor,
@@ -28,14 +29,9 @@ export default class PolygonCanvasItem implements ICanvasItem {
 	}
 
 	toJson = (): JsonData => ({
-		polygon: this.polygon,
+		points: this.polygon.points,
+		styleContext: { ...this.polygon },
 	});
-
-	fromJson = (data: JsonData): void => {
-		if (data.polygon) {
-			this.polygon = data.polygon as Polygon;
-		}
-	};
 
 	render = (painter: IPainterAPI): void => {
 		painter.drawPolygon(this.polygon);
