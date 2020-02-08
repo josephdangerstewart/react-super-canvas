@@ -38,11 +38,13 @@ export default class PainterAPI implements IPainterAPI {
 	drawLine = (arg: Line): void => {
 		const line = fillDefaults(arg, LineDefaults);
 
-		const point1 = this.toAbsolutePoint(line.point1);
-		const point2 = this.toAbsolutePoint(line.point2);
+		const canvasRect = this.getViewport();
 
 		// Only draw if it is visible
-		if (this.lineIntersectsCanvas({ point1, point2 })) {
+		if (lineCollidesWithRect(line, canvasRect)) {
+			const point1 = this.toAbsolutePoint(line.point1);
+			const point2 = this.toAbsolutePoint(line.point2);
+
 			this.context2d.beginPath();
 			this.context2d.moveTo(point1.x, point1.y);
 			this.context2d.lineTo(point2.x, point2.y);
@@ -230,11 +232,6 @@ export default class PainterAPI implements IPainterAPI {
 		virtualPoint.y += virtualPan.y;
 
 		return virtualPoint;
-	};
-
-	private lineIntersectsCanvas = (line: Line): boolean => {
-		const canvasRect = this.getViewport();
-		return lineCollidesWithRect(line, canvasRect);
 	};
 
 	private doDrawImage = (topLeftCorner: Vector2D, image: HTMLImageElement, scale?: Vector2D, opacity?: number): void => {

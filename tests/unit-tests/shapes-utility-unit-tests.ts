@@ -94,15 +94,33 @@ describe('shapes-util', () => {
 	});
 
 	describe('rectToLines', () => {
-		const expectedLines: Line[] = [
-			line(0, 0, 5, 0),
-			line(5, 0, 5, 5),
-			line(5, 5, 0, 5),
-			line(0, 5, 0, 0),
-		];
-
 		it('can convert a rectangle to an array of lines', () => {
+			const expectedLines: Line[] = [
+				line(0, 0, 5, 0),
+				line(5, 0, 5, 5),
+				line(5, 5, 0, 5),
+				line(0, 5, 0, 0),
+			];
 			const result = rectToLines(rect);
+
+			expect(result).toEqual(expectedLines);
+		});
+
+		it('works when the rect has a non zero top left', () => {
+			const nonZeroRect: Rectangle = {
+				topLeftCorner: vector(4, 4),
+				width: 1,
+				height: 1,
+			};
+
+			const expectedLines: Line[] = [
+				line(4, 4, 5, 4),
+				line(5, 4, 5, 5),
+				line(5, 5, 4, 5),
+				line(4, 5, 4, 4),
+			];
+
+			const result = rectToLines(nonZeroRect);
 
 			expect(result).toEqual(expectedLines);
 		});
@@ -164,9 +182,26 @@ describe('shapes-util', () => {
 			[ line(-5, 1, -4, 2), false ],
 		];
 
+		const nonZeroRect: Rectangle = {
+			topLeftCorner: { x: -66, y: -15 },
+			width: 600,
+			height: 600,
+		};
+
+		const nonZeroCases = [
+			[ line(5, 3, 5, 7), true ],
+		];
+
 		cases.forEach(([ input, expectedOutput ]) => {
 			it(`returns ${expectedOutput} for ${lineToString(input as Line)}`, () => {
 				const result = lineCollidesWithRect(input as Line, rect);
+				expect(result).toEqual(expectedOutput);
+			});
+		});
+
+		nonZeroCases.forEach(([ input, expectedOutput ]) => {
+			it(`returns ${expectedOutput} for ${lineToString(input as Line)} in nonZeroRect`, () => {
+				const result = lineCollidesWithRect(input as Line, nonZeroRect);
 				expect(result).toEqual(expectedOutput);
 			});
 		});

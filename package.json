@@ -5,7 +5,7 @@
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
 	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1",
+		"test": "yarn jest",
 		"docz:dev": "docz dev",
 		"docz:build": "yarn meta && docz build",
 		"docz:publish": "git checkout master && git checkout netlify && git pull origin master && git push origin netlify && git checkout master",
