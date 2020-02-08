@@ -101,7 +101,7 @@ export default class ImageCache implements IImageCache {
 		const now = new Date();
 		Object.keys(this.imageCache).forEach((key) => {
 			if (+now - +this.imageCache[key].lastAccessed > timeout) {
-				this.imageCache[key] = null;
+				delete this.imageCache[key];
 			}
 		});
 	};
