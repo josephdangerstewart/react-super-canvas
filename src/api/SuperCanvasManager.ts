@@ -241,9 +241,7 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 				break;
 		}
 
-		if (this.selectionManager.selectedItems.some((item) => !this.canvasItems.includes(item))) {
-			this.selectionManager.deselectItems();
-		}
+		this.handleCanvasItemsChange();
 	};
 
 	private update = (): void => {
@@ -344,7 +342,7 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 			this._onCanvasItemChange(data);
 		}
 
-		if (!this.getCanvasItems().length) {
+		if (this.selectionManager.selectedItems.some((item) => !this.canvasItems.includes(item))) {
 			this.selectionManager.deselectItems();
 		}
 	};

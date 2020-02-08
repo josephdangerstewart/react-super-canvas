@@ -12,7 +12,8 @@
 		"lint": "eslint . --ext .js,.jsx,.ts,.tsx",
 		"meta": "node tools/parse-jsdocs",
 		"dev": "yarn meta && yarn docz:dev",
-		"build": "tsc --declaration --declarationMap --declarationDir ./dist"
+		"build": "tsc --declaration --declarationMap --declarationDir ./dist",
+		"prepublishOnly": "yarn build"
 	},
 	"keywords": [
 		"canvas",
