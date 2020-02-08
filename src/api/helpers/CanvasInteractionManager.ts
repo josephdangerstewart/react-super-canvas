@@ -235,8 +235,8 @@ export default class CanvasInteractionManager {
 		const { x: curX, y: curY } = this._userMousePosition;
 
 		if (this._isPanning) {
-			this.panDiff.x = this.mouseDownAt.x - curX;
-			this.panDiff.y = this.mouseDownAt.y - curY;
+			this.panDiff.x = (this.mouseDownAt.x - curX) / this._scale;
+			this.panDiff.y = (this.mouseDownAt.y - curY) / this._scale;
 		} else {
 			this.mouseEvents[MouseEventKind.MouseMove].forEach((callback) => callback(event));
 		}

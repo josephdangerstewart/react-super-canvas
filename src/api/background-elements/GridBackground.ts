@@ -30,11 +30,6 @@ export default class GridBackground implements IBackgroundElement {
 		const rightX = scaledWidth + snappedTopLeftCorner.x;
 		const bottomY = scaledHeight + snappedTopLeftCorner.y;
 
-		painter.drawCircle({
-			center: snappedTopLeftCorner,
-			radius: 4,
-		});
-
 		for (let x = leftX; x <= rightX; x += this.pixelsPerUnit) {
 			const line: Line = {
 				point1: vector(x, topY - this.pixelsPerUnit),
