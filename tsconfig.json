@@ -9,9 +9,7 @@
 		"noImplicitReturns": true,
 		"outDir": "dist",
 		"sourceMap": true,
-		"typeRoots": [
-			"node_modules/@types"
-		],
+		"skipLibCheck": true,
 		"jsx": "react",
 		"esModuleInterop": true,
 	},
