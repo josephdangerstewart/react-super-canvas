@@ -9,11 +9,44 @@ import ICanvasItemMeta from '../../meta/interfaces/ICanvasItem';
 
 # The `ICanvasItem` interface
 
-All canvas items implement the following interface and represent a single object drawn on the canvas. All canvas items must be able to convert from/to pure JSON data. When converting from pure JSON, the super canvas will create an instance of the canvas item and then call `fromJson(data)`. Therefore, all classes that implement `ICanvasItem` must define a default constructor with the signature `constructor() {}`. In this case, initializing any data should be delegated to `fromJson(data)`.
+All canvas items implement the following interface and represent a single object drawn on the canvas. All canvas items must be able to convert from/to pure JSON data.
 
 ## `interface ICanvasItem`
 
 <InterfaceDocumentation interfaceMetadata={ICanvasItemMeta} />
+
+## Implementing `ICanvasItem`
+
+When converting from pure JSON, the super canvas will create an instance passing in the pure JSON data as the first and only parameter in the constructor. In order to accommodate this, it is best practice to use the [options object pattern](https://www.codereadability.com/what-are-javascript-options-objects/) when defining ICanvasItem constructor signatures. So the `CircleCanvasItem`, for example, has a constructor similar to the following.
+
+```ts
+class CircleCanvasItem implements ICanvasItem {
+	circle: Circle;
+
+	constructor({ center, radius, styleContext }) {
+		this.circle = {
+			...styleContext,
+			center,
+			radius,
+		};
+	}
+
+	toJson = () => ({
+		center: this.circle.center,
+		radius: this.circle.radius,
+		styleContext: { ...this.circle },
+	})
+
+	// ...
+}
+```
+
+So that when the super canvas creates an circle canvas item instance based off of saved JSON data, it will do so like this.
+
+```ts
+const CanvasItemClass = getClassOfCanvasItem(pureJsonFromDatabase);
+const canvasItem = new CanvasItemClass(pureJsonFromDatabase.data);
+```
 
 ## Defaults
 
