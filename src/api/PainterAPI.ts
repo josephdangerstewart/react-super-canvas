@@ -205,8 +205,8 @@ export default class PainterAPI implements IPainterAPI {
 		};
 
 		const absolutePan: Vector2D = {
-			x: this.panOffset.x,
-			y: this.panOffset.y,
+			x: this.panOffset.x * this.scale,
+			y: this.panOffset.y * this.scale,
 		};
 
 		absolutePoint.x -= absolutePan.x;
