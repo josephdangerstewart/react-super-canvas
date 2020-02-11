@@ -7,9 +7,13 @@ import { vector } from '../../utility/shapes-util';
 
 export default class GridBackground implements IBackgroundElement {
 	private pixelsPerUnit: number;
+	private gridLineColor: string;
+	private axisColor: string;
 
-	constructor(pixelsPerUnit: number) {
+	constructor(pixelsPerUnit: number, gridLineColor?: string, axisColor?: string) {
 		this.pixelsPerUnit = pixelsPerUnit || 10;
+		this.gridLineColor = gridLineColor || '#E8E8E8';
+		this.axisColor = axisColor || '#4A4A4A';
 	}
 
 	mapMouseCoordinates = (mousePos: Vector2D): Vector2D => ({
@@ -29,32 +33,42 @@ export default class GridBackground implements IBackgroundElement {
 
 		const rightX = scaledWidth + snappedTopLeftCorner.x;
 		const bottomY = scaledHeight + snappedTopLeftCorner.y;
+		let shouldRenderHorizontalCenter = false;
 
 		for (let x = leftX; x <= rightX; x += this.pixelsPerUnit) {
 			const line: Line = {
 				point1: vector(x, topY - this.pixelsPerUnit),
 				point2: vector(x, bottomY + this.pixelsPerUnit),
-				strokeColor: '#E8E8E8',
+				strokeColor: this.gridLineColor,
 			};
 
 			if (x === 0) {
-				line.strokeColor = '#4A4A4A';
+				shouldRenderHorizontalCenter = true;
+			} else {
+				painter.drawLine(line);
 			}
-
-			painter.drawLine(line);
 		}
 
 		for (let y = topY; y <= bottomY; y += this.pixelsPerUnit) {
 			const line: Line = {
 				point1: vector(leftX - this.pixelsPerUnit, y),
 				point2: vector(rightX + this.pixelsPerUnit, y),
-				strokeColor: '#E8E8E8',
+				strokeColor: this.gridLineColor,
 			};
 
 			if (y === 0) {
-				line.strokeColor = '#4A4A4A';
+				line.strokeColor = this.axisColor;
 			}
 
+			painter.drawLine(line);
+		}
+
+		if (shouldRenderHorizontalCenter) {
+			const line: Line = {
+				point1: vector(0, topY - this.pixelsPerUnit),
+				point2: vector(0, bottomY + this.pixelsPerUnit),
+				strokeColor: this.axisColor,
+			};
 			painter.drawLine(line);
 		}
 	};
