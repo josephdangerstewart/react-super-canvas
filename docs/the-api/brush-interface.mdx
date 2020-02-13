@@ -57,11 +57,24 @@ import { SuperCanvas } from 'react-super-canvas';
 The usage of `supportedCanvasItems` might be a little bit confusing. Say you have a brush called `CharacterBrush` that can paint NPCs and PCs on a map. Say that NPCs and PCs are both rendered by the `NPCCanvasItem` class and `PCCanvasItem` class respectively. Your declaration for `CharacterBrush` might look a little bit like the following.
 
 ```ts
+class PCCanvasItem implements ICanvasItem {
+	static canvasItemName = 'pccanvasitem';
+	canvasItemName = PCCanvasItem.canvasItemName;
+	// ...
+}
+
+class NPCCanvasItem implements ICanvasItem {
+	static canvasItemName = 'npccanvasitem';
+	canvasItemName = NPCCanvasItem.canvasItemName;
+	// ...
+}
+
 export default class CharacterBrush implements IBrush {
 	supportedCanvasItems = {
-		PCCanvasItem,
-		NPCCanvasItem,
+		[PCCanvasItem.canvasItemName]: PCCanvasItem,
+		[NPCCanvasItem.canvasItemName]: NPCCanvasItem,
 	}
+	// ...
 }
 ```
 
