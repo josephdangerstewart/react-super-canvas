@@ -51,6 +51,22 @@ The toolbar in the component was designed using a replaceable component pattern,
 
 <InterfaceDocumentation interfaceMetadata={BrushControlsProps} />
 
+### Example
+
+<Playground>
+	<SuperCanvas
+		width={400}
+		height={400}
+		availableBrushes={[
+			new CircleBrush(),
+		]}
+		activeBackgroundElement={new GridBackground(15)}
+		toolbarComponents={{
+			BrushControls: MyCoolBrushControls,
+		}}
+	/>
+</Playground>
+
 ## StyleControls
 
 ### `interface StyleControlsProps`
