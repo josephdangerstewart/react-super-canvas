@@ -13,7 +13,7 @@ import {
 	PropertyType,
 } from './styled';
 
-import { TypedProperty, PropertyList } from './types';
+import { TypedProperty, InterfaceMetadata, IndexSignature } from './types';
 
 const intersperse = (arr: React.ReactNode[], separator: React.ReactNode): React.ReactNode[] => [].concat(
 	...arr.map((el) => [ separator, el ]),
@@ -71,16 +71,48 @@ const TypeDocumentation: React.FunctionComponent<TypedProperty> = ({
 	);
 };
 
+const IndexSignatureDocumentation: React.FunctionComponent<{ signature: IndexSignature }> = ({
+	signature,
+}) => {
+	const {
+		name,
+		isOptional,
+		isArray,
+		type,
+		parameters,
+		returnType,
+		typeUnion,
+		typeArguments,
+	} = signature.parameters[0] || {};
+
+	return (
+		<Property>
+			[<PropertyName>{name}</PropertyName>{isOptional ? '?' : ''}:&nbsp;
+			<TypeDocumentation
+				isArray={isArray}
+				type={type}
+				parameters={parameters}
+				returnType={returnType}
+				typeUnion={typeUnion}
+				typeArguments={typeArguments}
+			/>]: <TypeDocumentation {...signature.type} />
+		</Property>
+	);
+};
+
 export interface InterfaceDocumentationProps {
-	interfaceMetadata: PropertyList;
+	interfaceMetadata: InterfaceMetadata;
 	hideInheritedMembers?: boolean;
+	showIndexSignature?: boolean;
 }
 
 export const InterfaceDocumentation: React.FunctionComponent<InterfaceDocumentationProps> = ({
-	interfaceMetadata,
+	interfaceMetadata = {},
 	hideInheritedMembers,
+	showIndexSignature,
 }) => {
-	const properties = Object.keys(interfaceMetadata);
+	const properties = Object.keys(interfaceMetadata.properties || {});
+	const { indexSignature } = interfaceMetadata;
 
 	return (
 		<CodeSnippet>
@@ -96,7 +128,7 @@ export const InterfaceDocumentation: React.FunctionComponent<InterfaceDocumentat
 					isOptional,
 					typeUnion,
 					typeArguments,
-				} = interfaceMetadata[key];
+				} = interfaceMetadata.properties[key];
 
 				const typeForDefault = [ 'null', 'undefined' ].includes((defaultValue || '').trim()) ? 'nullish' : type;
 				if (hideInheritedMembers && inheritedFrom) {
@@ -125,6 +157,9 @@ export const InterfaceDocumentation: React.FunctionComponent<InterfaceDocumentat
 					</Property>
 				);
 			})}
+			{indexSignature && showIndexSignature && (
+				<IndexSignatureDocumentation signature={indexSignature} />
+			)}
 		</CodeSnippet>
 	);
 };

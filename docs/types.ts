@@ -17,3 +17,17 @@ export interface Property extends TypedProperty {
 	inheritedFrom?: string;
 	isOptional?: boolean;
 }
+
+export interface IndexSignatureParameter extends Property {
+	name: string;
+}
+
+export interface IndexSignature {
+	parameters: IndexSignatureParameter[];
+	type: TypedProperty;
+}
+
+export interface InterfaceMetadata {
+	indexSignature?: IndexSignature;
+	properties?: PropertyList;
+}

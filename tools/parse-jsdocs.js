@@ -169,6 +169,20 @@ const buildMetaForProperty = (reflection) => {
 	}
 }
 
+const getIndexSignatures = (indexSignature) => {
+	const parameters = indexSignature.parameters && indexSignature.parameters.map(r => ({
+		...buildMetaForProperty(r),
+		name: r.name
+	}));
+
+	const type = getType(indexSignature.type);
+
+	return {
+		parameters,
+		type,
+	};
+}
+
 function buildMetaForFunction(reflection) {
 	const commentTags = ((reflection.comment || reflection.signatures[0].comment || {}).tags || [])
 		.reduce((total, current) => ({ ...total, [current.tagName]: current.text }), {});
@@ -189,19 +203,27 @@ function buildMetaForFunction(reflection) {
 }
 
 for (const reflection of interfaces) {
-	const properties = {};
-	reflection.traverse(reflection => {
-		if (reflection.kindString === 'Property') {
-			properties[reflection.name] = buildMetaForProperty(reflection);
+	const meta = {};
+	reflection.traverse(r => {
+		if (r.kindString === 'Property') {
+			if (!meta.properties) {
+				meta.properties = {};
+			}
+
+			meta.properties[r.name] = buildMetaForProperty(r);
 		}
 	});
 
-	if (Object.keys(properties).some(Boolean)) {
+	if (reflection.indexSignature) {
+		meta.indexSignature = getIndexSignatures(reflection.indexSignature);
+	}
+
+	if (Object.keys(meta).some(Boolean)) {
 		if (!fs.existsSync(path.resolve('./meta/interfaces'))) {
 			fs.mkdirSync(path.resolve('./meta/interfaces'));
 		}
 
-		fs.writeFileSync(path.resolve(`./meta/interfaces/${reflection.name}.json`), JSON.stringify(properties));
+		fs.writeFileSync(path.resolve(`./meta/interfaces/${reflection.name}.json`), JSON.stringify(meta));
 	}
 }
 
