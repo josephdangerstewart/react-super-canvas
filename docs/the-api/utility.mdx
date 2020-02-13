@@ -7,6 +7,8 @@ route: /utility
 import { InterfaceDocumentation } from '../InterfaceDocumentation';
 import Vector2D from '../../meta/interfaces/Vector2D.json';
 import Type from '../../meta/interfaces/Type.json';
+import JsonData from '../../meta/interfaces/JsonData.json';
+import PureData from '../../meta/interfaces/PureData.json';
 
 # Utility Interfaces
 
@@ -23,3 +25,9 @@ Represents a cartesian (x, y) point on a plane.
 Represents a class (similar to the [Type](https://docs.microsoft.com/en-us/dotnet/api/system.type?view=netframework-4.8) class in C#). `CircleBrush` would be `Type<IBrush>`. Essentially [copied from angular](https://github.com/angular/angular/blob/6.1.6/packages/core/src/type.ts#L25).
 
 <InterfaceDocumentation interfaceMetadata={Type} />
+
+## `interface JsonData`
+
+Represents a pure (i.e. serializable) JSON. See [this](https://www.w3schools.com/js/js_json_datatypes.asp) guide for differences between valid javascript object types and JSON types.
+
+<InterfaceDocumentation interfaceMetadata={JsonData} showIndexSignature />

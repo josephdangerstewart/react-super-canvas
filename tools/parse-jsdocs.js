@@ -43,7 +43,6 @@ const reflections = docs
 	.files
 	.reduce((total, file) => [...total, ...file.reflections], []);
 
-const interfaces = reflections.filter(reflection => reflection && reflection.kindString === 'Interface');
 const callbacks = reflections
 	.filter(reflection =>
 		reflection &&
@@ -58,24 +57,6 @@ const callbacks = reflections
 			map[fileName] = signature;
 		}
 		return map;
-	}, {});
-
-const utilityMethodsByUtility = reflections
-	.filter(reflection =>
-		reflection &&
-		reflection.sources.find(source => /src\/utility\//.test(source.file.fullFileName)) &&
-		reflection.kind === TypeDoc.ReflectionKind.Function
-	)
-	.reduce((all, reflection) => {
-		const [,fileName] = /(.*)\.tsx?/.exec(reflection.sources[0].file.name);
-
-		if (!all[fileName]) {
-			all[fileName] = [];
-		}
-
-		all[fileName].push(reflection);
-
-		return all;
 	}, {});
 
 const getType = (type) => {
@@ -146,6 +127,41 @@ const getType = (type) => {
 	}
 };
 
+const typeAliases = reflections
+	.filter(r => r.kindString === 'Type alias')
+	.reduce((running, cur) => {
+		running[cur.name] = cur.type;
+		return running;
+	}, {});
+
+const interfaces = reflections.filter(reflection => reflection && reflection.kindString === 'Interface');
+
+const utilityMethodsByUtility = reflections
+	.filter(reflection =>
+		reflection &&
+		reflection.sources.find(source => /src\/utility\//.test(source.file.fullFileName)) &&
+		reflection.kind === TypeDoc.ReflectionKind.Function
+	)
+	.reduce((all, reflection) => {
+		const [,fileName] = /(.*)\.tsx?/.exec(reflection.sources[0].file.name);
+
+		if (!all[fileName]) {
+			all[fileName] = [];
+		}
+
+		all[fileName].push(reflection);
+
+		return all;
+	}, {});
+
+const getTypeOrTypeAlias = (type) => {
+	if (typeAliases[type.name]) {
+		return getType(typeAliases[type.name]);
+	}
+
+	return getType(type);
+}
+
 const buildMetaForProperty = (reflection) => {
 	const commentTags = (reflection.comment && reflection.comment.tags) || [];
 	const inheritedFrom =
@@ -158,7 +174,7 @@ const buildMetaForProperty = (reflection) => {
 
 	let typeObj = {};
 	if (reflection.type) {
-		typeObj = getType(reflection.type);
+		typeObj = getTypeOrTypeAlias(reflection.type);
 	}
 	
 	return {
@@ -175,7 +191,7 @@ const getIndexSignatures = (indexSignature) => {
 		name: r.name
 	}));
 
-	const type = getType(indexSignature.type);
+	const type = getTypeOrTypeAlias(indexSignature.type);
 
 	return {
 		parameters,

@@ -11,6 +11,7 @@ const links: { [interfaceName: string]: string } = {
 	IBrush: '/ibrush',
 	IBackgroundElement: '/ibackgroundelement',
 	Type: '/utility/#interface-type',
+	JsonData: '/utility#interface-jsondata',
 };
 
 export default links;
