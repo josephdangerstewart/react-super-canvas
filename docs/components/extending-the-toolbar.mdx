@@ -7,7 +7,17 @@ route: extendingtoolbar
 import ToolbarProps from '../../meta/interfaces/ToolbarProps.json';
 import BrushControlsProps from '../../meta/interfaces/BrushControlsProps.json';
 import StyleControlsProps from '../../meta/interfaces/StyleControlsProps.json';
+import CanvasControlsProps from '../../meta/interfaces/CanvasControlsProps.json';
 import { InterfaceDocumentation } from '../InterfaceDocumentation';
+import {
+	MyCoolToolbar,
+	MyCoolBrushControls,
+} from '../CustomToolbarComponents';
+import { Playground } from 'docz';
+
+import SuperCanvas from '../../src/components/SuperCanvas';
+import GridBackground from '../../src/api/background-elements/GridBackground';
+import CircleBrush from '../../src/api/brushes/CircleBrush';
 
 # Extending The Toolbar
 
@@ -18,6 +28,22 @@ The toolbar in the component was designed using a replaceable component pattern,
 ### `interface ToolbarProps`
 
 <InterfaceDocumentation interfaceMetadata={ToolbarProps} />
+
+### Example
+
+<Playground>
+	<SuperCanvas
+		width={400}
+		height={400}
+		availableBrushes={[
+			new CircleBrush(),
+		]}
+		activeBackgroundElement={new GridBackground(15)}
+		toolbarComponents={{
+			Toolbar: MyCoolToolbar
+		}}
+	/>
+</Playground>
 
 ## BrushControls
 
@@ -30,3 +56,9 @@ The toolbar in the component was designed using a replaceable component pattern,
 ### `interface StyleControlsProps`
 
 <InterfaceDocumentation interfaceMetadata={StyleControlsProps} />
+
+## CanvasControls
+
+### `interface CanvasControlsProps`
+
+<InterfaceDocumentation interfaceMetadata={CanvasControlsProps} />
