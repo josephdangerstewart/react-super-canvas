@@ -12,6 +12,8 @@ import { InterfaceDocumentation } from '../InterfaceDocumentation';
 import {
 	MyCoolToolbar,
 	MyCoolBrushControls,
+	MyCoolStyleControls,
+	MyCoolCanvasControls,
 } from '../CustomToolbarComponents';
 import { Playground } from 'docz';
 
@@ -73,8 +75,40 @@ The toolbar in the component was designed using a replaceable component pattern,
 
 <InterfaceDocumentation interfaceMetadata={StyleControlsProps} />
 
+### Example
+
+<Playground>
+	<SuperCanvas
+		width={400}
+		height={400}
+		availableBrushes={[
+			new CircleBrush(),
+		]}
+		activeBackgroundElement={new GridBackground(15)}
+		toolbarComponents={{
+			StyleControls: MyCoolStyleControls,
+		}}
+	/>
+</Playground>
+
 ## CanvasControls
 
 ### `interface CanvasControlsProps`
 
 <InterfaceDocumentation interfaceMetadata={CanvasControlsProps} />
+
+### Example
+
+<Playground>
+	<SuperCanvas
+		width={400}
+		height={400}
+		availableBrushes={[
+			new CircleBrush(),
+		]}
+		activeBackgroundElement={new GridBackground(15)}
+		toolbarComponents={{
+			CanvasControls: MyCoolCanvasControls,
+		}}
+	/>
+</Playground>

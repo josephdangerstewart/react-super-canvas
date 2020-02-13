@@ -2,6 +2,8 @@ import React from 'react';
 import styled from 'styled-components';
 import { ToolbarProps } from '../src/components/toolbar/DefaultToolbar';
 import { BrushControlsProps } from '../src/components/toolbar/DefaultBrushControls';
+import { StyleControlsProps } from '../src/components/toolbar/DefaultStyleControls';
+import { CanvasControlsProps } from '../src/components/toolbar/DefaultCanvasControls';
 
 const MyCoolToolbarContainer = styled.div`
 	display: flex;
@@ -60,4 +62,36 @@ export const MyCoolBrushControls: React.FunctionComponent<BrushControlsProps> = 
 			<option value={brush.brushName} key={brush.brushName}>{brush.brushName}</option>
 		))}
 	</select>
+);
+
+export const MyCoolStyleControls: React.FunctionComponent<StyleControlsProps> = ({
+	setStyleContext,
+	styleContext,
+}) => (
+	<button
+		onClick={(): void => setStyleContext({
+			fillColor: styleContext.fillColor === '#D10000' ? '#0072BB' : '#D10000',
+		})}
+		style={{ borderColor: styleContext.fillColor || '' }}
+	>
+		Set fill to {styleContext.fillColor === '#D10000' ? 'blue' : 'red'}
+	</button>
+);
+
+export const MyCoolCanvasControls: React.FunctionComponent<CanvasControlsProps> = ({
+	clear,
+	currentSelection,
+	deleteSelectedCanvasItems,
+}) => (
+	<button
+		onClick={(): void => {
+			if (currentSelection && currentSelection.selectedItemCount > 0) {
+				deleteSelectedCanvasItems();
+			} else {
+				clear();
+			}
+		}}
+	>
+		{currentSelection && currentSelection.selectedItemCount > 0 ? 'Delete selection' : 'Delete all'}
+	</button>
 );
