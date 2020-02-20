@@ -34,7 +34,6 @@ const filesToScan = [
 	...getTypescriptFilesFromDirectory(path.resolve('./src/types')),
 	...getTypescriptFilesFromDirectory(path.resolve('./src/components')),
 	...getTypescriptFilesFromDirectory(path.resolve('./src/utility')),
-	path.resolve('./src/types/IBrush.ts'),
 ];
 
 const docs = app.convert(filesToScan);
