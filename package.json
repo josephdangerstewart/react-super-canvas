@@ -22,6 +22,10 @@
 		"map",
 		"maker"
 	],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/josephdangerstewart/react-super-canvas/"
+	},
 	"author": "Joseph Stewart",
 	"license": "ISC",
 	"dependencies": {
