@@ -19,8 +19,19 @@ const ICONS: { [x: string]: IconDefinition } = {
 };
 
 export interface BrushControlsProps {
+	/**
+	 * @description Sets the brush that the user is currently using
+	 */
 	setActiveBrush: SetActiveBrushCallback;
+
+	/**
+	 * @description The list of available brushes
+	 */
 	brushes: IBrush[];
+
+	/**
+	 * @description The `brushName` of the currently selected brush
+	 */
 	activeBrushName: string;
 }
 

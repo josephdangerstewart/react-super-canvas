@@ -18,7 +18,7 @@ export interface CanvasControlsProps {
 	/**
 	 * @description The current selection
 	 */
-	currentSelection: ISelection;
+	currentSelection?: ISelection;
 }
 
 const DefaultCanvasControls: React.FunctionComponent<CanvasControlsProps> = ({

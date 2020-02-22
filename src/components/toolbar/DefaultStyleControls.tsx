@@ -3,10 +3,24 @@ import { faFillDrip, faPaintBrush } from '@fortawesome/free-solid-svg-icons';
 import { SetStyleContextCallback } from '../../types/callbacks/SetStyleContextCallback';
 import StyleContext from '../../types/context/StyleContext';
 import ColorInputPopover from './ColorInputPopover';
+import ISelection from '../../types/ISelection';
 
 export interface StyleControlsProps {
+	/**
+	 * @description Sets the style context. Only provided values are set, undefined values
+	 * ignored.
+	 */
 	setStyleContext: SetStyleContextCallback;
+
+	/**
+	 * @description The current style context.
+	 */
 	styleContext: StyleContext;
+
+	/**
+	 * @description The current selection of canvas items
+	 */
+	currentSelection?: ISelection;
 }
 
 const DefaultStyleControls: React.FunctionComponent<StyleControlsProps> = ({

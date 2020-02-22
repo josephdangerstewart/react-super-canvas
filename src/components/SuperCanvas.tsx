@@ -154,6 +154,7 @@ const SuperCanvas: React.ForwardRefExoticComponent<SuperCanvasProps> = forwardRe
 							<StyleControls
 								setStyleContext={superCanvasManager.setStyleContext}
 								styleContext={styleContext}
+								currentSelection={selection}
 							/>
 						)}
 						canvasControls={(
