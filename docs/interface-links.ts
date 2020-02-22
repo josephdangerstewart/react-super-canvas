@@ -16,6 +16,7 @@ const links: { [interfaceName: string]: string } = {
 	BackgroundElementContext: '/context#interface-backgroundelementcontext',
 	BrushContext: '/context#interface-brushcontext',
 	CanvasItemContext: '/context#interface-canvasitemcontext',
+	IImageCache: '/utility#interface-iimagecache',
 };
 
 export default links;
