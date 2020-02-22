@@ -17,6 +17,8 @@ const links: { [interfaceName: string]: string } = {
 	BrushContext: '/context#interface-brushcontext',
 	CanvasItemContext: '/context#interface-canvasitemcontext',
 	IImageCache: '/utility#interface-iimagecache',
+	CanvasPattern: 'https://developer.mozilla.org/en-US/docs/Web/API/CanvasPattern',
+	HTMLImageElement: 'https://developer.mozilla.org/en-US/docs/Web/API/HTMLImageElement',
 };
 
 export default links;
