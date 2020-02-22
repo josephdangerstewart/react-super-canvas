@@ -12,6 +12,10 @@ const links: { [interfaceName: string]: string } = {
 	IBackgroundElement: '/ibackgroundelement',
 	Type: '/utility/#interface-type',
 	JsonData: '/utility#interface-jsondata',
+	StyleContext: '/context#interface-stylecontext',
+	BackgroundElementContext: '/context#interface-backgroundelementcontext',
+	BrushContext: '/context#interface-brushcontext',
+	CanvasItemContext: '/context#interface-canvasitemcontext',
 };
 
 export default links;

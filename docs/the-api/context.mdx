@@ -1,0 +1,67 @@
+---
+name: Context Types
+menu: API Reference
+route: /context
+---
+
+import { InterfaceDocumentation } from '../InterfaceDocumentation';
+import Context from '../../meta/interfaces/Context';
+import StyleContext from '../../meta/interfaces/StyleContext';
+import BackgroundElementContext from '../../meta/interfaces/BackgroundElementContext';
+import BrushContext from '../../meta/interfaces/BrushContext';
+import CanvasItemContext from '../../meta/interfaces/CanvasItemContext';
+
+# Context Types
+
+The following interfaces are used to give important data to brushes, background elements, and canvas items allowing these interfaces some degree of self awareness of their environment. Context interfaces give information such as mouse coordinates, style information, selection, and so on. This data is passed in as an [options object](https://www.codereadability.com/what-are-javascript-options-objects/) to avoid future breaking changes, keep parameters organized and self documenting, and keep method signatures manageable.
+
+## `interface StyleContext`
+
+This type represents the style settings set by the user in the toolbar using the [style controls](/extendingtoolbar#stylecontrols). This does not necessarily have to correspond to the [`StyledShape`](/context#interface-stylecontext) properties but they can be used to set said properties.
+
+**Note:** There is no guarantee that the properties of `StyleContext` will always match `StyledShape` in future versions so do not cast one to the other. When assigning `StyledShape` properties based on `StyleContext`, do so explicitly.
+
+```ts
+// Bad
+const styleContext: StyleContext = getStyleContext();
+const circle: Circle = {
+	center: vector(0, 0),
+	radius: 1,
+	...styleContext,
+}
+
+// Bad
+const styleContext: StyleContext = getStyleContext();
+const styledShape: StyledShape = styleContext as StyleContext;
+
+// Good
+const styleContext: StyleContext = getStyleContext();
+const circle: Circle = {
+	center: vector(0, 0),
+	radius: 1,
+	fillColor: styleContext.fillColor,
+	fillImageUrl: styleContext.fillImageUrl,
+	strokeColor: styleContext.strokeColor,
+	strokeWeight: styleContext.strokeWeight,
+}
+```
+
+<InterfaceDocumentation interfaceMetadata={StyleContext} />
+
+## `interface BackgroundElementContext`
+
+Context that gets passed into [background element](/ibackgroundelement) methods.
+
+<InterfaceDocumentation interfaceMetadata={BackgroundElementContext} />
+
+## `interface BrushContext`
+
+Context that gets passed into [brush](/ibrush) methods.
+
+<InterfaceDocumentation interfaceMetadata={BrushContext} />
+
+## `interface CanvasItemContext`
+
+Context that gets passed into [canvas item](/icanvasitem) methods.
+
+<InterfaceDocumentation interfaceMetadata={CanvasItemContext} />
