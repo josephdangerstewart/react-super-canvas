@@ -19,6 +19,7 @@ const links: { [interfaceName: string]: string } = {
 	IImageCache: '/utility#interface-iimagecache',
 	CanvasPattern: 'https://developer.mozilla.org/en-US/docs/Web/API/CanvasPattern',
 	HTMLImageElement: 'https://developer.mozilla.org/en-US/docs/Web/API/HTMLImageElement',
+	ISelection: '/utility#interface-iselection',
 };
 
 export default links;
