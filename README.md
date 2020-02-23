@@ -6,6 +6,8 @@
 
 An powerfully flexible canvas based graphical editor
 
+Report bugs [here](https://github.com/josephdangerstewart/react-super-canvas/issues).
+
 **This component is still in development, do not use it in production**
 
 # Checkout these sick [DOCS](https://reactsupercanvas.netlify.com/)
