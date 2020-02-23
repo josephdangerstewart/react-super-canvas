@@ -10,6 +10,12 @@ Report bugs [here](https://github.com/josephdangerstewart/react-super-canvas/iss
 
 **This component is still in development, do not use it in production**
 
+# Installation
+
+```
+yarn add react-super-canvas
+```
+
 # Checkout these sick [DOCS](https://reactsupercanvas.netlify.com/)
 
 (it was made with [docz](https://www.docz.site/))
