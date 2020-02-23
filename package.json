@@ -26,6 +26,7 @@
 		"type": "git",
 		"url": "https://github.com/josephdangerstewart/react-super-canvas/"
 	},
+	"homepage": "https://reactsupercanvas.netlify.com/",
 	"author": "Joseph Stewart",
 	"license": "ISC",
 	"dependencies": {
