@@ -1,6 +1,6 @@
 {
 	"name": "react-super-canvas",
-	"version": "1.1.1",
+	"version": "1.1.2",
 	"description": "An API for creating powerful canvas based editors",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
