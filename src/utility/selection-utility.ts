@@ -11,5 +11,5 @@ export function createSelection(canvasItems: ICanvasItem[]): ISelection {
 		selectedItemCount: canvasItems && canvasItems.length,
 		selectedItem: canvasItems && canvasItems[0],
 		selectedItems: canvasItems,
-	}
+	};
 }

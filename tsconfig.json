@@ -20,7 +20,8 @@
 		"functions"
 	],
 	"include": [
-		"index.ts",
-		"defaults.ts"
+		"entry-points/index.ts",
+		"entry-points/defaults.ts",
+		"entry-points/shapes-util.ts"
 	]
 }

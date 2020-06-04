@@ -1,14 +1,15 @@
 // Expose canvas items
-export { CircleCanvasItem } from './dist/defaults';
-export { ImageCanvasItem } from './dist/defaults';
-export { PolygonCanvasItem } from './dist/defaults';
+// export { CircleCanvasItem } from '';
+export { CircleCanvasItem } from './dist/entry-points/defaults';
+export { ImageCanvasItem } from './dist/entry-points/defaults';
+export { PolygonCanvasItem } from './dist/entry-points/defaults';
 
 // Expose brushes
-export { CircleBrush } from './dist/defaults';
-export { ImageBrush } from './dist/defaults';
-export { PolygonBrush } from './dist/defaults';
-export { SelectionBrush } from './dist/defaults';
+export { CircleBrush } from './dist/entry-points/defaults';
+export { ImageBrush } from './dist/entry-points/defaults';
+export { PolygonBrush } from './dist/entry-points/defaults';
+export { SelectionBrush } from './dist/entry-points/defaults';
 
 // Exposes background elements
-export { DefaultBackgroundElement } from './dist/defaults';
-export { GridBackground } from './dist/defaults';
+export { DefaultBackgroundElement } from './dist/entry-points/defaults';
+export { GridBackground } from './dist/entry-points/defaults';

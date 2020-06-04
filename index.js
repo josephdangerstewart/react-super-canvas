@@ -1,1 +1,1 @@
-export { SuperCanvas } from './dist/index';
+export { SuperCanvas } from './dist/entry-points/index';
