@@ -196,7 +196,8 @@ export function stringToRgba(color: string): RGBA {
  * @param color The RGB object
  * @tested
  */
-export function rgbToString({ r, g, b }: RGB): string {
+export function rgbToString(color: RGB): string {
+	const { r, g, b } = color;
 	return `rgb(${r},${g},${b})`;
 }
 
@@ -205,12 +206,10 @@ export function rgbToString({ r, g, b }: RGB): string {
  * @param color The RGBA object
  * @tested
  */
-export function rgbaToString({
-	r,
-	g,
-	b,
-	a,
-}: RGBA): string {
+export function rgbaToString(color: RGBA): string {
+	const {
+		r, g, b, a,
+	} = color;
 	return `rgba(${r},${g},${b},${a})`;
 }
 

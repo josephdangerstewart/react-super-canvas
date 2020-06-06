@@ -82,6 +82,7 @@
 		"dist/*",
 		"index.js",
 		"defaults.js",
-		"shapes-util.js"
+		"shapes-util.js",
+		"color-util.js"
 	]
 }

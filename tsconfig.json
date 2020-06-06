@@ -22,6 +22,7 @@
 	"include": [
 		"entry-points/index.ts",
 		"entry-points/defaults.ts",
-		"entry-points/shapes-util.ts"
+		"entry-points/shapes-util.ts",
+		"entry-points/color-util.ts"
 	]
 }

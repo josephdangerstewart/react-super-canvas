@@ -57,7 +57,7 @@ export const UtilityMethodDocumentation: React.FunctionComponent<UtilityMethodDo
 			<p>
 				Test coverage (tested an explicitly untested functions): <strong>{testCoverage}%</strong>
 			</p>
-			{untestedFunctions.length && (
+			{untestedFunctions.length > 0 && (
 				<>
 					<p>Untested Functions</p>
 					<ul>
