@@ -18,6 +18,11 @@ export interface StyleControlsProps {
 	styleContext: StyleContext;
 
 	/**
+	 * @description The `brushName` of the currently selected brush
+	 */
+	activeBrushName?: string;
+
+	/**
 	 * @description The current selection of canvas items
 	 */
 	currentSelection?: ISelection;
