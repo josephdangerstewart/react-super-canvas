@@ -172,7 +172,16 @@ export function stringToRgba(color: string): RGBA {
 	const pieces = normalizedColor.match(/^rgba\((\d+),(\d+),(\d+),((\d+|\.)+)\)$/);
 
 	if (!pieces) {
-		return null;
+		const rgb = stringToRgb(color);
+
+		if (!rgb) {
+			return null;
+		}
+
+		return {
+			...rgb,
+			a: 1,
+		};
 	}
 
 	pieces.shift();

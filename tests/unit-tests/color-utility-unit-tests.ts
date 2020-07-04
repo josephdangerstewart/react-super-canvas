@@ -261,6 +261,15 @@ describe('color-utility', () => {
 				'rgba(260, 260, 260, 0.5)',
 				null,
 			],
+			[
+				'rgb(255, 255, 255)',
+				{
+					r: 255,
+					g: 255,
+					b: 255,
+					a: 1,
+				},
+			],
 		];
 
 		cases.forEach(([ input, expectedOutput ]) => {
