@@ -12,9 +12,9 @@ export default interface IPainterAPI {
 
 	/**
 	 * @description Draws an image in the virtual space
-	 * @remarks Images are cached
+	 * @remarks Images are cached, rotation is in degrees
 	 */
-	drawImage: (topLeftCorner: Vector2D, imageUrl: string, scale?: Vector2D, opacity?: number) => void;
+	drawImage: (topLeftCorner: Vector2D, imageUrl: string, scale?: Vector2D, opacity?: number, rotation?: number) => void;
 
 	/**
 	 * @description Draws a rectangle in the virtual space

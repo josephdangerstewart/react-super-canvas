@@ -13,10 +13,13 @@ import {
 	polygonCollidesWithRect,
 	boundingRectOfCircle,
 	boundingRectOfPolygon,
+	boundingRectOfLine,
+	getDiffBetweenPoints,
 } from '../utility/shapes-util';
 import Polygon, { PolygonDefaults } from '../types/shapes/Polygon';
 import StyledShape from '../types/shapes/StyledShape';
 import { IImageCache } from '../types/IImageCache';
+import { movePolygon } from '../utility/transform-utility';
 
 export default class PainterAPI implements IPainterAPI {
 	private panOffset: Vector2D;
@@ -45,19 +48,30 @@ export default class PainterAPI implements IPainterAPI {
 			const point1 = this.toAbsolutePoint(line.point1);
 			const point2 = this.toAbsolutePoint(line.point2);
 
-			this.context2d.beginPath();
-			this.context2d.moveTo(point1.x, point1.y);
-			this.context2d.lineTo(point2.x, point2.y);
-			this.context2d.strokeStyle = line.strokeColor;
-			this.context2d.lineWidth = line.strokeWeight;
-			this.context2d.closePath();
-			this.context2d.stroke();
+			if (line.rotation && line.rotation % 360 !== 0) {
+				const boundingRect = boundingRectOfLine(line);
+				this.withRotation(line.rotation, boundingRect, (topLeft) => {
+					this.context2d.beginPath();
+					this.context2d.moveTo(topLeft.x, topLeft.y);
+					this.context2d.lineTo(topLeft.x + boundingRect.width, topLeft.y + boundingRect.height);
+					this.context2d.closePath();
+					this.context2d.stroke();
+				});
+			} else {
+				this.context2d.beginPath();
+				this.context2d.moveTo(point1.x, point1.y);
+				this.context2d.lineTo(point2.x, point2.y);
+				this.context2d.strokeStyle = line.strokeColor;
+				this.context2d.lineWidth = line.strokeWeight;
+				this.context2d.closePath();
+				this.context2d.stroke();
+			}
 		}
 	};
 
-	drawImage = (topLeftCorner: Vector2D, imageUrl: string, scale?: Vector2D, opacity?: number): void => {
+	drawImage = (topLeftCorner: Vector2D, imageUrl: string, scale?: Vector2D, opacity?: number, rotation?: number): void => {
 		this.imageCache.withCachedImage(imageUrl, (image) => {
-			this.doDrawImage(topLeftCorner, image, scale, opacity);
+			this.doDrawImage(topLeftCorner, image, scale, opacity, rotation);
 		});
 	};
 
@@ -70,20 +84,19 @@ export default class PainterAPI implements IPainterAPI {
 
 		const canvasRect = this.getViewport();
 		if (polygonCollidesWithRect(polygon, canvasRect)) {
-			const [ firstPoint, ...restOfPoints ] = polygon.points.map(this.toAbsolutePoint);
-			const { x: firstX, y: firstY } = firstPoint;
+			const boundingRect = boundingRectOfPolygon(polygon);
 
-			this.context2d.beginPath();
-			this.context2d.moveTo(firstX, firstY);
+			if (polygon.rotation && polygon.rotation % 360 !== 0) {
+				this.withRotation(polygon.rotation, boundingRect, (newTopLeft) => {
+					const virtualNewTopLeft = this.toVirtualPoint(newTopLeft);
+					const diff = getDiffBetweenPoints(virtualNewTopLeft, boundingRect.topLeftCorner);
+					const movedPolygon = movePolygon(polygon, diff);
 
-			restOfPoints.forEach((point) => {
-				const { x, y } = point;
-				this.context2d.lineTo(x, y);
-			});
-			this.context2d.lineTo(firstX, firstY);
-
-			this.context2d.closePath();
-			this.drawWithStyles(polygon, boundingRectOfPolygon(polygon));
+					this.doDrawPolygon(movedPolygon, boundingRect);
+				});
+			} else {
+				this.doDrawPolygon(polygon, boundingRect);
+			}
 		}
 	};
 
@@ -96,10 +109,20 @@ export default class PainterAPI implements IPainterAPI {
 		const canvasRect = this.getViewport();
 
 		if (rectCollidesWithRect(rect, canvasRect)) {
-			this.context2d.beginPath();
+			const absWidth = width * this.scale;
+			const absHeight = height * this.scale;
 
-			this.context2d.rect(x, y, width * this.scale, height * this.scale);
-			this.context2d.closePath();
+			if (rect.rotation && rect.rotation % 360 !== 0) {
+				this.withRotation(rect.rotation, rect, (newTopLeft) => {
+					this.context2d.beginPath();
+					this.context2d.rect(newTopLeft.x, newTopLeft.y, absWidth, absHeight);
+					this.context2d.closePath();
+				});
+			} else {
+				this.context2d.beginPath();
+				this.context2d.rect(x, y, absWidth, absHeight);
+				this.context2d.closePath();
+			}
 
 			this.drawWithStyles(rect, rect);
 		}
@@ -160,6 +183,28 @@ export default class PainterAPI implements IPainterAPI {
 	};
 
 	/* UTILITY METHODS */
+
+	/**
+	 * @remarks Bounding rect is in virtual space but the vector passed into render is in the absolute space
+	 */
+	private withRotation = (rotation: number, boundingRect: Rectangle, render: (newTopLeft: Vector2D) => void): void => {
+		const { width, height } = boundingRect;
+		const { x, y } = this.toAbsolutePoint(boundingRect.topLeftCorner);
+		const absWidth = width * this.scale;
+		const absHeight = height * this.scale;
+		const absRotation = rotation * (Math.PI / 180);
+
+		const transX = x + absWidth / 2;
+		const transY = y + absHeight / 2;
+
+		this.context2d.translate(transX, transY);
+		this.context2d.rotate(absRotation);
+
+		render(vector(-absWidth / 2, -absHeight / 2));
+
+		this.context2d.rotate(-absRotation);
+		this.context2d.translate(-transX, -transY);
+	};
 
 	private getViewport = (): Rectangle => {
 		const canvasRect = getCanvasRect(this.context2d);
@@ -234,7 +279,24 @@ export default class PainterAPI implements IPainterAPI {
 		return virtualPoint;
 	};
 
-	private doDrawImage = (topLeftCorner: Vector2D, image: HTMLImageElement, scale?: Vector2D, opacity?: number): void => {
+	private doDrawPolygon = (polygon: Polygon, boundingRect: Rectangle): void => {
+		const [ firstPoint, ...restOfPoints ] = polygon.points.map(this.toAbsolutePoint);
+		const { x: firstX, y: firstY } = firstPoint;
+
+		this.context2d.beginPath();
+		this.context2d.moveTo(firstX, firstY);
+
+		restOfPoints.forEach((point) => {
+			const { x, y } = point;
+			this.context2d.lineTo(x, y);
+		});
+		this.context2d.lineTo(firstX, firstY);
+
+		this.context2d.closePath();
+		this.drawWithStyles(polygon, boundingRect);
+	};
+
+	private doDrawImage = (topLeftCorner: Vector2D, image: HTMLImageElement, scale?: Vector2D, opacity?: number, rotation?: number): void => {
 		const safeScale = scale || vector(1, 1);
 
 		const { x, y } = this.toAbsolutePoint(topLeftCorner);
@@ -253,7 +315,15 @@ export default class PainterAPI implements IPainterAPI {
 		if (rectCollidesWithRect(imageRect, canvasRect)) {
 			const oldOpacity = this.context2d.globalAlpha;
 			this.context2d.globalAlpha = opacity || oldOpacity;
-			this.context2d.drawImage(image, x, y, absWidth, absHeight);
+
+			if (rotation && rotation % 360 !== 0) {
+				this.withRotation(rotation, imageRect, (newTopLeft) => {
+					this.context2d.drawImage(image, newTopLeft.x, newTopLeft.y);
+				});
+			} else {
+				this.context2d.drawImage(image, x, y, absWidth, absHeight);
+			}
+
 			this.context2d.globalAlpha = oldOpacity;
 		}
 	};

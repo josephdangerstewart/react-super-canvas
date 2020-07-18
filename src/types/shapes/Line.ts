@@ -28,6 +28,11 @@ export default interface Line extends JsonData {
 	 * @default 1.0
 	 */
 	strokeWeight?: number;
+
+	/**
+	 * @description The rotation of the line in degrees
+	 */
+	rotation?: number;
 }
 
 export const LineDefaults: object = {

@@ -494,3 +494,10 @@ export const cursorPreview = (pos: Vector2D): Circle => ({
  * @note Is essentially an alias for distanceBetweenTwoPoints
  */
 export const lengthOfLine = (line: Line): number => distanceBetweenTwoPoints(line.point1, line.point2);
+
+/**
+ * @description Returns the difference between two points so essentially point1 - point2
+ */
+export function getDiffBetweenPoints(point1: Vector2D, point2: Vector2D): Vector2D {
+	return vector(point1.x - point2.x, point1.y - point2.y);
+}

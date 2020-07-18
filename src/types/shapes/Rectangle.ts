@@ -17,6 +17,11 @@ export default interface Rectangle extends StyledShape, JsonData {
 	 * @description The height of the rectangle in pixels
 	 */
 	height: number;
+
+	/**
+	 * @description The rotation of the rectangle in degrees
+	 */
+	rotation?: number;
 }
 
 export const RectangleDefaults: object = StyledShapeDefaults;
