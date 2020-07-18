@@ -1,8 +1,9 @@
 import Vector2D from '../utility/Vector2D';
 import StyledShape, { StyledShapeDefaults } from './StyledShape';
 import JsonData from '../utility/JsonData';
+import { IRotatable } from './IRotatable';
 
-export default interface Rectangle extends StyledShape, JsonData {
+export default interface Rectangle extends StyledShape, JsonData, IRotatable {
 	/**
 	 * @description The top left corner in the virtual space
 	 */
@@ -17,11 +18,6 @@ export default interface Rectangle extends StyledShape, JsonData {
 	 * @description The height of the rectangle in pixels
 	 */
 	height: number;
-
-	/**
-	 * @description The rotation of the rectangle in degrees
-	 */
-	rotation?: number;
 }
 
 export const RectangleDefaults: object = StyledShapeDefaults;

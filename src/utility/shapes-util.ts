@@ -4,6 +4,7 @@ import Vector2D from '../types/utility/Vector2D';
 import Circle from '../types/shapes/Circle';
 import Polygon from '../types/shapes/Polygon';
 import { solveQuadraticEquation } from './math-utility';
+import { IRotatable } from '../types/shapes/IRotatable';
 
 /**
  * @description Shorthand way to create Vector2D objects
@@ -13,6 +14,88 @@ import { solveQuadraticEquation } from './math-utility';
  */
 export function vector(x: number, y: number): Vector2D {
 	return { x, y };
+}
+
+/**
+ * @description Determines if a shape needs to be rotated
+ * @param shape A rotatable shape
+ */
+export function hasRotation(shape: IRotatable): boolean {
+	return shape.rotation && shape.rotation % 360 !== 0;
+}
+
+/**
+ * @description Returns the center point of a rectangle
+ */
+export function centerOfRect(rect: Rectangle): Vector2D {
+	return {
+		x: rect.topLeftCorner.x + rect.width / 2,
+		y: rect.topLeftCorner.y + rect.height / 2,
+	};
+}
+
+/**
+ * @description Rotates one point around another
+ *
+ * @param point The point to rotate
+ * @param center The center to rotate around
+ * @param rotation The rotation in degrees
+ */
+export function rotateAroundPoint(point: Vector2D, center: Vector2D, rotation: number): Vector2D {
+	const absRotation = rotation * (Math.PI / 180);
+	const s = Math.sin(absRotation);
+	const c = Math.cos(absRotation);
+
+	const p = vector(point.x, point.y);
+
+	p.x -= center.x;
+	p.y -= center.y;
+
+	const newX = p.x * c - p.y * s;
+	const newY = p.x * s + p.y * c;
+
+	p.x = newX + center.x;
+	p.y = newY + center.y;
+
+	return p;
+}
+
+/**
+ * @description Rotates a polygon around its center
+ *
+ * @param polygon The polygon to rotate
+ * @param rotation The rotation in degrees
+ */
+export function rotatePolygon(polygon: Polygon, rotation: number, centerArg?: Vector2D): Polygon {
+	if (rotation === 0) {
+		return polygon;
+	}
+
+	let center = centerArg;
+	if (centerArg) {
+		const { points } = polygon;
+		const xValues = points.map((point) => point.x);
+		const yValues = points.map((point) => point.y);
+
+		const minX = Math.min(...xValues);
+		const minY = Math.min(...yValues);
+
+		const maxX = Math.max(...xValues);
+		const maxY = Math.max(...yValues);
+
+		const { x, y } = vector(minX, minY);
+		const width = maxX - minX;
+		const height = maxY - minY;
+
+		center = vector(x + width / 2, y + height / 2);
+	}
+
+	const points = polygon.points.map((p) => rotateAroundPoint(p, center, rotation));
+	return {
+		...polygon,
+		points,
+		rotation: 0,
+	};
 }
 
 /**
@@ -289,16 +372,21 @@ export function pointOnLine(point: Vector2D, line: Line): boolean {
  * @tested
  */
 export function pointInsidePolygon(point: Vector2D, polygon: Polygon): boolean {
+	let normalizedPolygon = polygon;
+	if (hasRotation(polygon)) {
+		normalizedPolygon = rotatePolygon(polygon, polygon.rotation);
+	}
+
 	const ray: Line = {
 		point1: vector(Math.min(...polygon.points.map(({ x }) => x)) - 1, point.y),
 		point2: point,
 	};
 
-	if (polygon.points.some((v) => vectorEquals(v, point))) {
+	if (normalizedPolygon.points.some((v) => vectorEquals(v, point))) {
 		return true;
 	}
 
-	const polyLines = polygonToLines(polygon);
+	const polyLines = polygonToLines(normalizedPolygon);
 	let intersections = 0;
 
 	if (polyLines.some((line) => pointOnLine(point, line))) {
@@ -459,18 +547,23 @@ export function circleCollidesWithRect(circle: Circle, rect: Rectangle): boolean
  * @param rect
  */
 export function polygonCollidesWithRect(polygon: Polygon, rect: Rectangle): boolean {
+	let normalizedPolygon = polygon;
+	if (hasRotation(polygon)) {
+		normalizedPolygon = rotatePolygon(polygon, polygon.rotation);
+	}
+
 	// Polygon is inside rectangle
-	if (polygon.points.some((point) => pointInsideRect(point, rect))) {
+	if (normalizedPolygon.points.some((point) => pointInsideRect(point, rect))) {
 		return true;
 	}
 
 	// Rectangle inside polygon
-	if (rectToPoints(rect).some((point) => pointInsidePolygon(point, polygon))) {
+	if (rectToPoints(rect).some((point) => pointInsidePolygon(point, normalizedPolygon))) {
 		return true;
 	}
 
 	// Polygon intersects with rectangle
-	if (polygonToLines(polygon).some((line) => lineCollidesWithRect(line, rect))) {
+	if (polygonToLines(normalizedPolygon).some((line) => lineCollidesWithRect(line, rect))) {
 		return true;
 	}
 

@@ -5,8 +5,9 @@
 
 import Vector2D from '../utility/Vector2D';
 import JsonData from '../utility/JsonData';
+import { IRotatable } from './IRotatable';
 
-export default interface Line extends JsonData {
+export default interface Line extends JsonData, IRotatable {
 	/**
 	 * @description The first point in the virtual space
 	 */
@@ -28,11 +29,6 @@ export default interface Line extends JsonData {
 	 * @default 1.0
 	 */
 	strokeWeight?: number;
-
-	/**
-	 * @description The rotation of the line in degrees
-	 */
-	rotation?: number;
 }
 
 export const LineDefaults: object = {
