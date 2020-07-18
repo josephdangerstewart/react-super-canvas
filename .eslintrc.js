@@ -40,5 +40,6 @@ module.exports = {
 		'react/jsx-one-expression-per-line': 'off',
 		'prettier/prettier': 'off',
 		'no-case-declarations': 'off',
+		'no-shadow': 'off',
 	},
 };
