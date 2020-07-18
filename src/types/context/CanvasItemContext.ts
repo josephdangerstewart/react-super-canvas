@@ -11,4 +11,9 @@ export default interface CanvasItemContext extends Context {
 	 * @description The image cache for the component
 	 */
 	imageCache: IImageCache;
+
+	/**
+	 * @description Whether or not this item is being rendered for serialization
+	 */
+	isBeingSerialized: boolean;
 }

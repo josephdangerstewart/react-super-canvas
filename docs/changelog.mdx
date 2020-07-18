@@ -1,0 +1,13 @@
+---
+name: Changelog
+route: /changelog
+---
+
+# Changelog
+
+## 2.0.0
+
+- **Breaking change:** Changed the shape that canvas items are converted to when calling `onChange`, any data output from versions 1.x.x will not work with 2.0.0 and above. This was changed so that if the super canvas is passed in a model that contains canvas items it does not have knowledge of, it will still render it as a generic canvas item. In previous versions, in order for a canvas item to be reconstructed from a saved state, the super canvas component needed to be passed in a brush in `availableBrushes` that contained the original canvas item class in `supportedCanvasItems`. Now, if the super canvas does not see a corresponding `supportedCanvasItem` for a given canvas item in the model, it will instantiate that canvas item as a generic canvas item that can still be rendered. This will make it easer to display graphics created with the super canvas.
+- Made `toJson` optional for more basic canvas items
+
+I was not as forward thinking as I should have been so the changelog stops here

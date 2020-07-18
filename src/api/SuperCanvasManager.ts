@@ -18,11 +18,13 @@ import ActionHistoryManager, { ActionType, TransformAction, ActionRecord } from 
 import { IImageCache } from '../types/IImageCache';
 import ImageCache from './ImageCache';
 import { OnCanvasItemChangeCallback } from '../types/callbacks/OnCanvasItemChangeCallback';
-import JsonData from '../types/utility/JsonData';
 import Type from '../types/utility/Type';
 import ISelection from '../types/ISelection';
 import { OnSelectionChangeCallback } from '../types/callbacks/OnSelectionChangeCallback';
 import { createSelection } from '../utility/selection-utility';
+import { Renderable } from '../types/Renderable';
+import { RenderableCanvasItem } from './canvas-items/RenderableCanvasItem';
+import { generateRenderable } from '../utility/renderable-utility';
 
 export default class SuperCanvasManager implements ISuperCanvasManager {
 	/* PRIVATE MEMBERS */
@@ -108,7 +110,7 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 		this._onCanvasItemChange = onChange;
 	};
 
-	setCanvasItems = (items: JsonData[]): void => {
+	setCanvasItems = (items: Renderable[]): void => {
 		const availableCanvasItems = this.availableBrushes
 			.reduce(
 				(dictionary, brush) => ({
@@ -118,14 +120,19 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 				{},
 			) as Record<string, Type<ICanvasItem>>;
 
-		this.canvasItems = items.map((data = {}) => {
-			const { item, canvasItemName } = data;
+		this.canvasItems = items.map((renderable) => {
+			if (!renderable) {
+				return null;
+			}
+
+			const { canvasItemName, item } = renderable.canvasItemJson ?? {};
 			const CanvasItemClass = availableCanvasItems[canvasItemName as string];
 
 			if (CanvasItemClass) {
 				return new CanvasItemClass(item);
 			}
-			return null;
+
+			return new RenderableCanvasItem({ renderable, imageCache: this.imageCache });
 		}).filter(Boolean);
 	};
 
@@ -284,6 +291,7 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 		...this.generateContext(),
 		isSelected: this.selectionManager.selectedItems.includes(item),
 		imageCache: this.imageCache,
+		isBeingSerialized: false,
 	});
 
 	private generateBackgroundElementContext = (): BackgroundElementContext => ({
@@ -331,12 +339,7 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 
 	private handleCanvasItemsChange = (): void => {
 		if (this._onCanvasItemChange) {
-			const data = this.getCanvasItems()
-				.map((canvasItem) => ({
-					item: canvasItem.toJson(),
-					canvasItemName: canvasItem.canvasItemName,
-				}));
-
+			const data = this.getCanvasItems().map(generateRenderable);
 			this._onCanvasItemChange(data);
 		}
 

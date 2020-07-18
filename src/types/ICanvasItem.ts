@@ -23,9 +23,15 @@ export default interface ICanvasItem {
 	/**
 	 * @description Returns a pure JSON object that captures the
 	 * current state of this canvas item and can be serialized to
-	 * store in a database
+	 * store in a database. If omitted, the canvas item will be converted
+	 * to a universal format. It may still be deserialized and rendered but
+	 * will not map back to this canvas item. It is highly recommended
+	 * to implement this method.
+	 *
+	 * When reconstructing canvas items from a saved state, the return value
+	 * from this method will be passed into the constructor
 	 */
-	toJson: () => JsonData;
+	toJson?: () => JsonData;
 
 	/**
 	 * @description Optionally allows consumers to have more fine tuned control over
@@ -44,14 +50,15 @@ export default interface ICanvasItem {
 
 	/**
 	 * @description Applies a move transformation to the canvas item.
-	 * Moves should be invertible so that `applyMove({ -x, -y })` undos
+	 * Moves should be invertible so that `applyMove({ -x, -y })` undoes
 	 * `applyMove({ x, y })`
 	 */
 	applyMove?: (move: Vector2D) => void;
 
 	/**
 	 * @description The name of the canvas item so that the canvas can be
-	 * reconstructed from a saved pure JSON states
+	 * reconstructed from a saved pure JSON states. This property must be
+	 * a constant value and not change between instances.
 	 */
 	canvasItemName: string;
 }

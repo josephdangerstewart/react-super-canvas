@@ -17,7 +17,6 @@ import {
 import Polygon, { PolygonDefaults } from '../types/shapes/Polygon';
 import StyledShape from '../types/shapes/StyledShape';
 import { IImageCache } from '../types/IImageCache';
-import { Renderable, RenderOpType } from '../types/Renderable';
 
 export default class PainterAPI implements IPainterAPI {
 	private panOffset: Vector2D;
@@ -121,30 +120,6 @@ export default class PainterAPI implements IPainterAPI {
 			this.context2d.closePath();
 			this.drawWithStyles(circle, boundingRectOfCircle(circle));
 		}
-	};
-
-	drawRenderable = (renderable: Renderable): void => {
-		renderable.ops.forEach((op) => {
-			switch (op.type) {
-				case RenderOpType.Circle:
-					this.drawCircle(op.circle);
-					break;
-				case RenderOpType.Image:
-					this.drawImage(op.image.topLeftCorner, op.image.imageUrl, op.image.scale, op.image.opacity);
-					break;
-				case RenderOpType.Line:
-					this.drawLine(op.line);
-					break;
-				case RenderOpType.Polygon:
-					this.drawPolygon(op.polygon);
-					break;
-				case RenderOpType.Rectangle:
-					this.drawRect(op.rect);
-					break;
-				default:
-					break;
-			}
-		});
 	};
 
 	/* PUBLIC METHODS */
