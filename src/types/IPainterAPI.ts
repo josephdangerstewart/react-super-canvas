@@ -3,6 +3,7 @@ import Line from './shapes/Line';
 import Rectangle from './shapes/Rectangle';
 import Circle from './shapes/Circle';
 import Polygon from './shapes/Polygon';
+import { Renderable } from './Renderable';
 
 export default interface IPainterAPI {
 	/**
@@ -36,4 +37,9 @@ export default interface IPainterAPI {
 	 * So the top most item on the render stack has priority.
 	 */
 	setCursor: (cursor: string) => void;
+
+	/**
+	 * @description Draws a renderable in the virtual space
+	 */
+	drawRenderable: (renderable: Renderable) => void;
 }

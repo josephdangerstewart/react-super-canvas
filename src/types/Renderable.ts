@@ -5,7 +5,7 @@ import Polygon from './shapes/Polygon';
 import JsonData from './utility/JsonData';
 import Vector2D from './utility/Vector2D';
 
-export interface Renderable {
+export interface Renderable extends JsonData {
 	/**
 	 * @description The stack of render operations that make up this renderable item.
 	 * A renderable item is a singular and serializable format to describe any given
@@ -20,7 +20,7 @@ export interface Renderable {
 	canvasItemJson: JsonData;
 }
 
-export interface RenderOp {
+export interface RenderOp extends JsonData {
 	/**
 	 * @description The type of object that will be rendered to the canvas
 	 */

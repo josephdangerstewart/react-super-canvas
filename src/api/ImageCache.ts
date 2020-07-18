@@ -13,6 +13,43 @@ export default class ImageCache implements IImageCache {
 		this.imageCache = {};
 	}
 
+	getImage = (src: string): HTMLImageElement => {
+		const cachedImage = this.imageCache[src];
+		const image = cachedImage?.image ?? new Image();
+
+		if (cachedImage && cachedImage.isBroken) {
+			return null;
+		}
+
+		if (!cachedImage) {
+			this.imageCache[src] = {
+				image,
+				lastAccessed: new Date(),
+				repeating: null,
+				isBroken: false,
+			};
+			image.src = src;
+		} else {
+			this.imageCache[src].lastAccessed = new Date();
+		}
+
+		if (image?.complete) {
+			return image;
+		}
+
+		image.onload = (): void => {
+			this.handleOnImageLoad(src);
+		};
+
+		image.onerror = (): void => {
+			if (this.imageCache[src]) {
+				this.imageCache[src].isBroken = true;
+			}
+		};
+
+		return null;
+	};
+
 	getImageAsync = (src: string): Promise<HTMLImageElement> => new Promise((resolve, reject) => {
 		const cachedImage = this.imageCache[src];
 		const image = cachedImage ? cachedImage.image : new Image();
@@ -33,6 +70,7 @@ export default class ImageCache implements IImageCache {
 				repeating: null,
 				isBroken: false,
 			};
+			image.src = src;
 		} else {
 			this.imageCache[src].lastAccessed = new Date();
 		}
