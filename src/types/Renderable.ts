@@ -3,6 +3,7 @@ import Rectangle from './shapes/Rectangle';
 import Line from './shapes/Line';
 import Polygon from './shapes/Polygon';
 import JsonData from './utility/JsonData';
+import Vector2D from './utility/Vector2D';
 
 export interface Renderable {
 	/**
@@ -49,7 +50,9 @@ export interface RenderOp {
 	 * @description Image data if type is `RenderOpType.Image`
 	 */
 	image?: {
-		boundingRect: Rectangle;
+		scale: Vector2D;
+		opacity: number;
+		topLeftCorner: Vector2D;
 		imageUrl: string;
 	};
 }
