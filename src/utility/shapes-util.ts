@@ -61,44 +61,6 @@ export function rotateAroundPoint(point: Vector2D, center: Vector2D, rotation: n
 }
 
 /**
- * @description Rotates a polygon around its center
- *
- * @param polygon The polygon to rotate
- * @param rotation The rotation in degrees
- */
-export function rotatePolygon(polygon: Polygon, rotation: number, centerArg?: Vector2D): Polygon {
-	if (rotation === 0) {
-		return polygon;
-	}
-
-	let center = centerArg;
-	if (centerArg) {
-		const { points } = polygon;
-		const xValues = points.map((point) => point.x);
-		const yValues = points.map((point) => point.y);
-
-		const minX = Math.min(...xValues);
-		const minY = Math.min(...yValues);
-
-		const maxX = Math.max(...xValues);
-		const maxY = Math.max(...yValues);
-
-		const { x, y } = vector(minX, minY);
-		const width = maxX - minX;
-		const height = maxY - minY;
-
-		center = vector(x + width / 2, y + height / 2);
-	}
-
-	const points = polygon.points.map((p) => rotateAroundPoint(p, center, rotation));
-	return {
-		...polygon,
-		points,
-		rotation: 0,
-	};
-}
-
-/**
  * @description Shorthand way of checking equality of two vectors
  * @param v1 The right hand vector
  * @param v2 The left hand vector
@@ -127,72 +89,6 @@ export function boundingRectOfCircle(circle: Circle): Rectangle {
 		topLeftCorner: vector(x - radius, y - radius),
 		width: radius * 2,
 		height: radius * 2,
-	};
-}
-
-/**
- * @description Returns the bounding rectangle of a line
- */
-export function boundingRectOfLine(line: Line): Rectangle {
-	const { point1, point2 } = line;
-	const topLeftX = Math.min(point1.x, point2.x);
-	const topLeftY = Math.max(point1.y, point2.y);
-	const bottomRightX = Math.max(point1.x, point2.x);
-	const bottomRightY = Math.min(point1.y, point2.y);
-	return {
-		topLeftCorner: vector(topLeftX, topLeftY),
-		height: topLeftY - bottomRightY,
-		width: bottomRightX - topLeftX,
-	};
-}
-
-/**
- * @description Returns the total bounding rect of an array of rectangles
- * @param rects The rects to get the bounding rect of
- * @tested
- */
-export function boundingRectOfRects(rects: Rectangle[]): Rectangle {
-	const leftXs = rects.map(({ topLeftCorner }) => topLeftCorner.x);
-	const rightXs = rects.map(({ topLeftCorner, width }) => topLeftCorner.x + width);
-
-	const topYs = rects.map(({ topLeftCorner }) => topLeftCorner.y);
-	const bottomYs = rects.map(({ topLeftCorner, height }) => topLeftCorner.y + height);
-
-	const maxX = Math.max(...rightXs, ...leftXs);
-	const minX = Math.min(...rightXs, ...leftXs);
-
-	const maxY = Math.max(...topYs, ...bottomYs);
-	const minY = Math.min(...topYs, ...bottomYs);
-
-	const width = maxX - minX;
-	const height = maxY - minY;
-	const topLeftCorner = vector(minX, minY);
-
-	return {
-		width,
-		height,
-		topLeftCorner,
-	};
-}
-
-/**
- * @description Returns the bounding rectangle of a polygon
- */
-export function boundingRectOfPolygon(polygon: Polygon): Rectangle {
-	const { points } = polygon;
-	const xValues = points.map((point) => point.x);
-	const yValues = points.map((point) => point.y);
-
-	const minX = Math.min(...xValues);
-	const minY = Math.min(...yValues);
-
-	const maxX = Math.max(...xValues);
-	const maxY = Math.max(...yValues);
-
-	return {
-		topLeftCorner: vector(minX, minY),
-		width: maxX - minX,
-		height: maxY - minY,
 	};
 }
 
@@ -289,6 +185,173 @@ export function rectToLines(rect: Rectangle): Line[] {
 		{ point1: bottomRight, point2: bottomLeft },
 		{ point1: bottomLeft, point2: topLeft },
 	];
+}
+
+/**
+ * @description Rotates a polygon around its center and returns a polygon with rotation adjusted
+ * accordingly (i.e. if polygon.rotation === 90 and rotation === 90, the resulting
+ * polygon would have rotation === 0)
+ * @param polygon The polygon to rotate
+ * @param rotation The rotation in degrees
+ */
+export function rotatePolygon(polygon: Polygon, rotation: number, centerArg?: Vector2D): Polygon {
+	let center = centerArg;
+	if (centerArg) {
+		const { points } = polygon;
+		const xValues = points.map((point) => point.x);
+		const yValues = points.map((point) => point.y);
+
+		const minX = Math.min(...xValues);
+		const minY = Math.min(...yValues);
+
+		const maxX = Math.max(...xValues);
+		const maxY = Math.max(...yValues);
+
+		const { x, y } = vector(minX, minY);
+		const width = maxX - minX;
+		const height = maxY - minY;
+
+		center = vector(x + width / 2, y + height / 2);
+	}
+
+	const points = polygon.points.map((p) => rotateAroundPoint(p, center, rotation));
+	return {
+		...polygon,
+		points,
+		rotation: (polygon.rotation ?? 0) - rotation,
+	};
+}
+
+/**
+ * @description Rotates a rectangle around its center and returns a polygon
+ * with rotation adjusted accordingly (i.e. if rect.rotation === 90 and rotation === 90, the resulting
+ * polygon would have rotation === 0)
+ * @param rect The rectangle to rotate around it's center
+ * @param rotation The rotation (in degrees) to apply to the rectangle
+ */
+export function rotateRect(rect: Rectangle, rotation: number): Polygon {
+	const polygon: Polygon = {
+		...rect,
+		points: rectToPoints(rect),
+	};
+
+	const center = centerOfRect(rect);
+	return rotatePolygon(polygon, rotation, center);
+}
+
+/**
+ * @description Rotates a line around it's center and adjusts rotation
+ * accordingly (i.e. if line.rotation === 90 and rotation === 90, the resulting
+ * line would have rotation === 0)
+ * @param line The line to rotate
+ * @param rotation The rotation to apply (in degrees) to the line
+ */
+export function rotateLine(line: Line, rotation: number): Line {
+	const { point1, point2 } = line;
+	const tlX = Math.min(point1.x, point2.x);
+	const tlY = Math.min(point1.y, point2.y);
+
+	const brX = Math.max(point1.x, point2.x);
+	const brY = Math.max(point1.y, point2.y);
+
+	const width = brX - tlX;
+	const height = brY - tlY;
+
+	const center = vector(tlX + width / 2, tlY + height / 2);
+
+	const newPoint1 = rotateAroundPoint(point1, center, rotation);
+	const newPoint2 = rotateAroundPoint(point2, center, rotation);
+
+	return {
+		...line,
+		point1: newPoint1,
+		point2: newPoint2,
+		rotation: (line.rotation ?? 0) - rotation,
+	};
+}
+
+/**
+ * @description Returns the bounding rectangle of a line
+ */
+export function boundingRectOfLine(line: Line): Rectangle {
+	let normalizedLine = line;
+	if (hasRotation(line)) {
+		normalizedLine = rotateLine(line, line.rotation);
+	}
+
+	const { point1, point2 } = normalizedLine;
+	const topLeftX = Math.min(point1.x, point2.x);
+	const topLeftY = Math.max(point1.y, point2.y);
+	const bottomRightX = Math.max(point1.x, point2.x);
+	const bottomRightY = Math.min(point1.y, point2.y);
+	return {
+		topLeftCorner: vector(topLeftX, topLeftY),
+		height: topLeftY - bottomRightY,
+		width: bottomRightX - topLeftX,
+	};
+}
+
+/**
+ * @description Returns the bounding rectangle of a polygon
+ */
+export function boundingRectOfPolygon(polygon: Polygon): Rectangle {
+	let normalizedPolygon = polygon;
+	if (hasRotation(polygon)) {
+		normalizedPolygon = rotatePolygon(polygon, polygon.rotation);
+	}
+
+	const { points } = normalizedPolygon;
+	const xValues = points.map((point) => point.x);
+	const yValues = points.map((point) => point.y);
+
+	const minX = Math.min(...xValues);
+	const minY = Math.min(...yValues);
+
+	const maxX = Math.max(...xValues);
+	const maxY = Math.max(...yValues);
+
+	return {
+		topLeftCorner: vector(minX, minY),
+		width: maxX - minX,
+		height: maxY - minY,
+	};
+}
+
+/**
+ * @description Returns the total bounding rect of an array of rectangles
+ * @param rects The rects to get the bounding rect of
+ * @tested
+ */
+export function boundingRectOfRects(rects: Rectangle[]): Rectangle {
+	const normalizedRects = rects.map((rect) => {
+		if (hasRotation(rect)) {
+			return boundingRectOfPolygon(rotateRect(rect, rect.rotation));
+		}
+
+		return rect;
+	});
+
+	const leftXs = normalizedRects.map(({ topLeftCorner }) => topLeftCorner.x);
+	const rightXs = normalizedRects.map(({ topLeftCorner, width }) => topLeftCorner.x + width);
+
+	const topYs = normalizedRects.map(({ topLeftCorner }) => topLeftCorner.y);
+	const bottomYs = normalizedRects.map(({ topLeftCorner, height }) => topLeftCorner.y + height);
+
+	const maxX = Math.max(...rightXs, ...leftXs);
+	const minX = Math.min(...rightXs, ...leftXs);
+
+	const maxY = Math.max(...topYs, ...bottomYs);
+	const minY = Math.min(...topYs, ...bottomYs);
+
+	const width = maxX - minX;
+	const height = maxY - minY;
+	const topLeftCorner = vector(minX, minY);
+
+	return {
+		width,
+		height,
+		topLeftCorner,
+	};
 }
 
 /**
