@@ -80,114 +80,6 @@ export function distanceBetweenTwoPoints(point1: Vector2D, point2: Vector2D): nu
 }
 
 /**
- * @description Returns the bounding rectangle of a circle
- * @param circle
- */
-export function boundingRectOfCircle(circle: Circle): Rectangle {
-	const { center: { x, y }, radius } = circle;
-	return {
-		topLeftCorner: vector(x - radius, y - radius),
-		width: radius * 2,
-		height: radius * 2,
-	};
-}
-
-/**
- * @description Converts a polygon into a series of lines
- * @param polygon
- * @tested
- */
-export function polygonToLines(polygon: Polygon, enforceCompleteness = true): Line[] {
-	if (polygon.points.length < 2) {
-		return [];
-	}
-
-	let point1: Vector2D;
-	let point2: Vector2D;
-	const lines: Line[] = [];
-
-	for (let i = 0; i < polygon.points.length; i++) {
-		point1 = polygon.points[i];
-		if (i === polygon.points.length - 1) {
-			[ point2 ] = polygon.points;
-		} else {
-			point2 = polygon.points[i + 1];
-		}
-
-		if (i < polygon.points.length - 1 || enforceCompleteness) {
-			lines.push({ point1, point2 });
-		}
-	}
-
-	return lines;
-}
-
-/**
- * @description Converts a rectangle to a series of points (topLeft, topRight, bottomLeft, bottomRight)
- * @param rect The rectangle to convert
- * @tested
- */
-export function rectToPoints(rect: Rectangle): Vector2D[] {
-	const { x, y } = rect.topLeftCorner;
-	const { width, height } = rect;
-
-	const topLeft: Vector2D = {
-		x,
-		y,
-	};
-
-	const topRight: Vector2D = {
-		x: x + width,
-		y,
-	};
-
-	const bottomLeft: Vector2D = {
-		x,
-		y: y + height,
-	};
-
-	const bottomRight: Vector2D = {
-		x: x + width,
-		y: y + height,
-	};
-
-	return [
-		topLeft,
-		topRight,
-		bottomLeft,
-		bottomRight,
-	];
-}
-
-/**
- * @description Converts a line into an array of it's two points
- * @param line
- * @untested This is simple enough to not need a test
- */
-export function lineToPoints(line: Line): Vector2D[] {
-	return [
-		line.point1,
-		line.point2,
-	];
-}
-
-/**
- * @description Converts a rectangle to a series of lines (top, right, bottom, left)
- * @param rect The rectangle to convert
- * @tested
- */
-export function rectToLines(rect: Rectangle): Line[] {
-	const [ topLeft, topRight, bottomLeft, bottomRight ] = rectToPoints(rect);
-
-	return [
-		{ point1: topLeft, point2: topRight },
-		{ point1: topRight, point2: bottomRight },
-		{ point1: bottomRight, point2: bottomLeft },
-		{ point1: bottomLeft, point2: topLeft },
-	];
-}
-
-/**
  * @description Rotates a polygon around its center and returns a polygon with rotation adjusted
  * accordingly (i.e. if polygon.rotation === 90 and rotation === 90, the resulting
  * polygon would have rotation === 0)
@@ -230,9 +122,39 @@ export function rotatePolygon(polygon: Polygon, rotation: number, centerArg?: Ve
  * @param rotation The rotation (in degrees) to apply to the rectangle
  */
 export function rotateRect(rect: Rectangle, rotation: number): Polygon {
+	const { x, y } = rect.topLeftCorner;
+	const { width, height } = rect;
+
+	const topLeft: Vector2D = {
+		x,
+		y,
+	};
+
+	const topRight: Vector2D = {
+		x: x + width,
+		y,
+	};
+
+	const bottomLeft: Vector2D = {
+		x,
+		y: y + height,
+	};
+
+	const bottomRight: Vector2D = {
+		x: x + width,
+		y: y + height,
+	};
+
+	const points = [
+		topLeft,
+		topRight,
+		bottomLeft,
+		bottomRight,
+	];
+
 	const polygon: Polygon = {
 		...rect,
-		points: rectToPoints(rect),
+		points,
 	};
 
 	const center = centerOfRect(rect);
@@ -268,6 +190,128 @@ export function rotateLine(line: Line, rotation: number): Line {
 		point2: newPoint2,
 		rotation: (line.rotation ?? 0) - rotation,
 	};
+}
+
+/**
+ * @description Returns the bounding rectangle of a circle
+ * @param circle
+ */
+export function boundingRectOfCircle(circle: Circle): Rectangle {
+	const { center: { x, y }, radius } = circle;
+	return {
+		topLeftCorner: vector(x - radius, y - radius),
+		width: radius * 2,
+		height: radius * 2,
+	};
+}
+
+/**
+ * @description Converts a polygon into a series of lines
+ * @param polygon
+ * @tested
+ */
+export function polygonToLines(polygon: Polygon, enforceCompleteness = true): Line[] {
+	let normalizedPolygon = polygon;
+	if (hasRotation(polygon)) {
+		normalizedPolygon = rotatePolygon(polygon, polygon.rotation);
+	}
+
+	if (normalizedPolygon.points.length < 2) {
+		return [];
+	}
+
+	let point1: Vector2D;
+	let point2: Vector2D;
+	const lines: Line[] = [];
+
+	for (let i = 0; i < normalizedPolygon.points.length; i++) {
+		point1 = normalizedPolygon.points[i];
+		if (i === normalizedPolygon.points.length - 1) {
+			[ point2 ] = normalizedPolygon.points;
+		} else {
+			point2 = normalizedPolygon.points[i + 1];
+		}
+
+		if (i < normalizedPolygon.points.length - 1 || enforceCompleteness) {
+			lines.push({ point1, point2 });
+		}
+	}
+
+	return lines;
+}
+
+/**
+ * @description Converts a rectangle to a series of points (topLeft, topRight, bottomLeft, bottomRight)
+ * @param rect The rectangle to convert
+ * @tested
+ */
+export function rectToPoints(rect: Rectangle): Vector2D[] {
+	if (hasRotation(rect)) {
+		return rotateRect(rect, rect.rotation).points;
+	}
+
+	const { x, y } = rect.topLeftCorner;
+	const { width, height } = rect;
+
+	const topLeft: Vector2D = {
+		x,
+		y,
+	};
+
+	const topRight: Vector2D = {
+		x: x + width,
+		y,
+	};
+
+	const bottomLeft: Vector2D = {
+		x,
+		y: y + height,
+	};
+
+	const bottomRight: Vector2D = {
+		x: x + width,
+		y: y + height,
+	};
+
+	return [
+		topLeft,
+		topRight,
+		bottomLeft,
+		bottomRight,
+	];
+}
+
+/**
+ * @description Converts a line into an array of it's two points
+ * @param line
+ * @untested This is simple enough to not need a test
+ */
+export function lineToPoints(line: Line): Vector2D[] {
+	let normalizedLine = line;
+	if (hasRotation(line)) {
+		normalizedLine = rotateLine(line, line.rotation);
+	}
+
+	return [
+		normalizedLine.point1,
+		normalizedLine.point2,
+	];
+}
+
+/**
+ * @description Converts a rectangle to a series of lines (top, right, bottom, left)
+ * @param rect The rectangle to convert
+ * @tested
+ */
+export function rectToLines(rect: Rectangle): Line[] {
+	const [ topLeft, topRight, bottomLeft, bottomRight ] = rectToPoints(rect);
+
+	return [
+		{ point1: topLeft, point2: topRight },
+		{ point1: topRight, point2: bottomRight },
+		{ point1: bottomRight, point2: bottomLeft },
+		{ point1: bottomLeft, point2: topLeft },
+	];
 }
 
 /**
@@ -361,41 +405,25 @@ export function boundingRectOfRects(rects: Rectangle[]): Rectangle {
  * @tested
  */
 export function lineCollidesWithLine(line1: Line, line2: Line): boolean {
-	const { x: x1, y: y1 } = line1.point1;
-	const { x: x2, y: y2 } = line1.point2;
-	const { x: x3, y: y3 } = line2.point1;
-	const { x: x4, y: y4 } = line2.point2;
+	let normalizedLine1 = line1;
+	if (hasRotation(line1)) {
+		normalizedLine1 = rotateLine(line1, line1.rotation);
+	}
+
+	let normalizedLine2 = line2;
+	if (hasRotation(line2)) {
+		normalizedLine2 = rotateLine(line2, line2.rotation);
+	}
+
+	const { x: x1, y: y1 } = normalizedLine1.point1;
+	const { x: x2, y: y2 } = normalizedLine1.point2;
+	const { x: x3, y: y3 } = normalizedLine2.point1;
+	const { x: x4, y: y4 } = normalizedLine2.point2;
 
 	const uA = ((x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3)) / ((y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1));
 	const uB = ((x2 - x1) * (y1 - y3) - (y2 - y1) * (x1 - x3)) / ((y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1));
 
 	return uA >= 0 && uA <= 1 && uB >= 0 && uB <= 1;
-}
-
-/**
- * @description Returns true if a given point lies within a given rectangle
- * @param point The point
- * @param rect The rectangle
- * @tested
- */
-export function pointInsideRect(point: Vector2D, rect: Rectangle): boolean {
-	const { x, y } = point;
-	const { x: topLeftX, y: topLeftY } = rect.topLeftCorner;
-	const { height, width } = rect;
-
-	return x >= topLeftX && x <= topLeftX + width && y >= topLeftY && y <= topLeftY + height;
-}
-
-/**
- * @description Returns true if a line intersects a rectangle or if the line is completely inside the rectangle
- * @param line The line
- * @param rect The rectangle
- * @tested
- */
-export function lineCollidesWithRect(line: Line, rect: Rectangle): boolean {
-	return rectToLines(rect).some((rectLine) => lineCollidesWithLine(rectLine, line)) || (
-		pointInsideRect(line.point1, rect) && pointInsideRect(line.point2, rect)
-	);
 }
 
 /**
@@ -405,7 +433,12 @@ export function lineCollidesWithRect(line: Line, rect: Rectangle): boolean {
  * @tested
  */
 export function pointOnLine(point: Vector2D, line: Line): boolean {
-	const { point1, point2 } = line;
+	let normalizedLine = line;
+	if (hasRotation(line)) {
+		normalizedLine = rotateLine(line, line.rotation);
+	}
+
+	const { point1, point2 } = normalizedLine;
 
 	const maxX = Math.max(point1.x, point2.x);
 	const minX = Math.min(point1.x, point2.x);
@@ -475,6 +508,43 @@ export function pointInsidePolygon(point: Vector2D, polygon: Polygon): boolean {
 }
 
 /**
+ * @description Returns true if a given point lies within a given rectangle
+ * @param point The point
+ * @param rect The rectangle
+ * @tested
+ */
+export function pointInsideRect(point: Vector2D, rect: Rectangle): boolean {
+	if (hasRotation(rect)) {
+		const polygon = rotateRect(rect, rect.rotation);
+		return pointInsidePolygon(point, polygon);
+	}
+
+	const { x, y } = point;
+	const { x: topLeftX, y: topLeftY } = rect.topLeftCorner;
+	const { height, width } = rect;
+
+	return x >= topLeftX && x <= topLeftX + width && y >= topLeftY && y <= topLeftY + height;
+}
+
+/**
+ * @description Returns true if a line intersects a rectangle or if the line is completely inside the rectangle
+ * @param line The line
+ * @param rect The rectangle
+ * @tested
+ */
+export function lineCollidesWithRect(line: Line, rect: Rectangle): boolean {
+	let normalizedLine = line;
+	if (hasRotation(line)) {
+		normalizedLine = rotateLine(line, line.rotation);
+	}
+
+	const { point1, point2 } = normalizedLine;
+	return rectToLines(rect).some((rectLine) => lineCollidesWithLine(rectLine, normalizedLine)) || (
+		pointInsideRect(point1, rect) && pointInsideRect(point2, rect)
+	);
+}
+
+/**
  * @description Returns a rectangle representing the size of the given canvas element
  * @param context2d
  * @untested Simple enough to not need a test
@@ -535,7 +605,12 @@ export function circleCollidesWithLine(circle: Circle, line: Line): boolean {
 		return true;
 	}
 
-	const { point1, point2 } = line;
+	let normalizedLine = line;
+	if (hasRotation(line)) {
+		normalizedLine = rotateLine(line, line.rotation);
+	}
+
+	const { point1, point2 } = normalizedLine;
 	const { center: { x: c1, y: c2 }, radius: r } = circle;
 
 	// If the difference between our lines x values is 0 then
@@ -554,7 +629,7 @@ export function circleCollidesWithLine(circle: Circle, line: Line): boolean {
 			return false;
 		}
 
-		return pointOnLine({ x: n, y: y1 }, line) || pointOnLine({ x: n, y: y2 }, line);
+		return pointOnLine({ x: n, y: y1 }, normalizedLine) || pointOnLine({ x: n, y: y2 }, normalizedLine);
 	}
 
 	// Put the line in form y = mx + b
@@ -581,7 +656,7 @@ export function circleCollidesWithLine(circle: Circle, line: Line): boolean {
 	const y1 = m * x1 + b;
 	const y2 = m * x2 + b;
 
-	return pointOnLine({ x: x1, y: y1 }, line) || pointOnLine({ x: x2, y: y2 }, line);
+	return pointOnLine({ x: x1, y: y1 }, normalizedLine) || pointOnLine({ x: x2, y: y2 }, normalizedLine);
 }
 
 /**
