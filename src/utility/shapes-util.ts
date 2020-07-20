@@ -3,7 +3,9 @@ import Rectangle from '../types/shapes/Rectangle';
 import Vector2D from '../types/utility/Vector2D';
 import Circle from '../types/shapes/Circle';
 import Polygon from '../types/shapes/Polygon';
-import { solveQuadraticEquation, avg } from './math-utility';
+import {
+	solveQuadraticEquation, avg, degreesToRads, radsToDegrees,
+} from './math-utility';
 import { IRotatable } from '../types/shapes/IRotatable';
 
 /**
@@ -22,6 +24,37 @@ export function vector(x: number, y: number): Vector2D {
  */
 export function hasRotation(shape: IRotatable): boolean {
 	return shape.rotation && shape.rotation % 360 !== 0;
+}
+
+/**
+ * @description Returns the distance between two points in a cartesean plane
+ * @param point1
+ * @param point2
+ * @tested
+ */
+export function distanceBetweenTwoPoints(point1: Vector2D, point2: Vector2D): number {
+	return Math.sqrt((point1.x - point2.x) ** 2 + (point1.y - point2.y) ** 2);
+}
+
+/**
+ * @description Calculates the angle between to lines
+ * segments which share a common point
+ * @param sharedPoint The point that both lines share
+ * @param p1 Point 1
+ * @param p2 Point 2
+ */
+export function angleOfThreePoints(sharedPoint: Vector2D, p1: Vector2D, p2: Vector2D): number {
+	const dirCToA = Math.atan2(p1.y - sharedPoint.y, p1.x - sharedPoint.x);
+	const dirCToB = Math.atan2(p2.y - sharedPoint.y, p2.x - sharedPoint.x);
+	let angleACB = dirCToA - dirCToB;
+
+	if (angleACB > Math.PI) {
+		angleACB -= Math.PI * 2;
+	} else if (angleACB < -Math.PI) {
+		angleACB += Math.PI * 2;
+	}
+
+	return 360 - radsToDegrees(angleACB);
 }
 
 /**
@@ -62,7 +95,7 @@ export function centerOfNonRotatedPolygon(polygon: Polygon): Vector2D {
  * @param rotation The rotation in degrees
  */
 export function rotateAroundPoint(point: Vector2D, center: Vector2D, rotation: number): Vector2D {
-	const absRotation = rotation * (Math.PI / 180);
+	const absRotation = degreesToRads(rotation);
 	const s = Math.sin(absRotation);
 	const c = Math.cos(absRotation);
 
@@ -90,15 +123,13 @@ export function vectorEquals(v1: Vector2D, v2: Vector2D): boolean {
 }
 
 /**
- * @description Returns the distance between two points in a cartesean plane
- * @param point1
- * @param point2
- * @tested
+ * @description Rotates a polygon around a point. This will not adjust the polygon's rotation
+ * value as that value represents the polygons rotation around it's own center, this
+ * transforms the polygon into a new polygon
+ * @param polygon The polygon to rotate
+ * @param rotation The rotation in degrees
+ * @param point The point to rotate around
  */
-export function distanceBetweenTwoPoints(point1: Vector2D, point2: Vector2D): number {
-	return Math.sqrt((point1.x - point2.x) ** 2 + (point1.y - point2.y) ** 2);
-}
-
 export function rotatePolygonAroundPoint(polygon: Polygon, rotation: number, point: Vector2D): Polygon {
 	const points = polygon.points.map((p) => rotateAroundPoint(p, point, rotation));
 	return {
@@ -123,6 +154,15 @@ export function rotatePolygon(polygon: Polygon, rotation: number): Polygon {
 	};
 }
 
+/**
+ * @description Rotates a rectangle around a point and returns a polygon representing
+ * the rotated rectangle. The rotation value on the returned polygon is not adjusted as
+ * it represents a shape's rotation around it's own center. The returned shape is different
+ * than the shape passed in.
+ * @param rect The rectangle to rotate
+ * @param rotation The rotation in degrees
+ * @param point The point to rotate around
+ */
 export function rotateRectAroundPoint(rect: Rectangle, rotation: number, point: Vector2D): Polygon {
 	const { x, y } = rect.topLeftCorner;
 	const { width, height } = rect;
@@ -206,6 +246,26 @@ export function rotateRect(rect: Rectangle, rotation: number): Polygon {
 	};
 
 	return rotatePolygon(polygon, rotation);
+}
+
+/**
+ * @description Rotates a line around a point
+ * @param line The line to rotate
+ * @param rotation The rotation in degrees
+ * @param point The point to rotate around
+ */
+export function rotateLineAroundPoint(line: Line, rotation: number, point: Vector2D): Line {
+	const { point1, point2 } = line;
+
+	const newPoint1 = rotateAroundPoint(point1, point, rotation);
+	const newPoint2 = rotateAroundPoint(point2, point, rotation);
+
+	return {
+		...line,
+		point1: newPoint1,
+		point2: newPoint2,
+		rotation: (line.rotation ?? 0) - rotation,
+	};
 }
 
 /**

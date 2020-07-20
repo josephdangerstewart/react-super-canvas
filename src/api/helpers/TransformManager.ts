@@ -11,6 +11,9 @@ import {
 	centerOfRect,
 	rectToPoints,
 	pointInsidePolygon,
+	rotateLineAroundPoint,
+	pointInsideCircle,
+	angleOfThreePoints,
 } from '../../utility/shapes-util';
 import { ScalingNode } from '../../types/transform/ScalingNode';
 import { TransformKind } from '../../types/transform/TransformKind';
@@ -20,6 +23,9 @@ import { BrushContext } from '../../types/context/BrushContext';
 import { applyMultiScale } from '../../utility/transform-utility';
 import ActionHistoryManager from './ActionHistoryManager';
 import Polygon from '../../types/shapes/Polygon';
+import Circle from '../../types/shapes/Circle';
+import Line from '../../types/shapes/Line';
+import { snapAlongIncrement } from '../../utility/math-utility';
 
 const HANDLE_DIAMETER = 12;
 
@@ -41,6 +47,10 @@ const handleStylesHovered: StyledShape = {
 	...handleStyles,
 	fillColor: '#72B5C8',
 };
+
+const handleLineStrokeColor = '#7FC8DE';
+const handleLineStrokeWeight = null;
+const handleLineLength = 30;
 
 /**
  * This class exists to abstract the canvas item transform logic away from the SuperCanvasManager
@@ -73,7 +83,8 @@ export class TransformManager {
 		}
 
 		const boundingRect = this.previewRect || boundingRectOfRects(canvasItems.map((item) => item.getBoundingRect()));
-		const { canMove, canScale } = this.selectionManager;
+		const { canMove, canScale, canRotate } = this.selectionManager;
+		const isRotating = this.transformOperation?.action === TransformKind.Rotate;
 
 		const previewRect = {
 			...boundingRect,
@@ -86,8 +97,8 @@ export class TransformManager {
 			painter.setCursor('move');
 		}
 
-		if (canScale) {
-			this.getScaleNodes(boundingRect, 0, context).forEach((node) => {
+		if (canScale && !isRotating) {
+			this.getScaleNodes(boundingRect, previewRect.rotation ?? 0, context).forEach((node) => {
 				painter.drawPolygon(node.node);
 
 				if (pointInsidePolygon(mousePosition, node.node)) {
@@ -122,6 +133,21 @@ export class TransformManager {
 				}
 			});
 		}
+
+		if (canRotate) {
+			const [ line, circle ] = this.rotationHandle(previewRect, previewRect.rotation ?? 0, context);
+
+			if (!isRotating) {
+				painter.drawLine(line);
+			}
+			painter.drawCircle(circle);
+
+			if (this.transformOperation?.action === TransformKind.Rotate) {
+				painter.setCursor('grabbing');
+			} else if (pointInsideCircle(mousePosition, circle)) {
+				painter.setCursor('grab');
+			}
+		}
 	};
 
 	mouseDown = (context: BrushContext): void => {
@@ -135,7 +161,7 @@ export class TransformManager {
 			return;
 		}
 
-		const { canScale, canMove } = this.selectionManager;
+		const { canScale, canMove, canRotate } = this.selectionManager;
 
 		const boundingRect = boundingRectOfRects(canvasItems.map((item) => item.getBoundingRect()));
 		this.selectedItemBoundingRect = boundingRect;
@@ -152,6 +178,19 @@ export class TransformManager {
 			};
 
 			return;
+		}
+
+		let isRotating = false;
+		if (canRotate) {
+			const [ , circle ] = this.rotationHandle(boundingRect, 0);
+			isRotating = pointInsideCircle(mousePosition, circle);
+		}
+
+		if (isRotating) {
+			this.transformOperation = {
+				action: TransformKind.Rotate,
+				rotation: 0,
+			};
 		}
 
 		if (canMove && pointInsideRect(mousePosition, boundingRect)) {
@@ -234,6 +273,17 @@ export class TransformManager {
 			};
 
 			this.transformOperation.move = vector(curX - prevX, curY - prevY);
+		} else if (action === TransformKind.Rotate) {
+			this.previewRect.rotation = 0;
+			const center = centerOfRect(this.previewRect);
+
+			const angle = snapAlongIncrement(
+				angleOfThreePoints(center, this.mouseDownAt, context.absoluteMousePosition),
+				15,
+			);
+
+			this.previewRect.rotation = angle;
+			this.transformOperation.rotation = angle;
 		}
 	};
 
@@ -263,6 +313,11 @@ export class TransformManager {
 				} else if (selection.canScale) {
 					selection.selectedItem.applyScale(op.scale.value, op.scale.node);
 					this.onCanvasItemChange();
+				}
+				break;
+			case TransformKind.Rotate:
+				if (selection.canRotate) {
+					selection.selectedItem.applyRotation(op.rotation);
 				}
 				break;
 			default:
@@ -340,5 +395,37 @@ export class TransformManager {
 			...styles,
 			points: rectToPoints(rect),
 		};
+	};
+
+	private rotationHandle = (boundingRect: Rectangle, rotation: number, context?: BrushContext): [Line, Circle] => {
+		const { mousePosition } = context || {};
+
+		const boundingRectCenter = centerOfRect(boundingRect);
+
+		let line: Line = {
+			point1: vector(boundingRectCenter.x, boundingRect.topLeftCorner.y),
+			point2: vector(boundingRectCenter.x, boundingRect.topLeftCorner.y - handleLineLength),
+			strokeColor: handleLineStrokeColor,
+			strokeWeight: handleLineStrokeWeight,
+		};
+
+		if (hasRotation({ rotation })) {
+			line = rotateLineAroundPoint(line, rotation, boundingRectCenter);
+		}
+
+		const circle: Circle = {
+			center: line.point2,
+			radius: HANDLE_DIAMETER / 2,
+		};
+
+		let styles = handleStyles;
+		if (mousePosition && pointInsideCircle(mousePosition, circle)) {
+			styles = handleStylesHovered;
+		}
+
+		return [
+			line,
+			{ ...styles, ...circle },
+		];
 	};
 }

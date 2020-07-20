@@ -41,3 +41,36 @@ export function avg(n: number[]): number {
 
 	return sum(n) / n.length;
 }
+
+/**
+ * @description Converts an angle in degrees to radians
+ * @param degrees The angle to convert to radians
+ */
+export function degreesToRads(degrees: number): number {
+	return degrees * (Math.PI / 180);
+}
+
+/**
+ * @description Converts an angle in radians to degrees
+ * @param rads The angle to convert to degrees
+ */
+export function radsToDegrees(rads: number): number {
+	return rads * (180 / Math.PI);
+}
+
+/**
+ * @description Snaps a number along a line in increments
+ * @param n The number to snap
+ * @param inc The increment to snap along
+ * @example
+ * 	snapAlongIncrement(12, 10) = 10
+ * 	snapAlongIncrement(18, 10) = 20
+ */
+export function snapAlongIncrement(n: number, inc: number): number {
+	let x = n;
+	if (x % inc >= (inc / 2)) {
+		x += inc;
+	}
+
+	return Math.floor(x / inc) * inc;
+}
