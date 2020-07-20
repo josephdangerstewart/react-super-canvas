@@ -4,8 +4,6 @@ import IPainterAPI from '../../types/IPainterAPI';
 import Vector2D from '../../types/utility/Vector2D';
 import { boundingRectOfCircle } from '../../utility/shapes-util';
 import Rectangle from '../../types/shapes/Rectangle';
-import { TransformOperation } from '../../types/transform/TransformOperation';
-import { TransformKind } from '../../types/transform/TransformKind';
 import { scaleCircle, moveCircle } from '../../utility/transform-utility';
 import { ScalingNode } from '../../types/transform/ScalingNode';
 import JsonData from '../../types/utility/JsonData';
@@ -43,14 +41,6 @@ export default class CircleCanvasItem implements ICanvasItem {
 	};
 
 	getBoundingRect = (): Rectangle => boundingRectOfCircle(this.circle);
-
-	applyTransform = (operation: TransformOperation): void => {
-		if (operation.action === TransformKind.Scale) {
-			this.circle = scaleCircle(this.circle, operation.scale.value, operation.scale.node);
-		} if (operation.action === TransformKind.Move) {
-			this.circle = moveCircle(this.circle, operation.move);
-		}
-	};
 
 	applyScale = (scale: Vector2D, node: ScalingNode): void => {
 		this.circle = scaleCircle(this.circle, scale, node);

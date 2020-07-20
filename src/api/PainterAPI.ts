@@ -17,6 +17,7 @@ import {
 	getDiffBetweenPoints,
 	centerOfRect,
 	centerOfNonRotatedPolygon,
+	centerOfLine,
 } from '../utility/shapes-util';
 import Polygon, { PolygonDefaults } from '../types/shapes/Polygon';
 import StyledShape from '../types/shapes/StyledShape';
@@ -52,7 +53,7 @@ export default class PainterAPI implements IPainterAPI {
 
 			if (line.rotation && line.rotation % 360 !== 0) {
 				const boundingRect = boundingRectOfLine(line);
-				this.withRotation(line.rotation, centerOfRect(boundingRect), boundingRect, (topLeft) => {
+				this.withRotation(line.rotation, centerOfLine(line), boundingRect, (topLeft) => {
 					this.context2d.beginPath();
 					this.context2d.moveTo(topLeft.x, topLeft.y);
 					this.context2d.lineTo(topLeft.x + boundingRect.width, topLeft.y + boundingRect.height);

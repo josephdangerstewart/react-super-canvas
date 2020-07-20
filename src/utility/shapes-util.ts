@@ -34,6 +34,13 @@ export function centerOfRect(rect: Rectangle): Vector2D {
 	};
 }
 
+export function centerOfLine(line: Line): Vector2D {
+	const { x: x1, y: y1 } = line.point1;
+	const { x: x2, y: y2 } = line.point2;
+
+	return vector(avg([ x1, x2 ]), avg([ y1, y2 ]));
+}
+
 /**
  * @description Returns the centroid of a polygon
  */
@@ -164,16 +171,7 @@ export function rotateRect(rect: Rectangle, rotation: number): Polygon {
  */
 export function rotateLine(line: Line, rotation: number): Line {
 	const { point1, point2 } = line;
-	const tlX = Math.min(point1.x, point2.x);
-	const tlY = Math.min(point1.y, point2.y);
-
-	const brX = Math.max(point1.x, point2.x);
-	const brY = Math.max(point1.y, point2.y);
-
-	const width = brX - tlX;
-	const height = brY - tlY;
-
-	const center = vector(tlX + width / 2, tlY + height / 2);
+	const center = centerOfLine(line);
 
 	const newPoint1 = rotateAroundPoint(point1, center, rotation);
 	const newPoint2 = rotateAroundPoint(point2, center, rotation);
