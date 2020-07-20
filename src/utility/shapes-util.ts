@@ -3,7 +3,7 @@ import Rectangle from '../types/shapes/Rectangle';
 import Vector2D from '../types/utility/Vector2D';
 import Circle from '../types/shapes/Circle';
 import Polygon from '../types/shapes/Polygon';
-import { solveQuadraticEquation } from './math-utility';
+import { solveQuadraticEquation, avg } from './math-utility';
 import { IRotatable } from '../types/shapes/IRotatable';
 
 /**
@@ -32,6 +32,19 @@ export function centerOfRect(rect: Rectangle): Vector2D {
 		x: rect.topLeftCorner.x + rect.width / 2,
 		y: rect.topLeftCorner.y + rect.height / 2,
 	};
+}
+
+/**
+ * @description Returns the centroid of a polygon
+ */
+export function centerOfNonRotatedPolygon(polygon: Polygon): Vector2D {
+	const xValues = polygon.points.map(({ x }) => x);
+	const yValues = polygon.points.map(({ y }) => y);
+
+	const cX = avg(xValues);
+	const cY = avg(yValues);
+
+	return vector(cX, cY);
 }
 
 /**
@@ -86,26 +99,8 @@ export function distanceBetweenTwoPoints(point1: Vector2D, point2: Vector2D): nu
  * @param polygon The polygon to rotate
  * @param rotation The rotation in degrees
  */
-export function rotatePolygon(polygon: Polygon, rotation: number, centerArg?: Vector2D): Polygon {
-	let center = centerArg;
-	if (centerArg) {
-		const { points } = polygon;
-		const xValues = points.map((point) => point.x);
-		const yValues = points.map((point) => point.y);
-
-		const minX = Math.min(...xValues);
-		const minY = Math.min(...yValues);
-
-		const maxX = Math.max(...xValues);
-		const maxY = Math.max(...yValues);
-
-		const { x, y } = vector(minX, minY);
-		const width = maxX - minX;
-		const height = maxY - minY;
-
-		center = vector(x + width / 2, y + height / 2);
-	}
-
+export function rotatePolygon(polygon: Polygon, rotation: number): Polygon {
+	const center = centerOfNonRotatedPolygon(polygon);
 	const points = polygon.points.map((p) => rotateAroundPoint(p, center, rotation));
 	return {
 		...polygon,
@@ -157,8 +152,7 @@ export function rotateRect(rect: Rectangle, rotation: number): Polygon {
 		points,
 	};
 
-	const center = centerOfRect(rect);
-	return rotatePolygon(polygon, rotation, center);
+	return rotatePolygon(polygon, rotation);
 }
 
 /**

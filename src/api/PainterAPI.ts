@@ -15,6 +15,8 @@ import {
 	boundingRectOfPolygon,
 	boundingRectOfLine,
 	getDiffBetweenPoints,
+	centerOfRect,
+	centerOfNonRotatedPolygon,
 } from '../utility/shapes-util';
 import Polygon, { PolygonDefaults } from '../types/shapes/Polygon';
 import StyledShape from '../types/shapes/StyledShape';
@@ -50,7 +52,7 @@ export default class PainterAPI implements IPainterAPI {
 
 			if (line.rotation && line.rotation % 360 !== 0) {
 				const boundingRect = boundingRectOfLine(line);
-				this.withRotation(line.rotation, boundingRect, (topLeft) => {
+				this.withRotation(line.rotation, centerOfRect(boundingRect), boundingRect, (topLeft) => {
 					this.context2d.beginPath();
 					this.context2d.moveTo(topLeft.x, topLeft.y);
 					this.context2d.lineTo(topLeft.x + boundingRect.width, topLeft.y + boundingRect.height);
@@ -87,7 +89,7 @@ export default class PainterAPI implements IPainterAPI {
 			const boundingRect = boundingRectOfPolygon(polygon);
 
 			if (polygon.rotation && polygon.rotation % 360 !== 0) {
-				this.withRotation(polygon.rotation, boundingRect, (newTopLeft) => {
+				this.withRotation(polygon.rotation, centerOfNonRotatedPolygon(polygon), boundingRect, (newTopLeft) => {
 					const virtualNewTopLeft = this.toVirtualPoint(newTopLeft);
 					const diff = getDiffBetweenPoints(virtualNewTopLeft, boundingRect.topLeftCorner);
 					const movedPolygon = movePolygon(polygon, diff);
@@ -113,7 +115,7 @@ export default class PainterAPI implements IPainterAPI {
 			const absHeight = height * this.scale;
 
 			if (rect.rotation && rect.rotation % 360 !== 0) {
-				this.withRotation(rect.rotation, rect, (newTopLeft) => {
+				this.withRotation(rect.rotation, centerOfRect(rect), rect, (newTopLeft) => {
 					this.context2d.beginPath();
 					this.context2d.rect(newTopLeft.x, newTopLeft.y, absWidth, absHeight);
 					this.context2d.closePath();
@@ -185,25 +187,24 @@ export default class PainterAPI implements IPainterAPI {
 	/* UTILITY METHODS */
 
 	/**
-	 * @remarks Bounding rect is in virtual space but the vector passed into render is in the absolute space
+	 * @remarks Center point and bounding rect are in virtual space but the vector passed
+	 * into render is in the absolute space
 	 */
-	private withRotation = (rotation: number, boundingRect: Rectangle, render: (newTopLeft: Vector2D) => void): void => {
-		const { width, height } = boundingRect;
-		const { x, y } = this.toAbsolutePoint(boundingRect.topLeftCorner);
-		const absWidth = width * this.scale;
-		const absHeight = height * this.scale;
+	private withRotation = (rotation: number, center: Vector2D, boundingRect: Rectangle, render: (newTopLeft: Vector2D) => void): void => {
+		const { x: tlX, y: tlY } = boundingRect.topLeftCorner;
+		const { x, y } = this.toAbsolutePoint(center);
+
+		const topLeftDelta = this.toAbsolutePoint(vector(tlX - center.x, tlY - center.y));
+
 		const absRotation = rotation * (Math.PI / 180);
 
-		const transX = x + absWidth / 2;
-		const transY = y + absHeight / 2;
-
-		this.context2d.translate(transX, transY);
+		this.context2d.translate(x, y);
 		this.context2d.rotate(absRotation);
 
-		render(vector(-absWidth / 2, -absHeight / 2));
+		render(topLeftDelta);
 
 		this.context2d.rotate(-absRotation);
-		this.context2d.translate(-transX, -transY);
+		this.context2d.translate(-x, -y);
 	};
 
 	private getViewport = (): Rectangle => {
@@ -317,7 +318,7 @@ export default class PainterAPI implements IPainterAPI {
 			this.context2d.globalAlpha = opacity || oldOpacity;
 
 			if (rotation && rotation % 360 !== 0) {
-				this.withRotation(rotation, imageRect, (newTopLeft) => {
+				this.withRotation(rotation, centerOfRect(imageRect), imageRect, (newTopLeft) => {
 					this.context2d.drawImage(image, newTopLeft.x, newTopLeft.y);
 				});
 			} else {

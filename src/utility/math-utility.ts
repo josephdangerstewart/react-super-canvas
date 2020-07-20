@@ -23,3 +23,21 @@ export function slopeOf(line: Line): number {
 
 	return (y1 - y2) / (x1 - x2);
 }
+
+/**
+ * @description Returns the sum of a set of numbers
+ */
+export function sum(n: number[]): number {
+	return n.reduce((a, b) => a + b, 0);
+}
+
+/**
+ * @description Returns the average of a set of numbers
+ */
+export function avg(n: number[]): number {
+	if (n.length === 0) {
+		return undefined;
+	}
+
+	return sum(n) / n.length;
+}
