@@ -320,7 +320,7 @@ export default class PainterAPI implements IPainterAPI {
 
 			if (rotation && rotation % 360 !== 0) {
 				this.withRotation(rotation, centerOfRect(imageRect), imageRect, (newTopLeft) => {
-					this.context2d.drawImage(image, newTopLeft.x, newTopLeft.y);
+					this.context2d.drawImage(image, newTopLeft.x, newTopLeft.y, absWidth, absHeight);
 				});
 			} else {
 				this.context2d.drawImage(image, x, y, absWidth, absHeight);
