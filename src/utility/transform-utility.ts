@@ -6,6 +6,7 @@ import {
 	boundingRectOfCircle,
 	boundingRectOfPolygon,
 	boundingRectOfRects,
+	normalizeRotationForPolygon,
 } from './shapes-util';
 import Circle from '../types/shapes/Circle';
 import Polygon from '../types/shapes/Polygon';
@@ -98,19 +99,20 @@ export function scaleCircle(circle: Circle, scale: Vector2D, node: ScalingNode):
  * @param node The scaling node that was dragged by the user to
  */
 export function scalePolygon(polygon: Polygon, scale: Vector2D, node: ScalingNode): Polygon {
-	const boundingRect = boundingRectOfPolygon(polygon);
+	const normalizedPolygon = normalizeRotationForPolygon(polygon);
+	const boundingRect = boundingRectOfPolygon(normalizedPolygon);
 	const { x: left, y: top } = boundingRect.topLeftCorner;
 
 	const scaledBoundingRect = scaleRectangle(boundingRect, scale, node);
 	const { x: scaledLeft, y: scaledTop } = scaledBoundingRect.topLeftCorner;
 
-	const points = polygon.points.map((point) => ({
+	const points = normalizedPolygon.points.map((point) => ({
 		x: ((point.x - left) * scale.x) + scaledLeft,
 		y: ((point.y - top) * scale.y) + scaledTop,
 	}));
 
 	return {
-		...polygon,
+		...normalizedPolygon,
 		points,
 	};
 }

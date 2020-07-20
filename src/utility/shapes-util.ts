@@ -155,15 +155,11 @@ export function rotatePolygon(polygon: Polygon, rotation: number): Polygon {
 }
 
 /**
- * @description Rotates a rectangle around a point and returns a polygon representing
- * the rotated rectangle. The rotation value on the returned polygon is not adjusted as
- * it represents a shape's rotation around it's own center. The returned shape is different
- * than the shape passed in.
- * @param rect The rectangle to rotate
- * @param rotation The rotation in degrees
- * @param point The point to rotate around
+ * @description Converts a rectangle to an array of points without
+ * respect to it's rotation
+ * @param rect The rectangle
  */
-export function rotateRectAroundPoint(rect: Rectangle, rotation: number, point: Vector2D): Polygon {
+function unrotatedRectToPoints(rect: Rectangle): Vector2D[] {
 	const { x, y } = rect.topLeftCorner;
 	const { width, height } = rect;
 
@@ -187,16 +183,27 @@ export function rotateRectAroundPoint(rect: Rectangle, rotation: number, point: 
 		y: y + height,
 	};
 
-	const points = [
+	return [
 		topLeft,
 		topRight,
-		bottomLeft,
 		bottomRight,
+		bottomLeft,
 	];
+}
 
+/**
+ * @description Rotates a rectangle around a point and returns a polygon representing
+ * the rotated rectangle. The rotation value on the returned polygon is not adjusted as
+ * it represents a shape's rotation around it's own center. The returned shape is different
+ * than the shape passed in.
+ * @param rect The rectangle to rotate
+ * @param rotation The rotation in degrees
+ * @param point The point to rotate around
+ */
+export function rotateRectAroundPoint(rect: Rectangle, rotation: number, point: Vector2D): Polygon {
 	const polygon: Polygon = {
 		...rect,
-		points,
+		points: unrotatedRectToPoints(rect),
 	};
 
 	return rotatePolygonAroundPoint(polygon, rotation, point);
@@ -236,8 +243,8 @@ export function rotateRect(rect: Rectangle, rotation: number): Polygon {
 	const points = [
 		topLeft,
 		topRight,
-		bottomLeft,
 		bottomRight,
+		bottomLeft,
 	];
 
 	const polygon: Polygon = {
@@ -291,6 +298,54 @@ export function rotateLine(line: Line, rotation: number): Line {
 }
 
 /**
+ * @description Returns the same shape with rotation = 0
+ * @param polygon The polygon to normalize
+ */
+export function normalizeRotationForPolygon(polygon: Polygon): Polygon {
+	if (!hasRotation(polygon)) {
+		return polygon;
+	}
+
+	return {
+		...rotatePolygon(polygon, polygon.rotation),
+		rotation: 0,
+	};
+}
+
+/**
+ * @description Returns the same shape with rotation = 0
+ * @param rect The rectangle to normalize
+ */
+export function normalizeRotationForRect(rect: Rectangle): Polygon {
+	if (!hasRotation(rect)) {
+		return {
+			...rect,
+			points: unrotatedRectToPoints(rect),
+		};
+	}
+
+	return {
+		...rotateRect(rect, rect.rotation),
+		rotation: 0,
+	};
+}
+
+/**
+ * @description Returns the same shape with rotation = 0
+ * @param line The line to normalize
+ */
+export function normalizeRotationForLine(line: Line): Line {
+	if (!hasRotation(line)) {
+		return line;
+	}
+
+	return {
+		...rotateLine(line, line.rotation),
+		rotation: 0,
+	};
+}
+
+/**
  * @description Returns the bounding rectangle of a circle
  * @param circle
  */
@@ -309,10 +364,7 @@ export function boundingRectOfCircle(circle: Circle): Rectangle {
  * @tested
  */
 export function polygonToLines(polygon: Polygon, enforceCompleteness = true): Line[] {
-	let normalizedPolygon = polygon;
-	if (hasRotation(polygon)) {
-		normalizedPolygon = rotatePolygon(polygon, polygon.rotation);
-	}
+	const normalizedPolygon = normalizeRotationForPolygon(polygon);
 
 	if (normalizedPolygon.points.length < 2) {
 		return [];
@@ -344,39 +396,7 @@ export function polygonToLines(polygon: Polygon, enforceCompleteness = true): Li
  * @tested
  */
 export function rectToPoints(rect: Rectangle): Vector2D[] {
-	if (hasRotation(rect)) {
-		return rotateRect(rect, rect.rotation).points;
-	}
-
-	const { x, y } = rect.topLeftCorner;
-	const { width, height } = rect;
-
-	const topLeft: Vector2D = {
-		x,
-		y,
-	};
-
-	const topRight: Vector2D = {
-		x: x + width,
-		y,
-	};
-
-	const bottomLeft: Vector2D = {
-		x,
-		y: y + height,
-	};
-
-	const bottomRight: Vector2D = {
-		x: x + width,
-		y: y + height,
-	};
-
-	return [
-		topLeft,
-		topRight,
-		bottomRight,
-		bottomLeft,
-	];
+	return normalizeRotationForRect(rect).points;
 }
 
 /**
@@ -385,15 +405,8 @@ export function rectToPoints(rect: Rectangle): Vector2D[] {
  * @untested This is simple enough to not need a test
  */
 export function lineToPoints(line: Line): Vector2D[] {
-	let normalizedLine = line;
-	if (hasRotation(line)) {
-		normalizedLine = rotateLine(line, line.rotation);
-	}
-
-	return [
-		normalizedLine.point1,
-		normalizedLine.point2,
-	];
+	const { point1, point2 } = normalizeRotationForLine(line);
+	return [ point1, point2 ];
 }
 
 /**
@@ -402,7 +415,7 @@ export function lineToPoints(line: Line): Vector2D[] {
  * @tested
  */
 export function rectToLines(rect: Rectangle): Line[] {
-	const [ topLeft, topRight, bottomLeft, bottomRight ] = rectToPoints(rect);
+	const [ topLeft, topRight, bottomRight, bottomLeft ] = rectToPoints(rect);
 
 	return [
 		{ point1: topLeft, point2: topRight },
@@ -416,10 +429,7 @@ export function rectToLines(rect: Rectangle): Line[] {
  * @description Returns the bounding rectangle of a line
  */
 export function boundingRectOfLine(line: Line): Rectangle {
-	let normalizedLine = line;
-	if (hasRotation(line)) {
-		normalizedLine = rotateLine(line, line.rotation);
-	}
+	const normalizedLine = normalizeRotationForLine(line);
 
 	const { point1, point2 } = normalizedLine;
 	const topLeftX = Math.min(point1.x, point2.x);
@@ -437,10 +447,7 @@ export function boundingRectOfLine(line: Line): Rectangle {
  * @description Returns the bounding rectangle of a polygon
  */
 export function boundingRectOfPolygon(polygon: Polygon): Rectangle {
-	let normalizedPolygon = polygon;
-	if (hasRotation(polygon)) {
-		normalizedPolygon = rotatePolygon(polygon, polygon.rotation);
-	}
+	const normalizedPolygon = normalizeRotationForPolygon(polygon);
 
 	const { points } = normalizedPolygon;
 	const xValues = points.map((point) => point.x);
@@ -465,13 +472,7 @@ export function boundingRectOfPolygon(polygon: Polygon): Rectangle {
  * @tested
  */
 export function boundingRectOfRects(rects: Rectangle[]): Rectangle {
-	const normalizedRects = rects.map((rect) => {
-		if (hasRotation(rect)) {
-			return boundingRectOfPolygon(rotateRect(rect, rect.rotation));
-		}
-
-		return rect;
-	});
+	const normalizedRects = rects.map((rect) => boundingRectOfPolygon(normalizeRotationForRect(rect)));
 
 	const leftXs = normalizedRects.map(({ topLeftCorner }) => topLeftCorner.x);
 	const rightXs = normalizedRects.map(({ topLeftCorner, width }) => topLeftCorner.x + width);
@@ -503,15 +504,8 @@ export function boundingRectOfRects(rects: Rectangle[]): Rectangle {
  * @tested
  */
 export function lineCollidesWithLine(line1: Line, line2: Line): boolean {
-	let normalizedLine1 = line1;
-	if (hasRotation(line1)) {
-		normalizedLine1 = rotateLine(line1, line1.rotation);
-	}
-
-	let normalizedLine2 = line2;
-	if (hasRotation(line2)) {
-		normalizedLine2 = rotateLine(line2, line2.rotation);
-	}
+	const normalizedLine1 = normalizeRotationForLine(line1);
+	const normalizedLine2 = normalizeRotationForLine(line2);
 
 	const { x: x1, y: y1 } = normalizedLine1.point1;
 	const { x: x2, y: y2 } = normalizedLine1.point2;
@@ -531,10 +525,7 @@ export function lineCollidesWithLine(line1: Line, line2: Line): boolean {
  * @tested
  */
 export function pointOnLine(point: Vector2D, line: Line): boolean {
-	let normalizedLine = line;
-	if (hasRotation(line)) {
-		normalizedLine = rotateLine(line, line.rotation);
-	}
+	const normalizedLine = normalizeRotationForLine(line);
 
 	const { point1, point2 } = normalizedLine;
 
@@ -566,10 +557,7 @@ export function pointOnLine(point: Vector2D, line: Line): boolean {
  * @tested
  */
 export function pointInsidePolygon(point: Vector2D, polygon: Polygon): boolean {
-	let normalizedPolygon = polygon;
-	if (hasRotation(polygon)) {
-		normalizedPolygon = rotatePolygon(polygon, polygon.rotation);
-	}
+	const normalizedPolygon = normalizeRotationForPolygon(polygon);
 
 	const ray: Line = {
 		point1: vector(Math.min(...polygon.points.map(({ x }) => x)) - 1, point.y),
@@ -613,7 +601,7 @@ export function pointInsidePolygon(point: Vector2D, polygon: Polygon): boolean {
  */
 export function pointInsideRect(point: Vector2D, rect: Rectangle): boolean {
 	if (hasRotation(rect)) {
-		const polygon = rotateRect(rect, rect.rotation);
+		const polygon = normalizeRotationForRect(rect);
 		return pointInsidePolygon(point, polygon);
 	}
 
@@ -631,10 +619,7 @@ export function pointInsideRect(point: Vector2D, rect: Rectangle): boolean {
  * @tested
  */
 export function lineCollidesWithRect(line: Line, rect: Rectangle): boolean {
-	let normalizedLine = line;
-	if (hasRotation(line)) {
-		normalizedLine = rotateLine(line, line.rotation);
-	}
+	const normalizedLine = normalizeRotationForLine(line);
 
 	const { point1, point2 } = normalizedLine;
 	return rectToLines(rect).some((rectLine) => lineCollidesWithLine(rectLine, normalizedLine)) || (
@@ -703,10 +688,7 @@ export function circleCollidesWithLine(circle: Circle, line: Line): boolean {
 		return true;
 	}
 
-	let normalizedLine = line;
-	if (hasRotation(line)) {
-		normalizedLine = rotateLine(line, line.rotation);
-	}
+	const normalizedLine = normalizeRotationForLine(line);
 
 	const { point1, point2 } = normalizedLine;
 	const { center: { x: c1, y: c2 }, radius: r } = circle;
@@ -783,10 +765,7 @@ export function circleCollidesWithRect(circle: Circle, rect: Rectangle): boolean
  * @param rect
  */
 export function polygonCollidesWithRect(polygon: Polygon, rect: Rectangle): boolean {
-	let normalizedPolygon = polygon;
-	if (hasRotation(polygon)) {
-		normalizedPolygon = rotatePolygon(polygon, polygon.rotation);
-	}
+	const normalizedPolygon = normalizeRotationForPolygon(polygon);
 
 	// Polygon is inside rectangle
 	if (normalizedPolygon.points.some((point) => pointInsideRect(point, rect))) {
