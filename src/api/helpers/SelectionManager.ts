@@ -45,6 +45,10 @@ export default class SelectionManager implements ISelection {
 		return this._selectedItems.length && this._selectedItems.every((item) => item.applyScale);
 	}
 
+	get canRotate(): boolean {
+		return this._selectedItems.length === 1 && Boolean(this._selectedItems[0].applyRotation);
+	}
+
 	/* PUBLIC METHODS */
 
 	isSelected = (item: ICanvasItem): boolean => this._selectedItems.includes(item);

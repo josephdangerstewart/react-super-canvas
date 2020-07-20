@@ -99,6 +99,14 @@ export function distanceBetweenTwoPoints(point1: Vector2D, point2: Vector2D): nu
 	return Math.sqrt((point1.x - point2.x) ** 2 + (point1.y - point2.y) ** 2);
 }
 
+export function rotatePolygonAroundPoint(polygon: Polygon, rotation: number, point: Vector2D): Polygon {
+	const points = polygon.points.map((p) => rotateAroundPoint(p, point, rotation));
+	return {
+		...polygon,
+		points,
+	};
+}
+
 /**
  * @description Rotates a polygon around its center and returns a polygon with rotation adjusted
  * accordingly (i.e. if polygon.rotation === 90 and rotation === 90, the resulting
@@ -108,12 +116,50 @@ export function distanceBetweenTwoPoints(point1: Vector2D, point2: Vector2D): nu
  */
 export function rotatePolygon(polygon: Polygon, rotation: number): Polygon {
 	const center = centerOfNonRotatedPolygon(polygon);
-	const points = polygon.points.map((p) => rotateAroundPoint(p, center, rotation));
+	const rotatedPolygon = rotatePolygonAroundPoint(polygon, rotation, center);
 	return {
-		...polygon,
-		points,
+		...rotatedPolygon,
 		rotation: (polygon.rotation ?? 0) - rotation,
 	};
+}
+
+export function rotateRectAroundPoint(rect: Rectangle, rotation: number, point: Vector2D): Polygon {
+	const { x, y } = rect.topLeftCorner;
+	const { width, height } = rect;
+
+	const topLeft: Vector2D = {
+		x,
+		y,
+	};
+
+	const topRight: Vector2D = {
+		x: x + width,
+		y,
+	};
+
+	const bottomLeft: Vector2D = {
+		x,
+		y: y + height,
+	};
+
+	const bottomRight: Vector2D = {
+		x: x + width,
+		y: y + height,
+	};
+
+	const points = [
+		topLeft,
+		topRight,
+		bottomLeft,
+		bottomRight,
+	];
+
+	const polygon: Polygon = {
+		...rect,
+		points,
+	};
+
+	return rotatePolygonAroundPoint(polygon, rotation, point);
 }
 
 /**
@@ -268,8 +314,8 @@ export function rectToPoints(rect: Rectangle): Vector2D[] {
 	return [
 		topLeft,
 		topRight,
-		bottomLeft,
 		bottomRight,
+		bottomLeft,
 	];
 }
 

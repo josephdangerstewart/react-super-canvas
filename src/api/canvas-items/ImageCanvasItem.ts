@@ -26,6 +26,7 @@ export default class ImageCanvasItem implements ICanvasItem {
 	private topLeftCorner: Vector2D;
 	private scale: Vector2D;
 	private size: Vector2D;
+	private rotation: number;
 	private imageCache: IImageCache;
 
 	constructor({
@@ -39,6 +40,7 @@ export default class ImageCanvasItem implements ICanvasItem {
 		this.scale = vector(1, 1);
 		this.size = vector(0, 0);
 		this.imageCache = imageCache;
+		this.rotation = 0;
 
 		if (imageCache) {
 			this.generateSize();
@@ -58,7 +60,7 @@ export default class ImageCanvasItem implements ICanvasItem {
 	});
 
 	render = (painter: IPainterAPI): void => {
-		painter.drawImage(this.topLeftCorner, this.src, this.scale);
+		painter.drawImage(this.topLeftCorner, this.src, this.scale, null, this.rotation);
 	};
 
 	getBoundingRect = (): Rectangle => ({
@@ -77,6 +79,10 @@ export default class ImageCanvasItem implements ICanvasItem {
 		this.topLeftCorner = scaledRect.topLeftCorner;
 		this.scale.x *= scale.x;
 		this.scale.y *= scale.y;
+	};
+
+	applyRotation = (rotation: number): void => {
+		this.rotation += rotation;
 	};
 
 	private generateSize = async (): Promise<void> => {

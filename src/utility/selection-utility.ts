@@ -8,6 +8,7 @@ export function createSelection(canvasItems: ICanvasItem[]): ISelection {
 	return {
 		canMove: canvasItems && canvasItems.every((item) => item.applyMove),
 		canScale: canvasItems && canvasItems.every((item) => item.applyScale),
+		canRotate: canvasItems && canvasItems.length === 0 && Boolean(canvasItems[0].applyRotation),
 		selectedItemCount: canvasItems && canvasItems.length,
 		selectedItem: canvasItems && canvasItems[0],
 		selectedItems: canvasItems,

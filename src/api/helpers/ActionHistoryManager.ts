@@ -110,6 +110,13 @@ export default class ActionHistoryManager {
 					};
 
 					break;
+				case TransformKind.Rotate:
+					reversedTransform = {
+						action: TransformKind.Rotate,
+						rotation: -op.rotation,
+					};
+
+					break;
 				default:
 					throw new Error('Unsupported transform kind');
 			}

@@ -49,4 +49,6 @@ export default class CircleCanvasItem implements ICanvasItem {
 	applyMove = (move: Vector2D): void => {
 		this.circle = moveCircle(this.circle, move);
 	};
+
+	applyRotation = (): void => null;
 }

@@ -56,6 +56,13 @@ export default interface ICanvasItem {
 	applyMove?: (move: Vector2D) => void;
 
 	/**
+	 * @description Applies a rotation (in degrees) to the canvas item.
+	 * Rotations should be invertible so that `applyRotation(-r)` undoes
+	 * `applyRotation(r)`
+	 */
+	applyRotation?: (rotation: number) => void;
+
+	/**
 	 * @description The name of the canvas item so that the canvas can be
 	 * reconstructed from a saved pure JSON states. This property must be
 	 * a constant value and not change between instances.

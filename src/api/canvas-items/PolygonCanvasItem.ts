@@ -25,6 +25,7 @@ export default class PolygonCanvasItem implements ICanvasItem {
 			points,
 			fillColor: styleContext.fillColor,
 			strokeColor: styleContext.strokeColor,
+			rotation: 0,
 		};
 	}
 
@@ -47,5 +48,9 @@ export default class PolygonCanvasItem implements ICanvasItem {
 
 	applyMove = (move: Vector2D): void => {
 		this.polygon = movePolygon(this.polygon, move);
+	};
+
+	applyRotation = (rotation: number): void => {
+		this.polygon.rotation += rotation;
 	};
 }

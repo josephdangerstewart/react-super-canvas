@@ -6,6 +6,11 @@ import {
 	vector,
 	pointInsideRect,
 	boundingRectOfRects,
+	hasRotation,
+	rotateRectAroundPoint,
+	centerOfRect,
+	rectToPoints,
+	pointInsidePolygon,
 } from '../../utility/shapes-util';
 import { ScalingNode } from '../../types/transform/ScalingNode';
 import { TransformKind } from '../../types/transform/TransformKind';
@@ -14,6 +19,7 @@ import Vector2D from '../../types/utility/Vector2D';
 import { BrushContext } from '../../types/context/BrushContext';
 import { applyMultiScale } from '../../utility/transform-utility';
 import ActionHistoryManager from './ActionHistoryManager';
+import Polygon from '../../types/shapes/Polygon';
 
 const HANDLE_DIAMETER = 12;
 
@@ -69,21 +75,22 @@ export class TransformManager {
 		const boundingRect = this.previewRect || boundingRectOfRects(canvasItems.map((item) => item.getBoundingRect()));
 		const { canMove, canScale } = this.selectionManager;
 
-		painter.drawRect({
+		const previewRect = {
 			...boundingRect,
 			...boundingRectangleStyles,
-		});
+		};
 
+		painter.drawRect(previewRect);
 
 		if (canMove && pointInsideRect(mousePosition, boundingRect)) {
 			painter.setCursor('move');
 		}
 
 		if (canScale) {
-			this.getScaleNodes(boundingRect, context).forEach((node) => {
-				painter.drawRect(node.node);
+			this.getScaleNodes(boundingRect, 0, context).forEach((node) => {
+				painter.drawPolygon(node.node);
 
-				if (pointInsideRect(mousePosition, node.node)) {
+				if (pointInsidePolygon(mousePosition, node.node)) {
 					switch (node.type) {
 						case ScalingNode.TopLeft:
 							painter.setCursor('nw-resize');
@@ -133,7 +140,7 @@ export class TransformManager {
 		const boundingRect = boundingRectOfRects(canvasItems.map((item) => item.getBoundingRect()));
 		this.selectedItemBoundingRect = boundingRect;
 		this.previewRect = boundingRect;
-		const scaleNode = canScale && this.getScaleNodes(boundingRect).find(({ node }) => pointInsideRect(mousePosition, node));
+		const scaleNode = canScale && this.getScaleNodes(boundingRect, 0).find(({ node }) => pointInsidePolygon(mousePosition, node));
 
 		if (scaleNode) {
 			this.transformOperation = {
@@ -263,49 +270,50 @@ export class TransformManager {
 		}
 	};
 
-	private getScaleNodes = (rect: Rectangle, context?: BrushContext): { type: ScalingNode; node: Rectangle }[] => {
+	private getScaleNodes = (rect: Rectangle, rotation: number, context?: BrushContext): { type: ScalingNode; node: Polygon }[] => {
 		const { x, y } = rect.topLeftCorner;
 		const { width, height } = rect;
 		const halfWidth = Math.floor(width / 2);
 		const halfHeight = Math.floor(height / 2);
+		const center = centerOfRect(rect);
 
 		return [
 			{
 				type: ScalingNode.TopLeft,
-				node: this.scaleHandle(x, y, context),
+				node: this.scaleHandle(x, y, rotation, center, context),
 			},
 			{
 				type: ScalingNode.TopMiddle,
-				node: this.scaleHandle(x + halfWidth, y, context),
+				node: this.scaleHandle(x + halfWidth, y, rotation, center, context),
 			},
 			{
 				type: ScalingNode.TopRight,
-				node: this.scaleHandle(x + width, y, context),
+				node: this.scaleHandle(x + width, y, rotation, center, context),
 			},
 			{
 				type: ScalingNode.MiddleLeft,
-				node: this.scaleHandle(x, y + halfHeight, context),
+				node: this.scaleHandle(x, y + halfHeight, rotation, center, context),
 			},
 			{
 				type: ScalingNode.MiddleRight,
-				node: this.scaleHandle(x + width, y + halfHeight, context),
+				node: this.scaleHandle(x + width, y + halfHeight, rotation, center, context),
 			},
 			{
 				type: ScalingNode.BottomLeft,
-				node: this.scaleHandle(x, y + height, context),
+				node: this.scaleHandle(x, y + height, rotation, center, context),
 			},
 			{
 				type: ScalingNode.BottomMiddle,
-				node: this.scaleHandle(x + halfWidth, y + height, context),
+				node: this.scaleHandle(x + halfWidth, y + height, rotation, center, context),
 			},
 			{
 				type: ScalingNode.BottomRight,
-				node: this.scaleHandle(x + width, y + height, context),
+				node: this.scaleHandle(x + width, y + height, rotation, center, context),
 			},
 		];
 	};
 
-	private scaleHandle = (x: number, y: number, context?: BrushContext): Rectangle => {
+	private scaleHandle = (x: number, y: number, rotation: number, center: Vector2D, context?: BrushContext): Polygon => {
 		const { mousePosition } = context || {};
 		const rect = {
 			topLeftCorner: vector(x - HANDLE_DIAMETER / 2, y - HANDLE_DIAMETER / 2),
@@ -319,9 +327,18 @@ export class TransformManager {
 			styles = handleStylesHovered;
 		}
 
+		if (hasRotation({ rotation })) {
+			const scalingNode = {
+				...rect,
+				...styles,
+			};
+
+			return rotateRectAroundPoint(scalingNode, rotation, center);
+		}
+
 		return {
-			...rect,
 			...styles,
+			points: rectToPoints(rect),
 		};
 	};
 }
