@@ -456,5 +456,7 @@ describe('shapes-util', () => {
 			[ vector(Math.sqrt(3) / 2, 1 / 2), 30, vector(0, 0), vector(1 / 2, Math.sqrt(3) / 2) ],
 			[ vector(0, 1), -90, vector(0, 0), vector(1, 0) ],
 			[ vector(0, 1), 0, vector(0, 0), vector(0, 1) ],
+			[ vector(0, 1), 0, vector(1, 1), vector(0, 1) ],
+			[ vector(2, 1), 90, vector(1, 1), vector(1, 2) ],
 		]);
 });
