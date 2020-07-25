@@ -19,6 +19,7 @@ export default {
 				'IBrush',
 				'ICanvasItem',
 				'IBackgroundElement',
+				'Renderable',
 				'Context Types',
 				'Shape Types',
 				'Utility Types',

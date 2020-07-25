@@ -9,7 +9,9 @@ import ICanvasItemMeta from '../../meta/interfaces/ICanvasItem';
 
 # The `ICanvasItem` interface
 
-All canvas items implement the following interface and represent a single object drawn on the canvas. All canvas items must be able to convert from/to pure JSON data.
+A canvas item is defined as a thing that is drawn to the canvas. Canvas items can be stateful or stateless. However, when the canvas is changed and `onChange` is called, all of the canvas items in their current state are converted to [`Renderable`s](/renderable) using whatever output they render to the canvas in the `render` method.
+
+All canvas items implement the following interface and represent a single object drawn on the canvas. All canvas items should be able to convert from/to pure JSON data.
 
 ## `interface ICanvasItem`
 

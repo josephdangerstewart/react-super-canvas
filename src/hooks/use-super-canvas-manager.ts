@@ -6,7 +6,7 @@ import IBrush from '../types/IBrush';
 import StyleContext from '../types/context/StyleContext';
 import { OnCanvasItemChangeCallback } from '../types/callbacks/OnCanvasItemChangeCallback';
 import { OnSelectionChangeCallback } from '../types/callbacks/OnSelectionChangeCallback';
-import JsonData from '../types/utility/JsonData';
+import { Renderable } from '../types/Renderable';
 
 export interface UseSuperCanvasManagerHook {
 	canvasRef: React.MutableRefObject<HTMLCanvasElement>;
@@ -18,7 +18,7 @@ export interface UseSuperCanvasManagerHook {
 /**
  * @description Initializes the super canvas manager
  */
-export const useSuperCanvasManager = (activeBackgroundElement: IBackgroundElement, availableBrushes: IBrush[], onCanvasItemsChange?: OnCanvasItemChangeCallback, initialValue?: JsonData[], onSelectionChange?: OnSelectionChangeCallback): UseSuperCanvasManagerHook => {
+export const useSuperCanvasManager = (activeBackgroundElement: IBackgroundElement, availableBrushes: IBrush[], onCanvasItemsChange?: OnCanvasItemChangeCallback, initialValue?: Renderable[], onSelectionChange?: OnSelectionChangeCallback): UseSuperCanvasManagerHook => {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const [ activeBrushName, setActiveBrushName ] = useState('');
 	const [ styleContext, setStyleContext ] = useState({});

@@ -49,18 +49,20 @@ export interface RenderOp extends JsonData {
 	/**
 	 * @description Image data if type is `RenderOpType.Image`
 	 */
-	image?: {
-		scale: Vector2D;
-		opacity: number;
-		topLeftCorner: Vector2D;
-		imageUrl: string;
-	};
+	image?: ImageData;
+}
+
+export interface ImageData extends JsonData {
+	scale: Vector2D;
+	opacity: number;
+	topLeftCorner: Vector2D;
+	imageUrl: string;
 }
 
 export enum RenderOpType {
-	Circle,
-	Line,
-	Polygon,
-	Rectangle,
-	Image,
+	Circle = 'circle',
+	Line = 'line',
+	Polygon = 'polygon',
+	Rectangle = 'rectangle',
+	Image = 'image',
 }

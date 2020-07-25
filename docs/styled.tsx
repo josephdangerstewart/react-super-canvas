@@ -22,8 +22,8 @@ export const CodeSnippet = styled.div`
 	flex-grow: 1;
 `;
 
-export const Property = styled.div`
-	margin: 12px 0;
+export const Property = styled.div<{ verticalMargin?: number }>`
+	margin: ${({ verticalMargin }) => verticalMargin ?? 12}px 0;
 `;
 
 export const PropertyName = styled.span<{ isMethod?: boolean }>`

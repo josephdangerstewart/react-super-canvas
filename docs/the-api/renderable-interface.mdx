@@ -1,0 +1,32 @@
+---
+name: Renderable
+menu: API Reference
+route: /renderable
+---
+
+import { InterfaceDocumentation } from '../InterfaceDocumentation';
+import { EnumDocumentation } from '../EnumDocumentation';
+import RenderableMeta from '../../meta/interfaces/Renderable';
+import RenderOp from '../../meta/interfaces/RenderOp';
+import ImageData from '../../meta/interfaces/ImageData';
+import RenderOpType from '../../meta/enums/RenderOpType';
+
+# The `Renderable` interface
+
+`Renderable` is a single serializable representation for any [canvas item](/icanvasitem) on the canvas. When `onChange` is called, all canvas items are converted to renderables. It encodes any rendered output from the [painter api](/painterapi) along with any state data returned by a canvas item's `toJson` method. `Renderable` is useful because it provides a fallback for when the super canvas can't map serialized data back to it's original canvas item (for instance, if you are loading data into a super canvas but the super canvas doesn't have all of the canvas item classes for that data).
+
+## `interface Renderable`
+
+<InterfaceDocumentation interfaceMetadata={RenderableMeta} />
+
+## `interface RenderOp`
+
+<InterfaceDocumentation interfaceMetadata={RenderOp} />
+
+## `interface ImageData`
+
+<InterfaceDocumentation interfaceMetadata={ImageData} />
+
+## `enum RenderOp`
+
+<EnumDocumentation meta={RenderOpType} />

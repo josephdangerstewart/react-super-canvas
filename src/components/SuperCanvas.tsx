@@ -10,8 +10,8 @@ import DefaultStyleControls, { StyleControlsProps } from './toolbar/DefaultStyle
 import DefaultCanvasControls, { CanvasControlsProps } from './toolbar/DefaultCanvasControls';
 import SelectionBrush from '../api/brushes/SelectionBrush';
 import { OnCanvasItemChangeCallback } from '../types/callbacks/OnCanvasItemChangeCallback';
-import JsonData from '../types/utility/JsonData';
 import ISelection from '../types/ISelection';
+import { Renderable } from '../types/Renderable';
 
 export interface ToolbarComponents {
 	Toolbar?: React.ComponentType<ToolbarProps>;
@@ -55,7 +55,7 @@ export interface SuperCanvasProps {
 	 * @description The initial contents of the editor. Note that this
 	 * component cannot currently be controlled.
 	 */
-	initialValue?: JsonData[];
+	initialValue?: Renderable[];
 }
 
 export interface SuperCanvasImperativeHandle {
