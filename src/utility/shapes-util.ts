@@ -97,6 +97,7 @@ export function centerOfPolygon(polygon: Polygon): Vector2D {
  * @param point The point to rotate
  * @param center The center to rotate around
  * @param rotation The rotation in degrees
+ * @tested
  */
 export function rotateAroundPoint(point: Vector2D, center: Vector2D, rotation: number): Vector2D {
 	if (rotation === 0) {
