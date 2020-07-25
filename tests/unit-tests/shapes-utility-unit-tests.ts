@@ -19,6 +19,7 @@ import {
 	boundingRectOfRects,
 	rotateAroundPoint,
 	angleOfThreePoints,
+	centerOfRect,
 } from '../../src/utility/shapes-util';
 import {
 	line,
@@ -470,5 +471,30 @@ describe('shapes-util', () => {
 			[ vector(1 / Math.sqrt(2), -1 / Math.sqrt(2)), vector(0, 0), vector(1 / 2, Math.sqrt(3) / 2), 105 ],
 			[ vector(0, 1), vector(0, 0), vector(0, 1), 0 ],
 			[ vector(1, 2), vector(1, 1), vector(2, 1), 270 ],
+		]);
+
+	describeCases<[ Rectangle, Vector2D ]>('centerOfRect')
+		.it(([ rect, center ]) => `returns ${vectorToString(center)} for ${rectToString(rect)}`)
+		.test(([ rect, center ]) => {
+			const result = centerOfRect(rect);
+			expect(result).toRoughEqualVector(center);
+		})
+		.cases([
+			[
+				{
+					topLeftCorner: vector(0, 0),
+					width: 5,
+					height: 4,
+				},
+				vector(2.5, 2),
+			],
+			[
+				{
+					topLeftCorner: vector(3, 2),
+					width: 2,
+					height: 2,
+				},
+				vector(4, 3),
+			],
 		]);
 });

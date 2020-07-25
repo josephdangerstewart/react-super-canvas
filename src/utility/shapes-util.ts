@@ -67,6 +67,7 @@ export function angleOfThreePoints(sharedPoint: Vector2D, p1: Vector2D, p2: Vect
 
 /**
  * @description Returns the center point of a rectangle
+ * @tested
  */
 export function centerOfRect(rect: Rectangle): Vector2D {
 	return {
