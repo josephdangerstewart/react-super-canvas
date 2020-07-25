@@ -345,13 +345,18 @@ describe('shapes-util', () => {
 		});
 	});
 
-	describe('circleCollidesWithLine', () => {
-		const circle: Circle = {
-			center: vector(0, 0),
-			radius: 3,
-		};
+	describeCases<[ Line, boolean ]>('circleCollidesWithLine')
+		.it(([ line, expected ]) => `returns ${expected} for ${lineToString(line)}`)
+		.test(([ line, expected ]) => {
+			const circle: Circle = {
+				center: vector(0, 0),
+				radius: 3,
+			};
 
-		const cases = [
+			const result = circleCollidesWithLine(circle, line);
+			expect(result).toEqual(expected);
+		})
+		.cases([
 			[ line(0, 0, 2, 0), true ],
 			[ line(0, 0, 6, 0), true ],
 			[ line(-4, 0, 0, 0), true ],
@@ -363,16 +368,7 @@ describe('shapes-util', () => {
 			[ line(6, 4, 2, -4), false ],
 			[ line(0, 4, -4, 2), false ],
 			[ line(6, 0, 12, 0), false ],
-		];
-
-		cases.forEach(([ input, expectedOutput ]) => {
-			it(`returns ${expectedOutput} for ${lineToString(input as Line)}`, () => {
-				const result = circleCollidesWithLine(circle, input as Line);
-
-				expect(result).toEqual(expectedOutput);
-			});
-		});
-	});
+		]);
 
 	describe('circleCollidesWithRect', () => {
 		const cases = [
