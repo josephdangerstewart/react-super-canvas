@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import ReactMarkdown from 'react-markdown';
 import styled from 'styled-components';
 import { PropertyList } from './types';
 import {
@@ -96,7 +98,7 @@ export const UtilityMethodDocumentation: React.FunctionComponent<UtilityMethodDo
 							</span>
 						))})
 					</CodeSnippet>
-					<FunctionDescription>{description}</FunctionDescription>
+					<FunctionDescription><ReactMarkdown source={description} /></FunctionDescription>
 					{parameters && (
 						<>
 							<SubsectionHeader>Parameters</SubsectionHeader>
