@@ -86,7 +86,10 @@ export function centerOfLine(line: Line): Vector2D {
 }
 
 /**
- * @description Returns the centroid of a polygon
+ * @description Returns the centroid of a polygon. Note that the centroid of a polygon
+ * is not necessarily the center of it's bounding rect. The centroid of a polygon is
+ * defined [here](https://en.wikipedia.org/wiki/Centroid) as "the arithmetic mean position
+ * of all the points in the figure"
  */
 export function centerOfPolygon(polygon: Polygon): Vector2D {
 	const xValues = polygon.points.map(({ x }) => x);
