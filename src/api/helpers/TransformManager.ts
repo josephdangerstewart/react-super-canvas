@@ -278,7 +278,7 @@ export class TransformManager {
 			const center = centerOfRect(this.previewRect);
 
 			const angle = snapAlongIncrement(
-				angleOfThreePoints(center, this.mouseDownAt, context.absoluteMousePosition),
+				angleOfThreePoints(center, this.mouseDownAt, context.mousePosition),
 				15,
 			);
 

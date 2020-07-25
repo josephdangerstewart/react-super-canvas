@@ -23,6 +23,7 @@ import Polygon, { PolygonDefaults } from '../types/shapes/Polygon';
 import StyledShape from '../types/shapes/StyledShape';
 import { IImageCache } from '../types/IImageCache';
 import { movePolygon } from '../utility/transform-utility';
+import { degreesToRads } from '../utility/math-utility';
 
 export default class PainterAPI implements IPainterAPI {
 	private panOffset: Vector2D;
@@ -192,20 +193,20 @@ export default class PainterAPI implements IPainterAPI {
 	 * into render is in the absolute space
 	 */
 	private withRotation = (rotation: number, center: Vector2D, boundingRect: Rectangle, render: (newTopLeft: Vector2D) => void): void => {
-		const { x: tlX, y: tlY } = boundingRect.topLeftCorner;
-		const { x, y } = this.toAbsolutePoint(center);
+		const { x: tlX, y: tlY } = this.toAbsolutePoint(boundingRect.topLeftCorner);
+		const { x: cX, y: cY } = this.toAbsolutePoint(center);
 
-		const topLeftDelta = this.toAbsolutePoint(vector(tlX - center.x, tlY - center.y));
+		const topLeftDelta = vector(tlX - cX, tlY - cY);
 
-		const absRotation = rotation * (Math.PI / 180);
+		const absRotation = degreesToRads(rotation);
 
-		this.context2d.translate(x, y);
+		this.context2d.translate(cX, cY);
 		this.context2d.rotate(absRotation);
 
 		render(topLeftDelta);
 
 		this.context2d.rotate(-absRotation);
-		this.context2d.translate(-x, -y);
+		this.context2d.translate(-cX, -cY);
 	};
 
 	private getViewport = (): Rectangle => {
