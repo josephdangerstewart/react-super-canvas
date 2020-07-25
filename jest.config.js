@@ -5,7 +5,6 @@ module.exports = {
 	testPathIgnorePatterns: [
 		'/node_modules/',
 		'<rootDir>/tests/test-utils',
-		'<rootDir>/tests/globalSetup.ts',
 		'<rootDir>/tests/types',
 	],
 	globals: {
@@ -13,4 +12,5 @@ module.exports = {
 			tsConfig: './tsconfig.test.json',
 		},
 	},
+	moduleFileExtensions: [ 'js', 'json', 'jsx', 'ts', 'tsx', 'node', 'd.ts' ],
 };

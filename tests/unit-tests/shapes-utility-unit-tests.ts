@@ -1,3 +1,4 @@
+import '../types/jest';
 import Polygon from '../../src/types/shapes/Polygon';
 import Line from '../../src/types/shapes/Line';
 import {
@@ -451,6 +452,9 @@ describe('shapes-util', () => {
 			expect(result).toRoughEqualVector(expected);
 		})
 		.cases([
-			[ vector(0, 1), 90, vector(0, 0), vector(1, 0) ],
+			[ vector(1, 0), 90, vector(0, 0), vector(0, 1) ],
+			[ vector(Math.sqrt(3) / 2, 1 / 2), 30, vector(0, 0), vector(1 / 2, Math.sqrt(3) / 2) ],
+			[ vector(0, 1), -90, vector(0, 0), vector(1, 0) ],
+			[ vector(0, 1), 0, vector(0, 0), vector(0, 1) ],
 		]);
 });
