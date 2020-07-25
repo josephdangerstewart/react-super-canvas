@@ -5,5 +5,12 @@ module.exports = {
 	testPathIgnorePatterns: [
 		'/node_modules/',
 		'<rootDir>/tests/test-utils',
+		'<rootDir>/tests/globalSetup.ts',
+		'<rootDir>/tests/types',
 	],
+	globals: {
+		'ts-jest': {
+			tsConfig: './tsconfig.test.json',
+		},
+	},
 };

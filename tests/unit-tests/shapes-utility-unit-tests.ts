@@ -16,6 +16,7 @@ import {
 	circleCollidesWithRect,
 	distanceBetweenTwoPoints,
 	boundingRectOfRects,
+	rotateAroundPoint,
 } from '../../src/utility/shapes-util';
 import {
 	line,
@@ -27,6 +28,8 @@ import {
 import Rectangle from '../../src/types/shapes/Rectangle';
 import Vector2D from '../../src/types/utility/Vector2D';
 import Circle from '../../src/types/shapes/Circle';
+import { describeCases } from '../test-utils/describeCases';
+import { extensions } from '../test-utils/expectExtensions';
 
 // Prepare a 5x5 rectangle with top left corner of (0,0)
 const rect: Rectangle = Object.freeze({
@@ -36,6 +39,10 @@ const rect: Rectangle = Object.freeze({
 });
 
 describe('shapes-util', () => {
+	beforeAll(() => {
+		expect.extend(extensions);
+	});
+
 	describe('polygonToLines', () => {
 		const polygon: Polygon = Object.freeze({
 			points: [
@@ -436,4 +443,14 @@ describe('shapes-util', () => {
 			expect(actualResult).toEqual(expectedResult);
 		});
 	});
+
+	describeCases<[Vector2D, number, Vector2D, Vector2D]>('rotateAroundPoint')
+		.it(([ point, rotation, center ]) => `can rotate ${vectorToString(point)} ${rotation} degrees around ${vectorToString(center)}`)
+		.test(([ point, rotation, center, expected ]) => {
+			const result = rotateAroundPoint(point, center, rotation);
+			expect(result).toRoughEqualVector(expected);
+		})
+		.cases([
+			[ vector(0, 1), 90, vector(0, 0), vector(1, 0) ],
+		]);
 });
