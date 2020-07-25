@@ -16,7 +16,7 @@ import {
 	boundingRectOfLine,
 	getDiffBetweenPoints,
 	centerOfRect,
-	centerOfNonRotatedPolygon,
+	centerOfPolygon,
 	centerOfLine,
 } from '../utility/shapes-util';
 import Polygon, { PolygonDefaults } from '../types/shapes/Polygon';
@@ -91,7 +91,7 @@ export default class PainterAPI implements IPainterAPI {
 			const boundingRect = boundingRectOfPolygon(polygon);
 
 			if (polygon.rotation && polygon.rotation % 360 !== 0) {
-				this.withRotation(polygon.rotation, centerOfNonRotatedPolygon(polygon), boundingRect, (newTopLeft) => {
+				this.withRotation(polygon.rotation, centerOfPolygon(polygon), boundingRect, (newTopLeft) => {
 					const virtualNewTopLeft = this.toVirtualPoint(newTopLeft);
 					const diff = getDiffBetweenPoints(virtualNewTopLeft, boundingRect.topLeftCorner);
 					const movedPolygon = movePolygon(polygon, diff);

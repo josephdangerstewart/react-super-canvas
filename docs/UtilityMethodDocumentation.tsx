@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { PropertyList } from './types';
 import {
@@ -8,6 +8,8 @@ import {
 	PropertyType,
 } from './styled';
 import links from './interface-links';
+
+const INITIAL_UNTESTED_LIMIT = 3;
 
 const SubsectionHeader = styled.h4`
 	margin: 5px 0;
@@ -34,6 +36,11 @@ const Anchor = styled.a`
 	}
 `;
 
+const ExpandToggle = styled(Anchor)`
+	cursor: pointer;
+	font-style: italic;
+`;
+
 interface UtilityMethodMetadata {
 	name: string;
 	description: string;
@@ -49,6 +56,7 @@ interface UtilityMethodDocumentationProps {
 export const UtilityMethodDocumentation: React.FunctionComponent<UtilityMethodDocumentationProps> = ({
 	meta,
 }) => {
+	const [ isExpanded, setIsExpanded ] = useState(false);
 	const untestedFunctions = meta.filter(({ isTested, untestedReason }) => !isTested && !untestedReason);
 	const testCoverage = 100 - Math.floor((untestedFunctions.length / meta.length) * 100);
 
@@ -61,9 +69,20 @@ export const UtilityMethodDocumentation: React.FunctionComponent<UtilityMethodDo
 				<>
 					<p>Untested Functions</p>
 					<ul>
-						{untestedFunctions.map(({ name }) => (
+						{untestedFunctions.slice(0, INITIAL_UNTESTED_LIMIT + 1).map(({ name }) => (
 							<li><Anchor href={`#${name}`}>{name}</Anchor></li>
 						))}
+						{untestedFunctions.length > INITIAL_UNTESTED_LIMIT && (
+							isExpanded
+								? untestedFunctions.slice(INITIAL_UNTESTED_LIMIT + 1).map(({ name }) => (
+									<li><Anchor href={`#${name}`}>{name}</Anchor></li>
+								)).concat((
+									<li><ExpandToggle onClick={() => setIsExpanded(false)}>Hide {untestedFunctions.length - INITIAL_UNTESTED_LIMIT}.</ExpandToggle></li>
+								))
+								: (
+									<li><ExpandToggle onClick={() => setIsExpanded(true)}>See {untestedFunctions.length - INITIAL_UNTESTED_LIMIT} more.</ExpandToggle></li>
+								)
+						)}
 					</ul>
 				</>
 			)}

@@ -9,6 +9,6 @@ import ShapesUtilMeta from '../../meta/utility/shapes-util.json';
 
 # Shape Utility Methods
 
-This collection of methods adds easy operations for working with shapes and geometry, making it easier to construct canvas items. Imports from `react-super-canvas/shapes-util`.
+This collection of methods adds easy operations for working with shapes and geometry, making it easier to construct canvas items. None of the `shapes-util` functions are guaranteed to preserve the values from [`StyledShape`](/shapes#StyledShape) in the returned values. However, all of the `shapes-util` functions respect the `rotation` property for shapes that extend [`IRotatable`](/shapes#IRotatable) (which is all except [`Circle`](/shapes#Circle)). Imports from `react-super-canvas/shapes-util`.
 
 <UtilityMethodDocumentation meta={ShapesUtilMeta} />

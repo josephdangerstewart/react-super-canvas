@@ -19,8 +19,9 @@ export function vector(x: number, y: number): Vector2D {
 }
 
 /**
- * @description Determines if a shape needs to be rotated
+ * @description Returns true if the shape has rotation and it's rotation is not divisible by 360
  * @param shape A rotatable shape
+ * @param untested An uncomplicated convinience method
  */
 export function hasRotation(shape: IRotatable): boolean {
 	return shape.rotation && shape.rotation % 360 !== 0;
@@ -37,7 +38,7 @@ export function distanceBetweenTwoPoints(point1: Vector2D, point2: Vector2D): nu
 }
 
 /**
- * @description Calculates the angle between to lines
+ * @description Calculates the angle between two lines
  * segments which share a common point
  * @param sharedPoint The point that both lines share
  * @param p1 Point 1
@@ -67,6 +68,9 @@ export function centerOfRect(rect: Rectangle): Vector2D {
 	};
 }
 
+/**
+ * @description Returns the center point on a line
+ */
 export function centerOfLine(line: Line): Vector2D {
 	const { x: x1, y: y1 } = line.point1;
 	const { x: x2, y: y2 } = line.point2;
@@ -77,7 +81,7 @@ export function centerOfLine(line: Line): Vector2D {
 /**
  * @description Returns the centroid of a polygon
  */
-export function centerOfNonRotatedPolygon(polygon: Polygon): Vector2D {
+export function centerOfPolygon(polygon: Polygon): Vector2D {
 	const xValues = polygon.points.map(({ x }) => x);
 	const yValues = polygon.points.map(({ y }) => y);
 
@@ -127,9 +131,7 @@ export function vectorEquals(v1: Vector2D, v2: Vector2D): boolean {
 }
 
 /**
- * @description Rotates a polygon around a point. This will not adjust the polygon's rotation
- * value as that value represents the polygons rotation around it's own center, this
- * transforms the polygon into a new polygon
+ * @description Rotates a polygon around a point. Returns the transformed polygon
  * @param polygon The polygon to rotate
  * @param rotation The rotation in degrees
  * @param point The point to rotate around
@@ -143,14 +145,12 @@ export function rotatePolygonAroundPoint(polygon: Polygon, rotation: number, poi
 }
 
 /**
- * @description Rotates a polygon around its center and returns a polygon with rotation adjusted
- * accordingly (i.e. if polygon.rotation === 90 and rotation === 90, the resulting
- * polygon would have rotation === 0)
+ * @description Rotates a polygon around its center. Returns the transformed polygon
  * @param polygon The polygon to rotate
  * @param rotation The rotation in degrees
  */
 export function rotatePolygon(polygon: Polygon, rotation: number): Polygon {
-	const center = centerOfNonRotatedPolygon(polygon);
+	const center = centerOfPolygon(polygon);
 	const rotatedPolygon = rotatePolygonAroundPoint(polygon, rotation, center);
 	return {
 		...rotatedPolygon,
@@ -197,9 +197,7 @@ function unrotatedRectToPoints(rect: Rectangle): Vector2D[] {
 
 /**
  * @description Rotates a rectangle around a point and returns a polygon representing
- * the rotated rectangle. The rotation value on the returned polygon is not adjusted as
- * it represents a shape's rotation around it's own center. The returned shape is different
- * than the shape passed in.
+ * the rotated rectangle. The returned shape is different than the shape passed in.
  * @param rect The rectangle to rotate
  * @param rotation The rotation in degrees
  * @param point The point to rotate around
@@ -214,9 +212,8 @@ export function rotateRectAroundPoint(rect: Rectangle, rotation: number, point: 
 }
 
 /**
- * @description Rotates a rectangle around its center and returns a polygon
- * with rotation adjusted accordingly (i.e. if rect.rotation === 90 and rotation === 90, the resulting
- * polygon would have rotation === 0)
+ * @description Rotates a rectangle around its center. Returns a polygon representing the transformed
+ * square
  * @param rect The rectangle to rotate around it's center
  * @param rotation The rotation (in degrees) to apply to the rectangle
  */
@@ -280,9 +277,7 @@ export function rotateLineAroundPoint(line: Line, rotation: number, point: Vecto
 }
 
 /**
- * @description Rotates a line around it's center and adjusts rotation
- * accordingly (i.e. if line.rotation === 90 and rotation === 90, the resulting
- * line would have rotation === 0)
+ * @description Rotates a line around it's center
  * @param line The line to rotate
  * @param rotation The rotation to apply (in degrees) to the line
  */
@@ -302,7 +297,10 @@ export function rotateLine(line: Line, rotation: number): Line {
 }
 
 /**
- * @description Returns the same shape with rotation = 0
+ * @description Returns the same shape with it's points rotated around its center by it's rotation
+ * and it's rotation = 0, useful for doing geometric calculations (such as hit testing) without having
+ * to factor in that polygon's rotation value. The returned shape represents the *same polygon* as the
+ * one passed in.
  * @param polygon The polygon to normalize
  */
 export function normalizeRotationForPolygon(polygon: Polygon): Polygon {
@@ -317,7 +315,10 @@ export function normalizeRotationForPolygon(polygon: Polygon): Polygon {
 }
 
 /**
- * @description Returns the same shape with rotation = 0
+ * @description Returns the same shape with it's points rotated around its center by it's rotation
+ * and it's rotation = 0, useful for doing geometric calculations (such as hit testing) without having
+ * to factor in that polygon's rotation value. The returned shape represents the *same rectangle* as the
+ * one passed in.
  * @param rect The rectangle to normalize
  */
 export function normalizeRotationForRect(rect: Rectangle): Polygon {
@@ -335,7 +336,10 @@ export function normalizeRotationForRect(rect: Rectangle): Polygon {
 }
 
 /**
- * @description Returns the same shape with rotation = 0
+ * @description Returns the same shape with it's points rotated around its center by it's rotation
+ * and it's rotation = 0, useful for doing geometric calculations (such as hit testing) without having
+ * to factor in that polygon's rotation value. The returned shape represents the *same line* as the
+ * one passed in.
  * @param line The line to normalize
  */
 export function normalizeRotationForLine(line: Line): Line {
