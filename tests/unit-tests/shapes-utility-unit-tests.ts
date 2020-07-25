@@ -90,8 +90,8 @@ describe('shapes-util', () => {
 		const expectedPoints: Vector2D[] = [
 			vector(0, 0),
 			vector(5, 0),
-			vector(0, 5),
 			vector(5, 5),
+			vector(0, 5),
 		];
 
 		it('can convert a rectangle to an array of points', () => {
