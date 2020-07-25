@@ -78,6 +78,7 @@ export function centerOfRect(rect: Rectangle): Vector2D {
 
 /**
  * @description Returns the center point on a line
+ * @tested
  */
 export function centerOfLine(line: Line): Vector2D {
 	const { x: x1, y: y1 } = line.point1;

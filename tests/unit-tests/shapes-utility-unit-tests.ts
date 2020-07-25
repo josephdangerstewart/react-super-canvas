@@ -20,6 +20,7 @@ import {
 	rotateAroundPoint,
 	angleOfThreePoints,
 	centerOfRect,
+	centerOfLine,
 } from '../../src/utility/shapes-util';
 import {
 	line,
@@ -496,5 +497,16 @@ describe('shapes-util', () => {
 				},
 				vector(4, 3),
 			],
+		]);
+
+	describeCases<[ Line, Vector2D ]>('centerOfLine')
+		.it(([ line, center ]) => `returns ${vectorToString(center)} for ${lineToString(line)}`)
+		.test(([ line, center ]) => {
+			const result = centerOfLine(line);
+			expect(result).toRoughEqualVector(center);
+		})
+		.cases([
+			[ line(0, 0, 5, 0), vector(2.5, 0) ],
+			[ line(1, 1, 6, 5), vector(3.5, 3) ],
 		]);
 });
