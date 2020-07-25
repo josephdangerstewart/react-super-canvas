@@ -11,7 +11,7 @@ function round(n: number, toNearestDecimal: number): number {
 	return Math.floor(n * (toNearestDecimal * 10)) / (toNearestDecimal * 10);
 }
 
-function numberRoughEquals(received: number, expected: number, decimalPlaces = 3): CustomMatcherResult {
+function toRoughEqualNumber(received: number, expected: number, decimalPlaces = 6): CustomMatcherResult {
 	const pass = round(received, decimalPlaces) === round(expected, decimalPlaces);
 
 	return {
@@ -20,9 +20,9 @@ function numberRoughEquals(received: number, expected: number, decimalPlaces = 3
 	};
 }
 
-function toRoughEqualVector(received: Vector2D, expected: Vector2D, decimalPlaces = 3): CustomMatcherResult {
-	const xResult = numberRoughEquals(received.x, expected.x, decimalPlaces);
-	const yResult = numberRoughEquals(received.y, expected.y, decimalPlaces);
+function toRoughEqualVector(received: Vector2D, expected: Vector2D, decimalPlaces = 6): CustomMatcherResult {
+	const xResult = toRoughEqualNumber(received.x, expected.x, decimalPlaces);
+	const yResult = toRoughEqualNumber(received.y, expected.y, decimalPlaces);
 	const pass = xResult.pass && yResult.pass;
 
 	return {
@@ -33,4 +33,5 @@ function toRoughEqualVector(received: Vector2D, expected: Vector2D, decimalPlace
 
 export const extensions = {
 	toRoughEqualVector,
+	toRoughEqualNumber,
 };

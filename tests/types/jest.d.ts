@@ -8,6 +8,7 @@ declare global {
 	namespace jest {
 		interface Matchers<R, T> {
 			toRoughEqualVector(point: Vector2D): CustomMatcherResult;
+			toRoughEqualNumber(number: number): CustomMatcherResult;
 		}
 	}
 }

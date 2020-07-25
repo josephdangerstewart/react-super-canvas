@@ -55,7 +55,13 @@ export function angleOfThreePoints(sharedPoint: Vector2D, p1: Vector2D, p2: Vect
 		angleACB += Math.PI * 2;
 	}
 
-	return 360 - radsToDegrees(angleACB);
+	const result = radsToDegrees(angleACB) * -1;
+
+	if (result < 0) {
+		return result + 360;
+	}
+
+	return result;
 }
 
 /**

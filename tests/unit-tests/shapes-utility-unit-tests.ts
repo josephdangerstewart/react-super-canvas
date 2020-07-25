@@ -18,6 +18,7 @@ import {
 	distanceBetweenTwoPoints,
 	boundingRectOfRects,
 	rotateAroundPoint,
+	angleOfThreePoints,
 } from '../../src/utility/shapes-util';
 import {
 	line,
@@ -458,5 +459,16 @@ describe('shapes-util', () => {
 			[ vector(0, 1), 0, vector(0, 0), vector(0, 1) ],
 			[ vector(0, 1), 0, vector(1, 1), vector(0, 1) ],
 			[ vector(2, 1), 90, vector(1, 1), vector(1, 2) ],
+		]);
+
+	describeCases<[ Vector2D, Vector2D, Vector2D, number ]>('angleOfThreePoints')
+		.it(([ p1, shared, p2, expectedAngle ]) => `returns ${expectedAngle} degrees for ${vectorToString(p1)} -> ${vectorToString(shared)} -> ${vectorToString(p2)}`)
+		.test(([ p1, shared, p2, expectedAngle ]) => {
+			const result = angleOfThreePoints(shared, p1, p2);
+			expect(result).toRoughEqualNumber(expectedAngle);
+		})
+		.cases([
+			[ vector(0, 1), vector(0, 0), vector(1, 0), 270 ],
+			[ vector(1, 0), vector(0, 0), vector(0, 1), 90 ],
 		]);
 });
