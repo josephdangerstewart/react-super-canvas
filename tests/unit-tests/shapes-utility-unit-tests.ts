@@ -470,5 +470,9 @@ describe('shapes-util', () => {
 		.cases([
 			[ vector(0, 1), vector(0, 0), vector(1, 0), 270 ],
 			[ vector(1, 0), vector(0, 0), vector(0, 1), 90 ],
+			[ vector(1 / 2, Math.sqrt(3) / 2), vector(0, 0), vector(1 / Math.sqrt(2), -1 / Math.sqrt(2)), 255 ],
+			[ vector(1 / Math.sqrt(2), -1 / Math.sqrt(2)), vector(0, 0), vector(1 / 2, Math.sqrt(3) / 2), 105 ],
+			[ vector(0, 1), vector(0, 0), vector(0, 1), 0 ],
+			[ vector(1, 2), vector(1, 1), vector(2, 1), 270 ],
 		]);
 });
