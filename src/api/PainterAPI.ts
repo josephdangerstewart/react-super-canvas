@@ -310,6 +310,7 @@ export default class PainterAPI implements IPainterAPI {
 			topLeftCorner,
 			width: width * safeScale.x,
 			height: height * safeScale.y,
+			rotation,
 		};
 
 		const canvasRect = this.getViewport();
