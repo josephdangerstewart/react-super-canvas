@@ -43,6 +43,7 @@ export function distanceBetweenTwoPoints(point1: Vector2D, point2: Vector2D): nu
  * @param sharedPoint The point that both lines share
  * @param p1 Point 1
  * @param p2 Point 2
+ * @tested
  */
 export function angleOfThreePoints(sharedPoint: Vector2D, p1: Vector2D, p2: Vector2D): number {
 	const dirCToA = Math.atan2(p1.y - sharedPoint.y, p1.x - sharedPoint.x);
