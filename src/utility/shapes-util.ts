@@ -21,7 +21,7 @@ export function vector(x: number, y: number): Vector2D {
 /**
  * @description Returns true if the shape has rotation and it's rotation is not divisible by 360
  * @param shape A rotatable shape
- * @param untested An uncomplicated convinience method
+ * @untested An uncomplicated convinience method
  */
 export function hasRotation(shape: IRotatable): boolean {
 	return shape.rotation && shape.rotation % 360 !== 0;
