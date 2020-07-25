@@ -135,6 +135,16 @@ const typeAliases = reflections
 
 const interfaces = reflections.filter(reflection => reflection && reflection.kindString === 'Interface');
 
+const enums = reflections
+	.filter(r => r && r.kindString === 'Enumeration')
+	.map(r => ({
+		name: r.name,
+		members: r.children.map(x => ({
+			name: x.name,
+			value: x.defaultValue,
+		})),
+	}));
+
 const utilityMethodsByUtility = reflections
 	.filter(reflection =>
 		reflection &&
@@ -250,4 +260,12 @@ for (const utilityFile in utilityMethodsByUtility) {
 	}
 
 	fs.writeFileSync(path.resolve(`./meta/utility/${utilityFile}.json`), JSON.stringify(utilityMeta));
+}
+
+for (const enumeration of enums) {
+	if (!fs.existsSync(path.resolve('./meta/enums'))) {
+		fs.mkdirSync(path.resolve('./meta/enums'));
+	}
+
+	fs.writeFileSync(path.resolve(`./meta/enums/${enumeration.name}.json`), JSON.stringify(enumeration));
 }
