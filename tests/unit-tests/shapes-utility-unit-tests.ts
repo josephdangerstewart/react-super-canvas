@@ -21,6 +21,7 @@ import {
 	angleOfThreePoints,
 	centerOfRect,
 	centerOfLine,
+	centerOfPolygon,
 } from '../../src/utility/shapes-util';
 import {
 	line,
@@ -508,5 +509,25 @@ describe('shapes-util', () => {
 		.cases([
 			[ line(0, 0, 5, 0), vector(2.5, 0) ],
 			[ line(1, 1, 6, 5), vector(3.5, 3) ],
+		]);
+
+	describeCases<[ Polygon, Vector2D ]>('centerOfPolygon')
+		.test(([ polygon, center ]) => {
+			const result = centerOfPolygon(polygon);
+			expect(result).toRoughEqualVector(center);
+		})
+		.cases([
+			[
+				{
+					points: [
+						vector(0, 0),
+						vector(2, 1),
+						vector(3, -1),
+						vector(3, 3),
+						vector(0, 2),
+					],
+				},
+				vector(1.6, 1),
+			],
 		]);
 });

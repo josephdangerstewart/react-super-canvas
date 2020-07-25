@@ -92,6 +92,7 @@ export function centerOfLine(line: Line): Vector2D {
  * is not necessarily the center of it's bounding rect. The centroid of a polygon is
  * defined [here](https://en.wikipedia.org/wiki/Centroid) as "the arithmetic mean position
  * of all the points in the figure"
+ * @tested
  */
 export function centerOfPolygon(polygon: Polygon): Vector2D {
 	const xValues = polygon.points.map(({ x }) => x);
@@ -138,6 +139,7 @@ export function rotateAroundPoint(point: Vector2D, center: Vector2D, rotation: n
  * @description Shorthand way of checking equality of two vectors
  * @param v1 The right hand vector
  * @param v2 The left hand vector
+ * @untested To simple to need tests
  */
 export function vectorEquals(v1: Vector2D, v2: Vector2D): boolean {
 	return v1?.x === v2?.x && v1?.y === v2?.y;
