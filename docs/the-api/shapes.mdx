@@ -5,6 +5,7 @@ route: /shapes
 ---
 
 import { InterfaceDocumentation } from '../InterfaceDocumentation';
+import IRotatable from '../../meta/interfaces/IRotatable';
 import StyledShape from '../../meta/interfaces/StyledShape';
 import Circle from '../../meta/interfaces/Circle';
 import Polygon from '../../meta/interfaces/Polygon';
@@ -14,6 +15,12 @@ import Line from '../../meta/interfaces/Line';
 # Shape Interfaces
 
 These interfaces are used for performing calculations on and rendering geometric shapes.
+
+## `interface IRotatable`
+
+All shapes except circle (which would be redundant) extend this interface which provides a way to easily denote rotation on primitive shapes. Rotation is always measured in degrees and is applied to the center of the element. If `rotation` is omitted then the shape has a rotation of 0 degrees.
+
+<InterfaceDocumentation interfaceMetadata={IRotatable} />
 
 ## `interface StyledShape`
 
