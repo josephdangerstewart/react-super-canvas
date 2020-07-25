@@ -95,6 +95,10 @@ export function centerOfNonRotatedPolygon(polygon: Polygon): Vector2D {
  * @param rotation The rotation in degrees
  */
 export function rotateAroundPoint(point: Vector2D, center: Vector2D, rotation: number): Vector2D {
+	if (rotation === 0) {
+		return point;
+	}
+
 	const absRotation = degreesToRads(rotation);
 	const s = Math.sin(absRotation);
 	const c = Math.cos(absRotation);
