@@ -169,7 +169,6 @@ export function rotatePolygon(polygon: Polygon, rotation: number): Polygon {
 	const rotatedPolygon = rotatePolygonAroundPoint(polygon, rotation, center);
 	return {
 		...rotatedPolygon,
-		rotation: (polygon.rotation ?? 0) - rotation,
 	};
 }
 
