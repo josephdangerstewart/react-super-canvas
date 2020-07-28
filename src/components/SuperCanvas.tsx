@@ -90,7 +90,7 @@ export interface SuperCanvasProps {
 
 	/**
 	 * @description How much canvas items should be translated when they are
-	 * pasted, default is (15, 15)
+	 * pasted, default is (0, 0)
 	 */
 	translationOnPaste?: Vector2D;
 }
@@ -215,7 +215,7 @@ const SuperCanvas: React.ForwardRefExoticComponent<SuperCanvasProps> = forwardRe
 			const selection = createSelection(canvasItems);
 
 			if (selection.canMove) {
-				const translation = translationOnPaste ?? vector(15, 15);
+				const translation = translationOnPaste ?? vector(0, 0);
 				canvasItems.forEach((item) => item.applyMove(translation));
 			}
 
