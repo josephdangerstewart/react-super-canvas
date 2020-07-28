@@ -8,6 +8,7 @@ import { OnCanvasItemChangeCallback } from './callbacks/OnCanvasItemChangeCallba
 import { OnSelectionChangeCallback } from './callbacks/OnSelectionChangeCallback';
 import JsonData from './utility/JsonData';
 import ISelection from './ISelection';
+import { Renderable } from './Renderable';
 
 export default interface ISuperCanvasManager {
 	/**
@@ -102,4 +103,14 @@ export default interface ISuperCanvasManager {
 	 * @description Redos the last action
 	 */
 	redo: () => void;
+
+	/**
+	 * @description Converts an array of renderables into an array of canvas items
+	 */
+	fromRenderables: (renderables: Renderable[]) => ICanvasItem[];
+
+	/**
+	 * @description Adds canvas items and invokes onChange
+	 */
+	addCanvasItems: (canvasItems: ICanvasItem[]) => void;
 }

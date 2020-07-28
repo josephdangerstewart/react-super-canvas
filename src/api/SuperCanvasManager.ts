@@ -111,29 +111,7 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 	};
 
 	setCanvasItems = (items: Renderable[]): void => {
-		const availableCanvasItems = this.availableBrushes
-			.reduce(
-				(dictionary, brush) => ({
-					...dictionary,
-					...brush.supportedCanvasItems,
-				}),
-				{},
-			) as Record<string, Type<ICanvasItem>>;
-
-		this.canvasItems = items.map((renderable) => {
-			if (!renderable) {
-				return null;
-			}
-
-			const { canvasItemName, item } = renderable.canvasItemJson ?? {};
-			const CanvasItemClass = availableCanvasItems[canvasItemName as string];
-
-			if (CanvasItemClass) {
-				return new CanvasItemClass(item);
-			}
-
-			return new RenderableCanvasItem({ renderable, imageCache: this.imageCache });
-		}).filter(Boolean);
+		this.canvasItems = this.fromRenderables(items);
 	};
 
 	getCanvasItems = (): ICanvasItem[] => this.canvasItems;
@@ -222,6 +200,38 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 	redo = (): void => {
 		const action = this.actionHistoryManager.getNextRedoAction();
 		this.applyAction(action);
+	};
+
+	fromRenderables = (renderables: Renderable[]): ICanvasItem[] => {
+		const availableCanvasItems = this.availableBrushes
+			.reduce(
+				(dictionary, brush) => ({
+					...dictionary,
+					...brush.supportedCanvasItems,
+				}),
+				{},
+			) as Record<string, Type<ICanvasItem>>;
+
+		return renderables.map((renderable) => {
+			if (!renderable) {
+				return null;
+			}
+
+			const { canvasItemName, item } = renderable.canvasItemJson ?? {};
+			const CanvasItemClass = availableCanvasItems[canvasItemName as string];
+
+			if (CanvasItemClass) {
+				return new CanvasItemClass(item);
+			}
+
+			return new RenderableCanvasItem({ renderable, imageCache: this.imageCache });
+		});
+	};
+
+	addCanvasItems = (canvasItems: ICanvasItem[]): void => {
+		this.canvasItems.push(...canvasItems);
+		this.actionHistoryManager.recordAddCanvasItems(canvasItems);
+		this.handleCanvasItemsChange();
 	};
 
 	/* PRIVATE METHODS */

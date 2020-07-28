@@ -12,6 +12,13 @@ import SelectionBrush from '../api/brushes/SelectionBrush';
 import { OnCanvasItemChangeCallback } from '../types/callbacks/OnCanvasItemChangeCallback';
 import ISelection from '../types/ISelection';
 import { Renderable } from '../types/Renderable';
+import { ClipboardEventCallback } from '../types/callbacks/ClipboardEventCallback';
+import { generateRenderable } from '../utility/renderable-utility';
+import { createSelection } from '../utility/selection-utility';
+import Vector2D from '../types/utility/Vector2D';
+import { vector } from '../utility/shapes-util';
+
+const CANVAS_ITEM_MIME_TYPE = 'application/json';
 
 export interface ToolbarComponents {
 	Toolbar?: React.ComponentType<ToolbarProps>;
@@ -56,6 +63,36 @@ export interface SuperCanvasProps {
 	 * component cannot currently be controlled.
 	 */
 	initialValue?: Renderable[];
+
+	/**
+	 * @description An event that is fired when the user copies canvas items
+	 * to the clipboard
+	 */
+	onCopy?: ClipboardEventCallback;
+
+	/**
+	 * @description An event that is fired when the user pastes canvas items
+	 * to the canvas
+	 */
+	onPaste?: ClipboardEventCallback;
+
+	/**
+	 * @description Optionally disable pasting to the canvas
+	 * @default false
+	 */
+	disablePaste?: boolean;
+
+	/**
+	 * @description Optionally disable copying to the canvas
+	 * @default false
+	 */
+	disableCopy?: boolean;
+
+	/**
+	 * @description How much canvas items should be translated when they are
+	 * pasted, default is (15, 15)
+	 */
+	translationOnPaste?: Vector2D;
 }
 
 export interface SuperCanvasImperativeHandle {
@@ -85,6 +122,11 @@ const SuperCanvas: React.ForwardRefExoticComponent<SuperCanvasProps> = forwardRe
 			toolbarComponents,
 			onChange,
 			initialValue,
+			onCopy: onCopyHook,
+			onPaste: onPasteHook,
+			disableCopy,
+			disablePaste,
+			translationOnPaste,
 		},
 		ref,
 	) => {
@@ -122,6 +164,70 @@ const SuperCanvas: React.ForwardRefExoticComponent<SuperCanvasProps> = forwardRe
 			[ superCanvasManager ],
 		);
 
+		const onCopy = useCallback((event: React.ClipboardEvent<HTMLDivElement>) => {
+			if (disableCopy) {
+				event.preventDefault();
+				return;
+			}
+
+			const currentSelection = superCanvasManager.getSelection();
+
+			if (currentSelection.selectedItemCount === 0) {
+				event.preventDefault();
+				return;
+			}
+
+			const renderables = currentSelection.selectedItems.map(generateRenderable);
+			const serializedSnapshot = JSON.stringify({
+				kind: 'canvasitem',
+				renderables,
+			});
+			event.clipboardData.setData(CANVAS_ITEM_MIME_TYPE, serializedSnapshot);
+
+			if (onCopyHook) {
+				onCopyHook(currentSelection);
+			}
+
+			event.preventDefault();
+		}, [ disableCopy, superCanvasManager, onCopyHook ]);
+
+		const onPaste = useCallback((event: React.ClipboardEvent<HTMLDivElement>) => {
+			if (disablePaste) {
+				event.preventDefault();
+				return;
+			}
+
+			const serializedData = event.clipboardData.getData(CANVAS_ITEM_MIME_TYPE);
+
+			if (!serializedData) {
+				event.preventDefault();
+				return;
+			}
+
+			const jsonData = JSON.parse(serializedData);
+
+			if (!jsonData || jsonData.kind !== 'canvasitem') {
+				event.preventDefault();
+				return;
+			}
+
+			const canvasItems = superCanvasManager.fromRenderables(jsonData.renderables as Renderable[]);
+			const selection = createSelection(canvasItems);
+
+			if (selection.canMove) {
+				const translation = translationOnPaste ?? vector(15, 15);
+				canvasItems.forEach((item) => item.applyMove(translation));
+			}
+
+			superCanvasManager.addCanvasItems(canvasItems);
+
+			if (onPasteHook) {
+				onPasteHook(selection);
+			}
+
+			event.preventDefault();
+		}, [ disablePaste, superCanvasManager, onPasteHook, translationOnPaste ]);
+
 		const {
 			Toolbar: CustomToolbar,
 			BrushControls: CustomBrushControls,
@@ -135,7 +241,11 @@ const SuperCanvas: React.ForwardRefExoticComponent<SuperCanvasProps> = forwardRe
 		const CanvasControls = CustomCanvasControls || DefaultCanvasControls as React.ComponentType<CanvasControlsProps>;
 
 		return (
-			<div style={{ position: 'relative' }}>
+			<div
+				style={{ position: 'relative' }}
+				onCopy={onCopy}
+				onPaste={onPaste}
+			>
 				<canvas
 					height={height}
 					width={width}
