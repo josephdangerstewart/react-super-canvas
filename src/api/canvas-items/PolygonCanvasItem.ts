@@ -13,7 +13,7 @@ import StyleContext from '../../types/context/StyleContext';
 export interface PolygonCanvasItemConstructor {
 	points: Vector2D[];
 	styleContext: StyleContext;
-	rotation: number;
+	rotation?: number;
 }
 
 export default class PolygonCanvasItem implements ICanvasItem {
