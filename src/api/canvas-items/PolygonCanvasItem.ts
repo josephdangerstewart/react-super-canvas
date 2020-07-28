@@ -13,6 +13,7 @@ import StyleContext from '../../types/context/StyleContext';
 export interface PolygonCanvasItemConstructor {
 	points: Vector2D[];
 	styleContext: StyleContext;
+	rotation: number;
 }
 
 export default class PolygonCanvasItem implements ICanvasItem {
@@ -20,18 +21,19 @@ export default class PolygonCanvasItem implements ICanvasItem {
 
 	private polygon: Polygon;
 
-	constructor({ points, styleContext }: PolygonCanvasItemConstructor) {
+	constructor({ points, styleContext, rotation }: PolygonCanvasItemConstructor) {
 		this.polygon = {
 			points,
 			fillColor: styleContext.fillColor,
 			strokeColor: styleContext.strokeColor,
-			rotation: 0,
+			rotation: rotation ?? 0,
 		};
 	}
 
 	toJson = (): JsonData => ({
 		points: this.polygon.points,
 		styleContext: { ...this.polygon },
+		rotation: this.polygon.rotation,
 	});
 
 	render = (painter: IPainterAPI): void => {

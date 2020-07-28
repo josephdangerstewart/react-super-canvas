@@ -15,6 +15,7 @@ export interface ImageCanvasItemConstructor {
 	imageMeta?: {
 		size: Vector2D;
 		scale: Vector2D;
+		rotation: number;
 	};
 	imageCache?: IImageCache;
 }
@@ -40,7 +41,7 @@ export default class ImageCanvasItem implements ICanvasItem {
 		this.scale = vector(1, 1);
 		this.size = vector(0, 0);
 		this.imageCache = imageCache;
-		this.rotation = 0;
+		this.rotation = imageMeta?.rotation ?? 0;
 
 		if (imageCache) {
 			this.generateSize();
@@ -56,6 +57,7 @@ export default class ImageCanvasItem implements ICanvasItem {
 		imageMeta: {
 			size: this.size,
 			scale: this.scale,
+			rotation: this.rotation,
 		},
 	});
 
