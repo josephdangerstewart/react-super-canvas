@@ -1,11 +1,12 @@
 import { Renderable } from '../types/Renderable';
-import ICanvasItem from '../types/ICanvasItem';
 import CanvasItemContext from '../types/context/CanvasItemContext';
 import { vector } from './shapes-util';
 import { FakeImageCache } from './FakeImageCache';
 import { RenderableSnapshotPainter } from './RenderableSnapshotPainter';
+import { CanvasItemInstance } from '../types/utility/CanvasItemInstance';
 
-export function generateRenderable(canvasItem: ICanvasItem): Renderable {
+export function generateRenderable(instance: CanvasItemInstance): Renderable {
+	const { canvasItem, metadata } = instance;
 	const canvasItemJson = canvasItem.toJson ? {
 		item: canvasItem.toJson(),
 		canvasItemName: canvasItem.canvasItemName,
@@ -29,5 +30,6 @@ export function generateRenderable(canvasItem: ICanvasItem): Renderable {
 	return {
 		ops,
 		canvasItemJson,
+		metadata,
 	};
 }

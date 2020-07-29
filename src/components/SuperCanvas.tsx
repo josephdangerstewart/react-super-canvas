@@ -13,7 +13,6 @@ import { OnCanvasItemChangeCallback } from '../types/callbacks/OnCanvasItemChang
 import ISelection from '../types/ISelection';
 import { Renderable } from '../types/Renderable';
 import { ClipboardEventCallback } from '../types/callbacks/ClipboardEventCallback';
-import { generateRenderable } from '../utility/renderable-utility';
 import { createSelection } from '../utility/selection-utility';
 import Vector2D from '../types/utility/Vector2D';
 import { vector } from '../utility/shapes-util';
@@ -177,7 +176,7 @@ const SuperCanvas: React.ForwardRefExoticComponent<SuperCanvasProps> = forwardRe
 				return;
 			}
 
-			const renderables = currentSelection.selectedItems.map(generateRenderable);
+			const renderables = superCanvasManager.serializeCurrentSelection();
 			const serializedSnapshot = JSON.stringify({
 				kind: 'canvasitem',
 				renderables,

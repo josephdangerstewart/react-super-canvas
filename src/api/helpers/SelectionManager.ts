@@ -3,6 +3,7 @@ import ICanvasItem from '../../types/ICanvasItem';
 import Context from '../../types/context/Context';
 import { pointInsideRect } from '../../utility/shapes-util';
 import CanvasInteractionManager from './CanvasInteractionManager';
+import { CanvasItemInstance } from '../../types/utility/CanvasItemInstance';
 
 type OnSelectionChangeCallback = () => void;
 
@@ -12,7 +13,7 @@ type OnSelectionChangeCallback = () => void;
  */
 export default class SelectionManager implements ISelection {
 	private onSelectionChangeHandlers: OnSelectionChangeCallback[];
-	private _selectedItems: ICanvasItem[];
+	private _selectedItems: CanvasItemInstance[];
 	private _mouseDragged: boolean;
 	private interactionManager: CanvasInteractionManager;
 
@@ -26,11 +27,11 @@ export default class SelectionManager implements ISelection {
 	/* INTERFACE METHODS */
 
 	get selectedItem(): ICanvasItem {
-		return this._selectedItems[0];
+		return this._selectedItems[0]?.canvasItem;
 	}
 
 	get selectedItems(): ICanvasItem[] {
-		return this._selectedItems;
+		return this._selectedItems.map(({ canvasItem }) => canvasItem);
 	}
 
 	get selectedItemCount(): number {
@@ -38,24 +39,26 @@ export default class SelectionManager implements ISelection {
 	}
 
 	get canMove(): boolean {
-		return this._selectedItems.length && this._selectedItems.every((item) => item.applyMove);
+		return this._selectedItems.length && this._selectedItems.every(({ canvasItem }) => canvasItem.applyMove);
 	}
 
 	get canScale(): boolean {
-		return this._selectedItems.length && this._selectedItems.every((item) => item.applyScale);
+		return this._selectedItems.length && this._selectedItems.every(({ canvasItem }) => canvasItem.applyScale);
 	}
 
 	get canRotate(): boolean {
-		return this._selectedItems.length === 1 && Boolean(this._selectedItems[0].applyRotation);
+		return this._selectedItems.length === 1 && Boolean(this._selectedItems[0].canvasItem.applyRotation);
 	}
 
 	/* PUBLIC METHODS */
 
-	isSelected = (item: ICanvasItem): boolean => this._selectedItems.includes(item);
+	isSelected = (item: CanvasItemInstance): boolean => this._selectedItems.includes(item);
 
 	onSelectionChange = (callback: OnSelectionChangeCallback): void => {
 		this.onSelectionChangeHandlers.push(callback);
 	};
+
+	getSelectedInstances = (): CanvasItemInstance[] => this._selectedItems;
 
 	mouseDown = (): void => {
 		this._mouseDragged = false;
@@ -65,7 +68,7 @@ export default class SelectionManager implements ISelection {
 		this._mouseDragged = true;
 	};
 
-	mouseUp = (context: Context, canvasItems: ICanvasItem[]): void => {
+	mouseUp = (context: Context, canvasItems: CanvasItemInstance[]): void => {
 		if (this._mouseDragged) {
 			return;
 		}
@@ -73,12 +76,12 @@ export default class SelectionManager implements ISelection {
 		const { mousePosition } = context;
 
 		// All the canvas items that hit the point
-		const hits = [];
+		const hits: CanvasItemInstance[] = [];
 
 		// Reverse iterate over the canvas items because the last hit in the array
 		// should be the one that hits
 		for (let i = canvasItems.length - 1; i >= 0; i--) {
-			const canvasItem = canvasItems[i];
+			const { canvasItem } = canvasItems[i];
 
 			// If the canvas item supplies a pointInsideItem method then use only that to determine if the
 			// point hits the canvas item, otherwise check inside the bounding rectangle
@@ -86,11 +89,11 @@ export default class SelectionManager implements ISelection {
 				(canvasItem.pointInsideItem && canvasItem.pointInsideItem(mousePosition))
 				|| (!canvasItem.pointInsideItem && pointInsideRect(mousePosition, canvasItem.getBoundingRect()))
 			) {
-				hits.push(canvasItem);
+				hits.push(canvasItems[i]);
 			}
 		}
 
-		const selectedIndex = hits.findIndex((canvasItem) => canvasItem === this.selectedItem);
+		const selectedIndex = hits.findIndex(({ canvasItem }) => canvasItem === this.selectedItem);
 
 		if (selectedIndex === hits.length - 1) {
 			// The user is already selecting the bottom item in the stack so deselect
@@ -110,12 +113,12 @@ export default class SelectionManager implements ISelection {
 
 	/* PRIVATE METHODS */
 
-	private setSelectedItem = (item: ICanvasItem): void => {
+	private setSelectedItem = (item: CanvasItemInstance): void => {
 		this._selectedItems = [ item ];
 		this.onSelectionChangeHandlers.forEach((handler): void => handler());
 	};
 
-	private addSelectedItem = (item: ICanvasItem): void => {
+	private addSelectedItem = (item: CanvasItemInstance): void => {
 		this._selectedItems.push(item);
 		this.onSelectionChangeHandlers.forEach((handler): void => handler());
 	};

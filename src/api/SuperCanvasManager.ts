@@ -1,6 +1,7 @@
 import ISuperCanvasManager from '../types/ISuperCanvasManager';
 import PainterAPI from './PainterAPI';
 import ICanvasItem from '../types/ICanvasItem';
+import { CanvasItemInstance } from '../types/utility/CanvasItemInstance';
 import IBrush, { DefaultBrushKind } from '../types/IBrush';
 import IBackgroundElement from '../types/IBackgroundElement';
 import CanvasItemContext from '../types/context/CanvasItemContext';
@@ -45,7 +46,7 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 	private transformManager: TransformManager;
 
 	// The active canvas items on the canvas
-	private canvasItems: ICanvasItem[];
+	private canvasItems: CanvasItemInstance[];
 
 	// The available bushes the user can paint with
 	private availableBrushes: IBrush[];
@@ -111,10 +112,10 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 	};
 
 	setCanvasItems = (items: Renderable[]): void => {
-		this.canvasItems = this.fromRenderables(items);
+		this.canvasItems = this.fromRenderablesCore(items);
 	};
 
-	getCanvasItems = (): ICanvasItem[] => this.canvasItems;
+	getCanvasItems = (): ICanvasItem[] => this.canvasItems.map(({ canvasItem }) => canvasItem);
 
 	setActiveBackgroundElement = (element: IBackgroundElement): void => {
 		this.activeBackgroundElement = element;
@@ -171,7 +172,7 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 	};
 
 	deleteSelectedCanvasItem = (): void => {
-		const items = this.selectionManager.selectedItems;
+		const items = this.selectionManager.getSelectedInstances();
 		this.actionHistoryManager.recordDeleteCanvasItems([ ...items ]);
 		this.canvasItems = this.canvasItems.filter((item) => !items.includes(item));
 		this.handleCanvasItemsChange();
@@ -229,12 +230,51 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 	};
 
 	addCanvasItems = (canvasItems: ICanvasItem[]): void => {
-		this.canvasItems.push(...canvasItems);
-		this.actionHistoryManager.recordAddCanvasItems(canvasItems);
+		const instances = canvasItems.map((canvasItem) => ({
+			canvasItem,
+			metadata: {},
+		}));
+		this.canvasItems.push(...instances);
+
+		this.actionHistoryManager.recordAddCanvasItems(instances);
 		this.handleCanvasItemsChange();
 	};
 
+	serializeCurrentSelection = (): Renderable[] => this.selectionManager.getSelectedInstances().map(generateRenderable);
+
 	/* PRIVATE METHODS */
+
+	private fromRenderablesCore = (renderables: Renderable[]): CanvasItemInstance[] => {
+		const availableCanvasItems = this.availableBrushes
+			.reduce(
+				(dictionary, brush) => ({
+					...dictionary,
+					...brush.supportedCanvasItems,
+				}),
+				{},
+			) as Record<string, Type<ICanvasItem>>;
+
+		return renderables.map((renderable): CanvasItemInstance => {
+			if (!renderable) {
+				return null;
+			}
+
+			const { canvasItemName, item } = renderable.canvasItemJson ?? {};
+			const CanvasItemClass = availableCanvasItems[canvasItemName as string];
+
+			let canvasItem: ICanvasItem = null;
+			if (CanvasItemClass) {
+				canvasItem = new CanvasItemClass(item);
+			} else {
+				canvasItem = new RenderableCanvasItem({ renderable, imageCache: this.imageCache });
+			}
+
+			return {
+				canvasItem,
+				metadata: renderable.metadata ?? {},
+			};
+		});
+	};
 
 	private applyAction = (action: ActionRecord): void => {
 		if (!action) {
@@ -250,7 +290,7 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 				break;
 			case ActionType.TransformCanvasItems:
 				const data = (action.data as TransformAction);
-				this.transformManager.applyTransform(data.transformOperation, createSelection(data.canvasItems));
+				this.transformManager.applyTransform(data.transformOperation, createSelection(data.canvasItems.map(({ canvasItem }) => canvasItem)));
 				break;
 			default:
 				break;
@@ -272,9 +312,9 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 			this.activeBackgroundElement.renderBackground(this.painter, this.context2d, this.generateBackgroundElementContext());
 		}
 
-		this.canvasItems.forEach((item) => {
-			const context = this.generateCanvasContextForItem(item);
-			item.render(this.painter, context);
+		this.canvasItems.forEach(({ canvasItem }) => {
+			const context = this.generateCanvasContextForItem(canvasItem);
+			canvasItem.render(this.painter, context);
 		});
 
 		this.transformManager.render(this.painter, this.generateBrushContext());
@@ -341,19 +381,24 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 		}
 	};
 
-	private addCanvasItem = (item: ICanvasItem): void => {
-		this.canvasItems.push(item);
-		this.actionHistoryManager.recordAddCanvasItems([ item ]);
+	private addCanvasItem = (canvasItem: ICanvasItem): void => {
+		const instance = {
+			canvasItem,
+			metadata: {},
+		};
+
+		this.canvasItems.push(instance);
+		this.actionHistoryManager.recordAddCanvasItems([ instance ]);
 		this.handleCanvasItemsChange();
 	};
 
 	private handleCanvasItemsChange = (): void => {
 		if (this._onCanvasItemChange) {
-			const data = this.getCanvasItems().map(generateRenderable);
+			const data = this.canvasItems.map(generateRenderable);
 			this._onCanvasItemChange(data);
 		}
 
-		if (this.selectionManager.selectedItems.some((item) => !this.canvasItems.includes(item))) {
+		if (this.selectionManager.selectedItems.some((item) => !this.canvasItems.find((x) => x.canvasItem === item))) {
 			this.selectionManager.deselectItems();
 		}
 	};

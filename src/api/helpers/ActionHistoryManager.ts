@@ -1,7 +1,7 @@
-import ICanvasItem from '../../types/ICanvasItem';
 import { TransformOperation } from '../../types/transform/TransformOperation';
 import { TransformKind } from '../../types/transform/TransformKind';
 import { vector } from '../../utility/shapes-util';
+import { CanvasItemInstance } from '../../types/utility/CanvasItemInstance';
 
 export enum ActionType {
 	TransformCanvasItems,
@@ -10,7 +10,7 @@ export enum ActionType {
 }
 
 export interface CanvasItemsAction {
-	canvasItems: ICanvasItem[];
+	canvasItems: CanvasItemInstance[];
 }
 
 export interface TransformAction extends CanvasItemsAction {
@@ -35,7 +35,7 @@ export default class ActionHistoryManager {
 		}
 	}
 
-	recordTransform = (canvasItems: ICanvasItem[], transformOperation: TransformOperation): void => {
+	recordTransform = (canvasItems: CanvasItemInstance[], transformOperation: TransformOperation): void => {
 		this.actionHistory.push({
 			type: ActionType.TransformCanvasItems,
 			data: {
@@ -46,7 +46,7 @@ export default class ActionHistoryManager {
 		this.onAddActionRecord();
 	};
 
-	recordAddCanvasItems = (canvasItems: ICanvasItem[]): void => {
+	recordAddCanvasItems = (canvasItems: CanvasItemInstance[]): void => {
 		this.actionHistory.push({
 			type: ActionType.AddCanvasItems,
 			data: { canvasItems },
@@ -54,7 +54,7 @@ export default class ActionHistoryManager {
 		this.onAddActionRecord();
 	};
 
-	recordDeleteCanvasItems = (canvasItems: ICanvasItem[]): void => {
+	recordDeleteCanvasItems = (canvasItems: CanvasItemInstance[]): void => {
 		this.actionHistory.push({
 			type: ActionType.DeleteCanvasItems,
 			data: { canvasItems },

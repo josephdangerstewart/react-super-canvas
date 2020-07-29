@@ -18,6 +18,19 @@ export interface Renderable extends JsonData {
 	 * to a canvas item
 	 */
 	canvasItemJson: JsonData;
+
+	/**
+	 * @description Metadata is data that is stored about a canvas item but managed by
+	 * the system.
+	 */
+	metadata?: RenderableMetadata;
+}
+
+export interface RenderableMetadata extends JsonData {
+	/**
+	 * @description Whether or not this renderable is locked on the canvas
+	 */
+	isLocked?: boolean;
 }
 
 export interface RenderOp extends JsonData {

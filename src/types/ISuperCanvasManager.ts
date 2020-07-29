@@ -113,4 +113,9 @@ export default interface ISuperCanvasManager {
 	 * @description Adds canvas items and invokes onChange
 	 */
 	addCanvasItems: (canvasItems: ICanvasItem[]) => void;
+
+	/**
+	 * @description Serializes the current selection to an array of Renderables
+	 */
+	serializeCurrentSelection: () => Renderable[];
 }
