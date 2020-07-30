@@ -39,15 +39,15 @@ export default class SelectionManager implements ISelection {
 	}
 
 	get canMove(): boolean {
-		return this._selectedItems.length && this._selectedItems.every(({ canvasItem }) => canvasItem.applyMove);
+		return this._selectedItems.length && this._selectedItems.every(({ canvasItem, metadata }) => !metadata.isLocked && canvasItem.applyMove);
 	}
 
 	get canScale(): boolean {
-		return this._selectedItems.length && this._selectedItems.every(({ canvasItem }) => canvasItem.applyScale);
+		return this._selectedItems.length && this._selectedItems.every(({ canvasItem, metadata }) => !metadata.isLocked && canvasItem.applyScale);
 	}
 
 	get canRotate(): boolean {
-		return this._selectedItems.length === 1 && Boolean(this._selectedItems[0].canvasItem.applyRotation);
+		return this._selectedItems.length === 1 && Boolean(this._selectedItems[0].canvasItem.applyRotation) && !this._selectedItems[0].metadata.isLocked;
 	}
 
 	/* PUBLIC METHODS */
@@ -81,13 +81,17 @@ export default class SelectionManager implements ISelection {
 		// Reverse iterate over the canvas items because the last hit in the array
 		// should be the one that hits
 		for (let i = canvasItems.length - 1; i >= 0; i--) {
-			const { canvasItem } = canvasItems[i];
+			const { canvasItem, metadata } = canvasItems[i];
+			const isLocked = metadata.isLocked && !this.interactionManager.keysDown.Alt;
 
 			// If the canvas item supplies a pointInsideItem method then use only that to determine if the
 			// point hits the canvas item, otherwise check inside the bounding rectangle
 			if (
-				(canvasItem.pointInsideItem && canvasItem.pointInsideItem(mousePosition))
-				|| (!canvasItem.pointInsideItem && pointInsideRect(mousePosition, canvasItem.getBoundingRect()))
+				!isLocked
+				&& (
+					(canvasItem.pointInsideItem && canvasItem.pointInsideItem(mousePosition))
+					|| (!canvasItem.pointInsideItem && pointInsideRect(mousePosition, canvasItem.getBoundingRect()))
+				)
 			) {
 				hits.push(canvasItems[i]);
 			}

@@ -45,24 +45,19 @@ The super canvas is super easy to use! Use it just like this:
 
 The `SuperCanvas` component defines an imperative API that extends the following interface. This allows consumers to imperatively manipulate the canvas (e.g. for setting up hotkeys). The imperative handle is accessed via a ref to the `SuperCanvas` component.
 
+**Note:** Locked canvas items can still be selected while holding down the alt key.
+
 <InterfaceDocumentation interfaceMetadata={SuperCanvasImperativeHandle} />
 
 <Playground>
 	{() => {
 		const ref = React.useRef(null);
-		const redo = React.useCallback(() => {
-			if (ref.current) {
-				ref.current.redo();
-			}
-		});
-		const undo = React.useCallback(() => {
-			if (ref.current) {
-				ref.current.undo();
-			}
-		})
 		return (
 			<>
-				<button onClick={undo}>Undo</button><button onClick={redo}>Redo</button>
+				<button onClick={() => ref.current.undo()}>Undo</button>
+				<button onClick={() => ref.current.redo()}>Redo</button>
+				<button onClick={() => ref.current.lockCurrentSelection()}>Lock</button>
+				<button onClick={() => ref.current.unlockCurrentSelection()}>Unlock</button>
 				<SuperCanvas
 					height={600}
 					width={600}

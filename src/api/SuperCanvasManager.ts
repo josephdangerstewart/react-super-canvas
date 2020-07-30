@@ -242,6 +242,23 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 
 	serializeCurrentSelection = (): Renderable[] => this.selectionManager.getSelectedInstances().map(generateRenderable);
 
+	lockCurrentSelection = (): void => {
+		const instances = this.selectionManager.getSelectedInstances();
+		for (let i = 0; i < instances.length; i++) {
+			instances[i].metadata.isLocked = true;
+		}
+		this.selectionManager.deselectItems();
+		this.handleCanvasItemsChange();
+	};
+
+	unlockCurrentSelection = (): void => {
+		const instances = this.selectionManager.getSelectedInstances();
+		for (let i = 0; i < instances.length; i++) {
+			instances[i].metadata.isLocked = false;
+		}
+		this.handleCanvasItemsChange();
+	};
+
 	/* PRIVATE METHODS */
 
 	private fromRenderablesCore = (renderables: Renderable[]): CanvasItemInstance[] => {
@@ -290,7 +307,7 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 				break;
 			case ActionType.TransformCanvasItems:
 				const data = (action.data as TransformAction);
-				this.transformManager.applyTransform(data.transformOperation, createSelection(data.canvasItems.map(({ canvasItem }) => canvasItem)));
+				this.transformManager.applyTransform(data.transformOperation, createSelection(data.canvasItems));
 				break;
 			default:
 				break;

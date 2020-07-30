@@ -118,4 +118,14 @@ export default interface ISuperCanvasManager {
 	 * @description Serializes the current selection to an array of Renderables
 	 */
 	serializeCurrentSelection: () => Renderable[];
+
+	/**
+	 * @description Locks current selection
+	 */
+	lockCurrentSelection: () => void;
+
+	/**
+	 * @description Unlock current selection
+	 */
+	unlockCurrentSelection: () => void;
 }

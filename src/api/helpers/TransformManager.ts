@@ -26,6 +26,7 @@ import Polygon from '../../types/shapes/Polygon';
 import Circle from '../../types/shapes/Circle';
 import Line from '../../types/shapes/Line';
 import { snapAlongIncrement } from '../../utility/math-utility';
+import SelectionManager from './SelectionManager';
 
 const HANDLE_DIAMETER = 12;
 
@@ -56,7 +57,7 @@ const handleLineLength = 30;
  * This class exists to abstract the canvas item transform logic away from the SuperCanvasManager
  */
 export class TransformManager {
-	private selectionManager: ISelection;
+	private selectionManager: SelectionManager;
 	private isMouseDown: boolean;
 
 	private transformOperation: TransformOperation;
@@ -67,7 +68,7 @@ export class TransformManager {
 	private mouseDownAt: Vector2D;
 	private actionHistoryManager: ActionHistoryManager;
 
-	constructor(selectionManager: ISelection, onCanvasItemChange: () => void, actionHistoryManager: ActionHistoryManager) {
+	constructor(selectionManager: SelectionManager, onCanvasItemChange: () => void, actionHistoryManager: ActionHistoryManager) {
 		this.selectionManager = selectionManager;
 		this.mouseDownAt = vector(0, 0);
 		this.onCanvasItemChange = onCanvasItemChange;
@@ -289,7 +290,7 @@ export class TransformManager {
 
 	mouseUp = (): void => {
 		if (this.transformOperation && this.selectionManager.selectedItem) {
-			this.actionHistoryManager.recordTransform([ ...this.selectionManager.selectedItems ], { ...this.transformOperation });
+			this.actionHistoryManager.recordTransform([ ...this.selectionManager.getSelectedInstances() ], { ...this.transformOperation });
 			this.applyTransform(this.transformOperation, this.selectionManager);
 		}
 

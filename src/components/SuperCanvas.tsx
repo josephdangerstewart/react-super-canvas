@@ -16,6 +16,7 @@ import { ClipboardEventCallback } from '../types/callbacks/ClipboardEventCallbac
 import { createSelection } from '../utility/selection-utility';
 import Vector2D from '../types/utility/Vector2D';
 import { vector } from '../utility/shapes-util';
+import { CanvasItemInstance } from '../types/utility/CanvasItemInstance';
 
 const CANVAS_ITEM_MIME_TYPE = 'application/json';
 
@@ -109,6 +110,16 @@ export interface SuperCanvasImperativeHandle {
 	 * @description Redos the last undone action
 	 */
 	redo: () => void;
+
+	/**
+	 * @description Locks the current selection
+	 */
+	lockCurrentSelection: () => void;
+
+	/**
+	 * @description Unlocks the current selection
+	 */
+	unlockCurrentSelection: () => void;
 }
 
 const SuperCanvas: React.ForwardRefExoticComponent<SuperCanvasProps> = forwardRef<SuperCanvasImperativeHandle, SuperCanvasProps>(
@@ -156,9 +167,11 @@ const SuperCanvas: React.ForwardRefExoticComponent<SuperCanvasProps> = forwardRe
 		useImperativeHandle(
 			ref,
 			() => superCanvasManager && ({
-				setActiveBrush: superCanvasManager && superCanvasManager.setActiveBrushByName,
-				undo: superCanvasManager && superCanvasManager.undo,
-				redo: superCanvasManager && superCanvasManager.redo,
+				setActiveBrush: superCanvasManager?.setActiveBrushByName,
+				undo: superCanvasManager?.undo,
+				redo: superCanvasManager?.redo,
+				lockCurrentSelection: superCanvasManager?.lockCurrentSelection,
+				unlockCurrentSelection: superCanvasManager?.unlockCurrentSelection,
 			}),
 			[ superCanvasManager ],
 		);
@@ -210,15 +223,23 @@ const SuperCanvas: React.ForwardRefExoticComponent<SuperCanvasProps> = forwardRe
 				return;
 			}
 
-			const canvasItems = superCanvasManager.fromRenderables(jsonData.renderables as Renderable[]);
-			const selection = createSelection(canvasItems);
+			const canvasItemInstances: CanvasItemInstance[] = (jsonData.renderables as Renderable[]).map((r) => {
+				const [ canvasItem ] = superCanvasManager.fromRenderables([ r ]);
 
-			if (selection.canMove) {
+				return {
+					canvasItem,
+					metadata: r.metadata ?? {},
+				};
+			});
+
+			const selection = createSelection(canvasItemInstances);
+
+			if (selection.canMove && translationOnPaste) {
 				const translation = translationOnPaste ?? vector(0, 0);
-				canvasItems.forEach((item) => item.applyMove(translation));
+				selection.selectedItems.forEach((item) => item.applyMove(translation));
 			}
 
-			superCanvasManager.addCanvasItems(canvasItems);
+			superCanvasManager.addCanvasItems(selection.selectedItems);
 
 			if (onPasteHook) {
 				onPasteHook(selection);
