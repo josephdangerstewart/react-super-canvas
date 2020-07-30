@@ -118,6 +118,26 @@ export interface SuperCanvasImperativeHandle {
 	 * @description Unlocks the current selection
 	 */
 	unlockCurrentSelection: () => void;
+
+	/**
+	 * @description Move the current selection forward in the render order
+	 */
+	moveForward: () => void;
+
+	/**
+	 * @description Moves the current selection backward in the render order
+	 */
+	moveBackward: () => void
+
+	/**
+	 * @description Moves the current selection to the front of the render order
+	 */;
+	moveToFront: () => void
+
+	/**
+	 * @description Moves the current selection to the back of the render order
+	 */;
+	moveToBack: () => void;
 }
 
 const SuperCanvas: React.ForwardRefExoticComponent<SuperCanvasProps> = forwardRef<SuperCanvasImperativeHandle, SuperCanvasProps>(
@@ -170,6 +190,10 @@ const SuperCanvas: React.ForwardRefExoticComponent<SuperCanvasProps> = forwardRe
 				redo: superCanvasManager?.redo,
 				lockCurrentSelection: superCanvasManager?.lockCurrentSelection,
 				unlockCurrentSelection: superCanvasManager?.unlockCurrentSelection,
+				moveForward: superCanvasManager?.moveCurrentSelectionForward,
+				moveBackward: superCanvasManager?.moveCurrentSelectionBack,
+				moveToFront: superCanvasManager?.moveCurrentSelectionToFront,
+				moveToBack: superCanvasManager?.moveCurrentSelectionToBack,
 			}),
 			[ superCanvasManager ],
 		);

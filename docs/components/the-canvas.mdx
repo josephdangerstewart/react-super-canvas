@@ -58,6 +58,10 @@ The `SuperCanvas` component defines an imperative API that extends the following
 				<button onClick={() => ref.current.redo()}>Redo</button>
 				<button onClick={() => ref.current.lockCurrentSelection()}>Lock</button>
 				<button onClick={() => ref.current.unlockCurrentSelection()}>Unlock</button>
+				<button onClick={() => ref.current.moveForward()}>Move Forward</button>
+				<button onClick={() => ref.current.moveBackward()}>Move Backward</button>
+				<button onClick={() => ref.current.moveToFront()}>Move to Front</button>
+				<button onClick={() => ref.current.moveToBack()}>Move to Back</button>
 				<SuperCanvas
 					height={600}
 					width={600}

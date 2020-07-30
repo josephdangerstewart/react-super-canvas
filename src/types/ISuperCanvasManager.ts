@@ -124,4 +124,24 @@ export default interface ISuperCanvasManager {
 	 * @description Unlock current selection
 	 */
 	unlockCurrentSelection: () => void;
+
+	/**
+	 * @description Brings the current selection forward in the render stack one
+	 */
+	moveCurrentSelectionForward: () => void;
+
+	/**
+	 * @description Sends the current selection back in the render stack one
+	 */
+	moveCurrentSelectionBack: () => void;
+
+	/**
+	 * @description Brings current selection to the front of the render stack
+	 */
+	moveCurrentSelectionToFront: () => void;
+
+	/**
+	 * @description Brings current selection to the back of the render stack
+	 */
+	moveCurrentSelectionToBack: () => void;
 }

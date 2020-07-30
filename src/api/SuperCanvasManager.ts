@@ -219,7 +219,17 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 		this.handleCanvasItemsChange();
 	};
 
-	serializeCurrentSelection = (): Renderable[] => this.selectionManager.getSelectedInstances().map(generateRenderable);
+	serializeCurrentSelection = (): Renderable[] => {
+		const instances = [];
+		for (let i = 0; i < this.canvasItems.length; i++) {
+			const cur = this.canvasItems[i];
+			if (this.selectionManager.isSelected(cur)) {
+				instances.push(cur);
+			}
+		}
+
+		return instances.map(generateRenderable);
+	};
 
 	lockCurrentSelection = (): void => {
 		const instances = this.selectionManager.getSelectedInstances();
@@ -238,7 +248,73 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 		this.handleCanvasItemsChange();
 	};
 
+	moveCurrentSelectionForward = (): void => {
+		for (let i = this.canvasItems.length - 2; i >= 0; i--) {
+			const aheadInstance = this.canvasItems[i + 1];
+			const curInstance = this.canvasItems[i];
+
+			if (this.selectionManager.isSelected(curInstance)) {
+				if (!this.selectionManager.isSelected(aheadInstance)) {
+					this.swapCanvasItems(i, i + 1);
+				}
+			}
+		}
+	};
+
+	moveCurrentSelectionBack = (): void => {
+		for (let i = 1; i < this.canvasItems.length; i++) {
+			const aheadInstance = this.canvasItems[i - 1];
+			const curInstance = this.canvasItems[i];
+
+			if (this.selectionManager.isSelected(curInstance)) {
+				if (!this.selectionManager.isSelected(aheadInstance)) {
+					this.swapCanvasItems(i, i - 1);
+				}
+			}
+		}
+	};
+
+	moveCurrentSelectionToFront = (): void => {
+		const selection = [];
+
+		for (let i = 0; i < this.canvasItems.length; i++) {
+			const cur = this.canvasItems[i];
+			if (this.selectionManager.isSelected(cur)) {
+				const [ item ] = this.canvasItems.splice(i, 1);
+				i--;
+				selection.push(item);
+			}
+		}
+
+		this.canvasItems.push(...selection);
+	};
+
+	moveCurrentSelectionToBack = (): void => {
+		const selection = [];
+
+		for (let i = 0; i < this.canvasItems.length; i++) {
+			const cur = this.canvasItems[i];
+			if (this.selectionManager.isSelected(cur)) {
+				const [ item ] = this.canvasItems.splice(i, 1);
+				i--;
+				selection.push(item);
+			}
+		}
+
+		this.canvasItems.unshift(...selection);
+	};
+
 	/* PRIVATE METHODS */
+
+	private swapCanvasItems = (i1: number, i2: number): void => {
+		if (i1 === i2) {
+			return;
+		}
+
+		const temp = this.canvasItems[i1];
+		this.canvasItems[i1] = this.canvasItems[i2];
+		this.canvasItems[i2] = temp;
+	};
 
 	private fromRenderables = (renderables: Renderable[]): CanvasItemInstance[] => {
 		const availableCanvasItems = this.availableBrushes
