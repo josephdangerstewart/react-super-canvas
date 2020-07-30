@@ -240,6 +240,7 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 		for (let i = 0; i < instances.length; i++) {
 			instances[i].metadata.isLocked = true;
 		}
+		this.actionHistoryManager.recordLockItems(instances);
 		this.selectionManager.deselectItems();
 		this.handleCanvasItemsChange();
 	};
@@ -249,6 +250,7 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 		for (let i = 0; i < instances.length; i++) {
 			instances[i].metadata.isLocked = false;
 		}
+		this.actionHistoryManager.recordUnlockItems(instances);
 		this.handleCanvasItemsChange();
 	};
 
@@ -368,6 +370,26 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 			case ActionType.TransformCanvasItems:
 				const data = (action.data as TransformAction);
 				this.transformManager.applyTransform(data.transformOperation, createSelection(data.canvasItems));
+				break;
+			case ActionType.LockCanvasItems:
+				const itemIdsToLock = new Set(action.data.canvasItems.map((x) => x.id));
+				for (let i = 0; i < this.canvasItems.length; i++) {
+					const item = this.canvasItems[i];
+
+					if (itemIdsToLock.has(item.id)) {
+						item.metadata.isLocked = true;
+					}
+				}
+				break;
+			case ActionType.UnlockCanvasItems:
+				const itemIdsToUnlock = new Set(action.data.canvasItems.map((x) => x.id));
+				for (let i = 0; i < this.canvasItems.length; i++) {
+					const item = this.canvasItems[i];
+
+					if (itemIdsToUnlock.has(item.id)) {
+						item.metadata.isLocked = false;
+					}
+				}
 				break;
 			default:
 				break;

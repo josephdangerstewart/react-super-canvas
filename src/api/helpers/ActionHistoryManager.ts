@@ -7,6 +7,8 @@ export enum ActionType {
 	TransformCanvasItems,
 	AddCanvasItems,
 	DeleteCanvasItems,
+	LockCanvasItems,
+	UnlockCanvasItems,
 }
 
 export interface CanvasItemsAction {
@@ -62,6 +64,22 @@ export default class ActionHistoryManager {
 		this.onAddActionRecord();
 	};
 
+	recordLockItems = (canvasItems: CanvasItemInstance[]): void => {
+		this.actionHistory.push({
+			type: ActionType.LockCanvasItems,
+			data: { canvasItems },
+		});
+		this.onAddActionRecord();
+	};
+
+	recordUnlockItems = (canvasItems: CanvasItemInstance[]): void => {
+		this.actionHistory.push({
+			type: ActionType.UnlockCanvasItems,
+			data: { canvasItems },
+		});
+		this.onAddActionRecord();
+	};
+
 	getNextUndoAction = (): ActionRecord => {
 		const nextAction = this.actionHistory.pop();
 
@@ -81,6 +99,20 @@ export default class ActionHistoryManager {
 		if (nextAction.type === ActionType.DeleteCanvasItems) {
 			return {
 				type: ActionType.AddCanvasItems,
+				data: nextAction.data,
+			};
+		}
+
+		if (nextAction.type === ActionType.LockCanvasItems) {
+			return {
+				type: ActionType.UnlockCanvasItems,
+				data: nextAction.data,
+			};
+		}
+
+		if (nextAction.type === ActionType.UnlockCanvasItems) {
+			return {
+				type: ActionType.LockCanvasItems,
 				data: nextAction.data,
 			};
 		}
