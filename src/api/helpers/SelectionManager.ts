@@ -16,12 +16,14 @@ export default class SelectionManager implements ISelection {
 	private _selectedItems: CanvasItemInstance[];
 	private _mouseDragged: boolean;
 	private interactionManager: CanvasInteractionManager;
+	private selectedItemsCache: Record<number, boolean>;
 
 	constructor(interactionManager: CanvasInteractionManager) {
 		this._selectedItems = [];
 		this._mouseDragged = false;
 		this.onSelectionChangeHandlers = [];
 		this.interactionManager = interactionManager;
+		this.selectedItemsCache = {};
 	}
 
 	/* INTERFACE METHODS */
@@ -52,7 +54,7 @@ export default class SelectionManager implements ISelection {
 
 	/* PUBLIC METHODS */
 
-	isSelected = (item: CanvasItemInstance): boolean => this._selectedItems.includes(item);
+	isSelected = (item: CanvasItemInstance): boolean => this.selectedItemsCache[item.id];
 
 	onSelectionChange = (callback: OnSelectionChangeCallback): void => {
 		this.onSelectionChangeHandlers.push(callback);
@@ -112,11 +114,18 @@ export default class SelectionManager implements ISelection {
 
 	deselectItems = (): void => {
 		this._selectedItems = [];
+		this.selectedItemsCache = {};
 		this.onSelectionChangeHandlers.forEach((handler): void => handler());
 	};
 
 	setSelectedItems = (items: CanvasItemInstance[]): void => {
 		this._selectedItems = items;
+		this.selectedItemsCache = {};
+
+		for (let i = 0; i < items.length; i++) {
+			this.selectedItemsCache[items[i].id] = true;
+		}
+
 		this.onSelectionChangeHandlers.forEach((handler): void => handler());
 	};
 
@@ -124,11 +133,15 @@ export default class SelectionManager implements ISelection {
 
 	private setSelectedItem = (item: CanvasItemInstance): void => {
 		this._selectedItems = [ item ];
+		this.selectedItemsCache = {
+			[item.id]: true,
+		};
 		this.onSelectionChangeHandlers.forEach((handler): void => handler());
 	};
 
 	private addSelectedItem = (item: CanvasItemInstance): void => {
 		this._selectedItems.push(item);
+		this.selectedItemsCache[item.id] = true;
 		this.onSelectionChangeHandlers.forEach((handler): void => handler());
 	};
 }

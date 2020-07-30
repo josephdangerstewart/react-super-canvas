@@ -49,6 +49,9 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 	// The active canvas items on the canvas
 	private canvasItems: CanvasItemInstance[];
 
+	// The next canvas item instance id
+	private nextCanvasItemInstanceId: number;
+
 	// The available bushes the user can paint with
 	private availableBrushes: IBrush[];
 
@@ -94,6 +97,7 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 		this.canvasItems = [];
 		this.availableBrushes = [];
 		this.styleContext = defaultStyleContext;
+		this.nextCanvasItemInstanceId = 0;
 
 		this.isActive = true;
 
@@ -344,6 +348,7 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 			return {
 				canvasItem,
 				metadata: renderable.metadata ?? {},
+				id: this.getNextCanvasItemInstanceId(),
 			};
 		});
 	};
@@ -457,6 +462,7 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 		const instance = {
 			canvasItem,
 			metadata: {},
+			id: this.getNextCanvasItemInstanceId(),
 		};
 
 		this.canvasItems.push(instance);
@@ -474,4 +480,6 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 			this.selectionManager.deselectItems();
 		}
 	};
+
+	private getNextCanvasItemInstanceId = (): number => ++this.nextCanvasItemInstanceId;
 }
