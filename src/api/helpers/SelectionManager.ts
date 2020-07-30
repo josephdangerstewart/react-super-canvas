@@ -115,6 +115,11 @@ export default class SelectionManager implements ISelection {
 		this.onSelectionChangeHandlers.forEach((handler): void => handler());
 	};
 
+	setSelectedItems = (items: CanvasItemInstance[]): void => {
+		this._selectedItems = items;
+		this.onSelectionChangeHandlers.forEach((handler): void => handler());
+	};
+
 	/* PRIVATE METHODS */
 
 	private setSelectedItem = (item: CanvasItemInstance): void => {

@@ -9,6 +9,7 @@ import { OnSelectionChangeCallback } from './callbacks/OnSelectionChangeCallback
 import JsonData from './utility/JsonData';
 import ISelection from './ISelection';
 import { Renderable } from './Renderable';
+import Vector2D from './utility/Vector2D';
 
 export default interface ISuperCanvasManager {
 	/**
@@ -105,14 +106,9 @@ export default interface ISuperCanvasManager {
 	redo: () => void;
 
 	/**
-	 * @description Converts an array of renderables into an array of canvas items
+	 * @description Pastes items onto the canvas and selects them
 	 */
-	fromRenderables: (renderables: Renderable[]) => ICanvasItem[];
-
-	/**
-	 * @description Adds canvas items and invokes onChange
-	 */
-	addCanvasItems: (canvasItems: ICanvasItem[]) => void;
+	paste: (items: Renderable[], translateOnPaste: Vector2D) => void;
 
 	/**
 	 * @description Serializes the current selection to an array of Renderables

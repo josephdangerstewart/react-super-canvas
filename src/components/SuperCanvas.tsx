@@ -13,10 +13,8 @@ import { OnCanvasItemChangeCallback } from '../types/callbacks/OnCanvasItemChang
 import ISelection from '../types/ISelection';
 import { Renderable } from '../types/Renderable';
 import { ClipboardEventCallback } from '../types/callbacks/ClipboardEventCallback';
-import { createSelection } from '../utility/selection-utility';
 import Vector2D from '../types/utility/Vector2D';
 import { vector } from '../utility/shapes-util';
-import { CanvasItemInstance } from '../types/utility/CanvasItemInstance';
 
 const CANVAS_ITEM_MIME_TYPE = 'application/json';
 
@@ -223,26 +221,10 @@ const SuperCanvas: React.ForwardRefExoticComponent<SuperCanvasProps> = forwardRe
 				return;
 			}
 
-			const canvasItemInstances: CanvasItemInstance[] = (jsonData.renderables as Renderable[]).map((r) => {
-				const [ canvasItem ] = superCanvasManager.fromRenderables([ r ]);
-
-				return {
-					canvasItem,
-					metadata: r.metadata ?? {},
-				};
-			});
-
-			const selection = createSelection(canvasItemInstances);
-
-			if (selection.canMove && translationOnPaste) {
-				const translation = translationOnPaste ?? vector(0, 0);
-				selection.selectedItems.forEach((item) => item.applyMove(translation));
-			}
-
-			superCanvasManager.addCanvasItems(selection.selectedItems);
+			superCanvasManager.paste(jsonData.renderables as Renderable[], translationOnPaste ?? vector(0, 0));
 
 			if (onPasteHook) {
-				onPasteHook(selection);
+				onPasteHook(superCanvasManager.getSelection());
 			}
 
 			event.preventDefault();

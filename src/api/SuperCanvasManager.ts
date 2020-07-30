@@ -26,6 +26,7 @@ import { createSelection } from '../utility/selection-utility';
 import { Renderable } from '../types/Renderable';
 import { RenderableCanvasItem } from './canvas-items/RenderableCanvasItem';
 import { generateRenderable } from '../utility/renderable-utility';
+import Vector2D from '../types/utility/Vector2D';
 
 export default class SuperCanvasManager implements ISuperCanvasManager {
 	/* PRIVATE MEMBERS */
@@ -112,7 +113,7 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 	};
 
 	setCanvasItems = (items: Renderable[]): void => {
-		this.canvasItems = this.fromRenderablesCore(items);
+		this.canvasItems = this.fromRenderables(items);
 	};
 
 	getCanvasItems = (): ICanvasItem[] => this.canvasItems.map(({ canvasItem }) => canvasItem);
@@ -203,37 +204,15 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 		this.applyAction(action);
 	};
 
-	fromRenderables = (renderables: Renderable[]): ICanvasItem[] => {
-		const availableCanvasItems = this.availableBrushes
-			.reduce(
-				(dictionary, brush) => ({
-					...dictionary,
-					...brush.supportedCanvasItems,
-				}),
-				{},
-			) as Record<string, Type<ICanvasItem>>;
+	paste = (items: Renderable[], translateOnPaste: Vector2D): void => {
+		const instances = this.fromRenderables(items);
 
-		return renderables.map((renderable) => {
-			if (!renderable) {
-				return null;
-			}
+		this.selectionManager.setSelectedItems(instances);
 
-			const { canvasItemName, item } = renderable.canvasItemJson ?? {};
-			const CanvasItemClass = availableCanvasItems[canvasItemName as string];
+		if (this.selectionManager.canMove) {
+			this.selectionManager.selectedItems.forEach((item) => item.applyMove(translateOnPaste));
+		}
 
-			if (CanvasItemClass) {
-				return new CanvasItemClass(item);
-			}
-
-			return new RenderableCanvasItem({ renderable, imageCache: this.imageCache });
-		});
-	};
-
-	addCanvasItems = (canvasItems: ICanvasItem[]): void => {
-		const instances = canvasItems.map((canvasItem) => ({
-			canvasItem,
-			metadata: {},
-		}));
 		this.canvasItems.push(...instances);
 
 		this.actionHistoryManager.recordAddCanvasItems(instances);
@@ -261,7 +240,7 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 
 	/* PRIVATE METHODS */
 
-	private fromRenderablesCore = (renderables: Renderable[]): CanvasItemInstance[] => {
+	private fromRenderables = (renderables: Renderable[]): CanvasItemInstance[] => {
 		const availableCanvasItems = this.availableBrushes
 			.reduce(
 				(dictionary, brush) => ({
