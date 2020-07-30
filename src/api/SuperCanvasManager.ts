@@ -255,6 +255,7 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 	};
 
 	moveCurrentSelectionForward = (): void => {
+		const previous = this.canvasItems.slice();
 		for (let i = this.canvasItems.length - 2; i >= 0; i--) {
 			const aheadInstance = this.canvasItems[i + 1];
 			const curInstance = this.canvasItems[i];
@@ -265,9 +266,11 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 				}
 			}
 		}
+		this.actionHistoryManager.recordRearrange(previous, this.canvasItems);
 	};
 
 	moveCurrentSelectionBack = (): void => {
+		const previous = this.canvasItems.slice();
 		for (let i = 1; i < this.canvasItems.length; i++) {
 			const aheadInstance = this.canvasItems[i - 1];
 			const curInstance = this.canvasItems[i];
@@ -278,9 +281,11 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 				}
 			}
 		}
+		this.actionHistoryManager.recordRearrange(previous, this.canvasItems);
 	};
 
 	moveCurrentSelectionToFront = (): void => {
+		const previous = this.canvasItems.slice();
 		const selection = [];
 
 		for (let i = 0; i < this.canvasItems.length; i++) {
@@ -293,9 +298,11 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 		}
 
 		this.canvasItems.push(...selection);
+		this.actionHistoryManager.recordRearrange(previous, this.canvasItems);
 	};
 
 	moveCurrentSelectionToBack = (): void => {
+		const previous = this.canvasItems.slice();
 		const selection = [];
 
 		for (let i = 0; i < this.canvasItems.length; i++) {
@@ -308,6 +315,7 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 		}
 
 		this.canvasItems.unshift(...selection);
+		this.actionHistoryManager.recordRearrange(previous, this.canvasItems);
 	};
 
 	/* PRIVATE METHODS */
@@ -380,6 +388,9 @@ export default class SuperCanvasManager implements ISuperCanvasManager {
 						item.metadata.isLocked = true;
 					}
 				}
+				break;
+			case ActionType.SetArrangement:
+				this.canvasItems = action.data.canvasItems;
 				break;
 			case ActionType.UnlockCanvasItems:
 				const itemIdsToUnlock = new Set(action.data.canvasItems.map((x) => x.id));

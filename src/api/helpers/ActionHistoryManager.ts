@@ -9,6 +9,7 @@ export enum ActionType {
 	DeleteCanvasItems,
 	LockCanvasItems,
 	UnlockCanvasItems,
+	SetArrangement,
 }
 
 export interface CanvasItemsAction {
@@ -19,14 +20,23 @@ export interface TransformAction extends CanvasItemsAction {
 	transformOperation: TransformOperation;
 }
 
+interface CanvasItemChangeSetAction extends CanvasItemsAction {
+	previousCanvasItems: CanvasItemInstance[];
+}
+
+interface ActionRecordInternal {
+	type: ActionType;
+	data: TransformAction | CanvasItemsAction | CanvasItemChangeSetAction;
+}
+
 export interface ActionRecord {
 	type: ActionType;
 	data: TransformAction | CanvasItemsAction;
 }
 
 export default class ActionHistoryManager {
-	private actionHistory: ActionRecord[];
-	private redoHistory: ActionRecord[];
+	private actionHistory: ActionRecordInternal[];
+	private redoHistory: ActionRecordInternal[];
 	private historySize = 10;
 
 	constructor(historySize?: number) {
@@ -41,7 +51,7 @@ export default class ActionHistoryManager {
 		this.actionHistory.push({
 			type: ActionType.TransformCanvasItems,
 			data: {
-				canvasItems,
+				canvasItems: canvasItems.slice(),
 				transformOperation,
 			},
 		});
@@ -51,7 +61,7 @@ export default class ActionHistoryManager {
 	recordAddCanvasItems = (canvasItems: CanvasItemInstance[]): void => {
 		this.actionHistory.push({
 			type: ActionType.AddCanvasItems,
-			data: { canvasItems },
+			data: { canvasItems: canvasItems.slice() },
 		});
 		this.onAddActionRecord();
 	};
@@ -59,7 +69,7 @@ export default class ActionHistoryManager {
 	recordDeleteCanvasItems = (canvasItems: CanvasItemInstance[]): void => {
 		this.actionHistory.push({
 			type: ActionType.DeleteCanvasItems,
-			data: { canvasItems },
+			data: { canvasItems: canvasItems.slice() },
 		});
 		this.onAddActionRecord();
 	};
@@ -67,7 +77,7 @@ export default class ActionHistoryManager {
 	recordLockItems = (canvasItems: CanvasItemInstance[]): void => {
 		this.actionHistory.push({
 			type: ActionType.LockCanvasItems,
-			data: { canvasItems },
+			data: { canvasItems: canvasItems.slice() },
 		});
 		this.onAddActionRecord();
 	};
@@ -75,9 +85,19 @@ export default class ActionHistoryManager {
 	recordUnlockItems = (canvasItems: CanvasItemInstance[]): void => {
 		this.actionHistory.push({
 			type: ActionType.UnlockCanvasItems,
-			data: { canvasItems },
+			data: { canvasItems: canvasItems.slice() },
 		});
 		this.onAddActionRecord();
+	};
+
+	recordRearrange = (previousArrangement: CanvasItemInstance[], currentArrangement: CanvasItemInstance[]): void => {
+		this.actionHistory.push({
+			type: ActionType.SetArrangement,
+			data: {
+				previousCanvasItems: previousArrangement.slice(),
+				canvasItems: currentArrangement.slice(),
+			},
+		});
 	};
 
 	getNextUndoAction = (): ActionRecord => {
@@ -114,6 +134,16 @@ export default class ActionHistoryManager {
 			return {
 				type: ActionType.LockCanvasItems,
 				data: nextAction.data,
+			};
+		}
+
+		if (nextAction.type === ActionType.SetArrangement) {
+			const data = (nextAction.data as CanvasItemChangeSetAction);
+			return {
+				type: ActionType.SetArrangement,
+				data: {
+					canvasItems: data.previousCanvasItems,
+				},
 			};
 		}
 
