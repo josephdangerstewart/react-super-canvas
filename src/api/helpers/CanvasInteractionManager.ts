@@ -244,7 +244,7 @@ export default class CanvasInteractionManager {
 
 	private onScroll = (event: WheelEvent): void => {
 		if (this._keysDown.Shift && this.isMouseIn) {
-			this._scale += event.deltaY / 50;
+			this._scale += event.deltaY / 1300;
 			if (this._scale > SCALE_MAX) {
 				this._scale = SCALE_MAX;
 			} else if (this._scale < SCALE_MIN) {
