@@ -25,6 +25,7 @@ export default class PolygonCanvasItem implements ICanvasItem {
 		this.polygon = {
 			points,
 			fillColor: styleContext.fillColor,
+			fillImageUrl: styleContext.fillImageUrl,
 			strokeColor: styleContext.strokeColor,
 			rotation: rotation ?? 0,
 		};
